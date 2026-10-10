@@ -4,3 +4,12 @@ libraries/*/work
 libraries/*/work/*
 libraries/*/tools
 libraries/*/tools/*
+
+# Disassembly dumps — never commit
+*.asm
+
+# Build artifacts
+*.o
+*.nm
+functab.s
+libraries/*/source/*.library
