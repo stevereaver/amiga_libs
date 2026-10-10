@@ -94,4 +94,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `fastlayers_40.48.library` | Kneer/Abt 'FastLayers' layers.library accelerator reconstructed in C; ROM->RAM module relocation + internal-call rewrite + 5 SetFunction patches (cheap layer create, SMART->SIMPLE move/size) decoded; dead-flag and functab-shift quirks filed (AMIGALIBS-51) |
 | `mathffp_36.5.library` | C= FFP math library 36.5 (MC68343-derived firmware) reconstructed in C; all 16 vectors resolved, word-offset functab + packed RomTag preserved; 1,649,955 host differential cases with 0 mismatches vs bit-exact oracle; shipped quirks filed (AMIGALIBS-52) |
 | `xpkBLZW_3.3.library` | 'Bryan's turbo-charged LZW' XPK sublib reconstructed in C; 9-15-bit hash-chain LZW codec, byte-exact pack vs oracle + full unpack round-trips; hash-table-OOB and divu-divisor quirks filed (AMIGALIBS-53) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~92/1482 done) |
+| `explode_4.6.library` | 'Executable exploder' V4.6 decruncher+relocating loader reconstructed in C; LoadSeg hook install + inline-data Explode entry + tail-jump decoded; dead-end-alert and never-expunge quirks filed (AMIGALIBS-54) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~93/1482 done) |
