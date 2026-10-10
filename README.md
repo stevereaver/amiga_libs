@@ -96,4 +96,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkBLZW_3.3.library` | 'Bryan's turbo-charged LZW' XPK sublib reconstructed in C; 9-15-bit hash-chain LZW codec, byte-exact pack vs oracle + full unpack round-trips; hash-table-OOB and divu-divisor quirks filed (AMIGALIBS-53) |
 | `explode_4.6.library` | 'Executable exploder' V4.6 decruncher+relocating loader reconstructed in C; LoadSeg hook install + inline-data Explode entry + tail-jump decoded; dead-end-alert and never-expunge quirks filed (AMIGALIBS-54) |
 | `i2c_40.0.library` | Apollo I2C bus driver reconstructed in C; 9-clock bit-bang engine ($de0080/$de0081), CIAA-timed edges, I2CDELAY env init, packed error strings decoded; dead-status and in-code-hunk-buffer quirks filed (AMIGALIBS-55) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~94/1482 done) |
+| `bfbplayMED__1.0.library` | Teijo Kinnunen MED/OctaMED player wrapper reconstructed in C; tag-driven InitModule (file/handle/memory sources), medplayer.library vector map decoded; uninit-clamp and wild-free defects filed (AMIGALIBS-56) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~95/1482 done) |
