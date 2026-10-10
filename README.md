@@ -84,5 +84,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `reqattack_0.03.library` | ReqAttack requester-attack proxy reconstructed in C (SAS/C manual-init, WarpCore port+46 forwarding to intuition EasyRequest/BuildEasyRequest); double-Permit + decorative-RomTag defects filed (AMIGALIBS-42) |
 | `xpkFBR2_3.1.library` | Froehling 'FastByteRun' three-mode RLE XPK sublib reconstructed in C; 5676 host round-trips verified + windowed-scanner OOB-emit, tail-drop and unsafe-decoder defects filed (AMIGALIBS-43) |
 | `xpkILZR_1.5_000_.library` | Jose Reanu 'Incremental LZ-Renau' hash-chain LZSS XPK sublib reconstructed in C (absolute-position match tokens, dynamic position width); 3647 host round-trips verified + latent chain-overflow, dangling-PackFree and OOB-read defects filed (AMIGALIBS-44) |
+| `xpkrlen_1.1.library` | xpkRLEN 'Run Length' RLE XPK sublib reconstructed in C (two-hunk SAS/C copy+fixup init, long-address functab); 19701 host round-trips verified + unchecked-run-emit and boundless-decoder quirks filed (AMIGALIBS-45) |
 | `services_37.10.library` | Commodore nipc service registrar reconstructed in C; SvcControl entity sequence + SvcFormat RawDoFmt decoded; undocumented nipc LVOs + init-alert quirk filed (AMIGALIBS-38) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~83/1482 done) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~84/1482 done) |
