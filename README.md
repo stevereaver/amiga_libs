@@ -68,5 +68,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 |---------|-------|
 | `zlib_3.2.library` | Original StormC source recovered from Aminet; all 24 LVOs resolved in OKF |
 | `iffparse_40.1_WB3.1_.library` | Fully reconstructed in C, builds with m68k cross toolchain |
-| `version_*` (14 builds, WB1.1–45.5) | Fully reconstructed in C; quirks filed (buggy 1.1 Expunge, hidden FindSemaphore probe in 44+/45+) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order |
+| `version_*` (14 builds, WB1.1–45.5 + 47.2/47.3) | Fully reconstructed in C; quirks filed (buggy 1.1 Expunge, hidden FindSemaphore probe in 44+/45+, 47.x semantics reversion) |
+| `mathieeesingtrans_40.6_FPU_`, `mathieeedoubbas_40.6_{FPU,040}_`, `mathtrans_40.6_FPU_` | Martin Berndt 68881/82 rebuilds reconstructed in C+asm; FPU ops + FFP/IEEE converters verified |
+| `xpkFRLE_1.1.library` | XPK sublibrary reconstructed; encoder defects filed as Plane card |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~63/1482 done) |
