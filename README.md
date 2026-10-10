@@ -86,4 +86,4 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkILZR_1.5_000_.library` | Jose Reanu 'Incremental LZ-Renau' hash-chain LZSS XPK sublib reconstructed in C (absolute-position match tokens, dynamic position width); 3647 host round-trips verified + latent chain-overflow, dangling-PackFree and OOB-read defects filed (AMIGALIBS-44) |
 | `xpkrlen_1.1.library` | xpkRLEN 'Run Length' RLE XPK sublib reconstructed in C (two-hunk SAS/C copy+fixup init, long-address functab); 19701 host round-trips verified + unchecked-run-emit and boundless-decoder quirks filed (AMIGALIBS-45) |
 | `services_37.10.library` | Commodore nipc service registrar reconstructed in C; SvcControl entity sequence + SvcFormat RawDoFmt decoded; undocumented nipc LVOs + init-alert quirk filed (AMIGALIBS-38) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~86/1482 done) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~87/1482 done) |
