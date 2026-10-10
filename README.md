@@ -92,4 +92,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `shutdown_2.3.library` | Shutdown-hook registry reconstructed in C (semaphore-guarded callback list, dos+utility per context); Register/Unregister/FireShutdown decoded; SAS/C manual-init far-data functional equivalent |
 | `xpkDMCB_1.1.library` | Froehling 'Dynamic Markov Compression' DMC arithmetic-coding XPK sublib reconstructed in C (68020+68881-gated, 2MB state-cloning Markov model); 3866 host round-trips verified + unreachable-clone and bound quirks filed (AMIGALIBS-50) |
 | `fastlayers_40.48.library` | Kneer/Abt 'FastLayers' layers.library accelerator reconstructed in C; ROM->RAM module relocation + internal-call rewrite + 5 SetFunction patches (cheap layer create, SMART->SIMPLE move/size) decoded; dead-flag and functab-shift quirks filed (AMIGALIBS-51) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~90/1482 done) |
+| `mathffp_36.5.library` | C= FFP math library 36.5 (MC68343-derived firmware) reconstructed in C; all 16 vectors resolved, word-offset functab + packed RomTag preserved; 1,649,955 host differential cases with 0 mismatches vs bit-exact oracle; shipped quirks filed (AMIGALIBS-52) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~91/1482 done) |
