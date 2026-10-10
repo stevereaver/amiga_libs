@@ -74,4 +74,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkFRLE_1.1.library`, `xpkCBR0_1.1.library`, `xpkDLTA_0.1.library`, `xpkFRLE_1.2_000_.library`, `xpkRLEN_1.3.library`, `xpkLHLB_1.1.library`, `xpkFRLE_1.0.library` | XPK sublibraries reconstructed in C; codec round-trips host-verified; encoder defects filed as Plane cards |
 | `mathieeedoubtrans_40.6_FPU_.library` | Martin Berndt 68881/82 double-precision transcendentals reconstructed; vector region byte-identical |
 | `ghostrider_37.2.library` | Hotkey input-handler library reconstructed in C; launcher dispatch protocol + IND_ADDHANDLER semantics decoded; quirks filed (unrelocated ln_Name, dead DELEXP close, caller-supplied VBR) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~72/1482 done) |
+| `patchtest_1.00.library` | SAS/C test lib reconstructed in C; per-open runtime decoded (OpenLibrary/DisplayBeep semantics) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~73/1482 done) |
