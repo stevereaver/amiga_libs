@@ -95,4 +95,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `mathffp_36.5.library` | C= FFP math library 36.5 (MC68343-derived firmware) reconstructed in C; all 16 vectors resolved, word-offset functab + packed RomTag preserved; 1,649,955 host differential cases with 0 mismatches vs bit-exact oracle; shipped quirks filed (AMIGALIBS-52) |
 | `xpkBLZW_3.3.library` | 'Bryan's turbo-charged LZW' XPK sublib reconstructed in C; 9-15-bit hash-chain LZW codec, byte-exact pack vs oracle + full unpack round-trips; hash-table-OOB and divu-divisor quirks filed (AMIGALIBS-53) |
 | `explode_4.6.library` | 'Executable exploder' V4.6 decruncher+relocating loader reconstructed in C; LoadSeg hook install + inline-data Explode entry + tail-jump decoded; dead-end-alert and never-expunge quirks filed (AMIGALIBS-54) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~93/1482 done) |
+| `i2c_40.0.library` | Apollo I2C bus driver reconstructed in C; 9-clock bit-bang engine ($de0080/$de0081), CIAA-timed edges, I2CDELAY env init, packed error strings decoded; dead-status and in-code-hunk-buffer quirks filed (AMIGALIBS-55) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~94/1482 done) |
