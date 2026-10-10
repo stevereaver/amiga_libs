@@ -1,0 +1,11 @@
+##base _MC680X0Base
+##basetype struct MC680X0Base *
+##libname 680x0.library
+##bias 30
+##public
+##include <libraries/680x0.h>
+char CPUType()()
+char FPUType()()
+char MMUType()()
+ULONG SetFPUExceptions(ULONG flags,ULONG mask)(d0,d1)
+##end
