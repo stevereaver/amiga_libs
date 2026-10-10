@@ -76,4 +76,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `ghostrider_37.2.library` | Hotkey input-handler library reconstructed in C; launcher dispatch protocol + IND_ADDHANDLER semantics decoded; quirks filed (unrelocated ln_Name, dead DELEXP close, caller-supplied VBR) |
 | `patchtest_1.00.library` | SAS/C test lib reconstructed in C; per-open runtime decoded (OpenLibrary/DisplayBeep semantics) |
 | `amigaflight_1.2.library` | AmigaFlight BETA debugger console I/O toolkit reconstructed in C+asm; hex-parse/format vectors + EnterAddress prompt decoded; dead duplicate routine + quirks filed (AMIGALIBS-35) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~74/1482 done) |
+| `xpkSLZ3_1.3_000_.library` | Froehling fastLZ-family LZSS XPK sublib reconstructed in C (64K hash + 4K chain workmem); codec round-trips host-verified; PackReset underflow + quirks filed (AMIGALIBS-36) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~75/1482 done) |
