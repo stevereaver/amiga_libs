@@ -1,0 +1,12 @@
+---
+type: Log
+title: Work Log
+description: Chronological journal of analysis sessions. Newest first.
+---
+
+# Log
+
+## 2026-10-10
+- Binary is byte-identical to asdg-low-mem_0.0.library (same sha256).
+  Reused that reconstruction's sources; `make` produces a valid
+  library.  Populated okf/ (shared findings).
