@@ -1,0 +1,320 @@
+TABLE OF CONTENTS
+
+zlib.library/GZ_Open
+zlib.library/GZ_OpenFromFH
+zlib.library/GZ_Close
+zlib.library/GZ_Read
+zlib.library/GZ_FGetS
+zlib.library/GZ_FGetC
+zlib.library/GZ_Write
+zlib.library/GZ_CompressMem
+zlib.library/GZ_DecompressMem
+zlib.library/GZ_FileLength
+
+Documentation of library functions:
+
+General note:
+This library can be used from plain 68k-systems as well as from Amigas with PowerPC under WarpOS !
+The 68k-functions have a "GZ_" prefix in front of the function name, while the PPC-functions have
+a "PPCGZ_"-prefix.
+
+Please ONLY use the 68k functions under a 68k context and the PPC-functions under PPC !!
+Do not mix them up, e.g. using 68k-functions under PPC or you might get into trouble !
+
+zlib.library/GZ_Open
+
+	NAME
+	GZ_Open -- Open a file for compression or decompression. (V1.0)
+
+	SYNOPSIS
+	handle =    GZ_Open(filename, openmode, strategy, level);
+	  D0                  A0        D0        D1        D2
+
+	handle = PPCGZ_Open(ZLibBase, filename, openmode, strategy, level);
+	  r3                  r3        r4        r5        r6        r7
+
+	APTR    GZ_Open(char *,ULONG,ULONG,ULONG)
+	APTR PPCGZ_Open(struct Library *,char *,ULONG,ULONG,ULONG)
+
+	FUNCTION
+	This opens a file for compression or uncompression.
+
+	To open a compressed file for uncompression, use the DOS symbol MODE_OLDFILE.
+	To open a file for compression, use the DOS symbol MODE_WRITEFILE.
+
+	If you open a file for compression, you need to supply the compression strategy
+	and the compression level. Otherwise use "0" for strategy and level for decompression.
+
+	Strategy symbols:
+	Zlib supports three kinds of compression:
+	GZ_STRATEGY_DEFAULT
+	GZ_STRATEGY_FILTERED
+	GZ_STRATEGY_HUFFMAN
+
+	Compression level:
+	Zlib knows 10 compression levels (0 to 9). The higher the level, the better the compression
+	ratio, but the slower the compression speed.
+	The following symbols describe the most common levels.
+	GZ_COMPRESS_NO
+	GZ_COMPRESS_FASTEST
+	GZ_COMPRESS_DEFAULT
+	GZ_COMPRESS_BEST
+
+	EXAMPLE:
+
+	APTR handle;
+	handle=GZ_Open("test.gz",MODE_OLDFILE,0,0);
+
+	or
+
+	handle=PPCGZ_Open("test.gz",MODE_NEWFILE,GZ_STRATEGY_DEFAULT,GZ_COMPRESS_BEST);
+
+	SEE ALSO
+	GZ_OpenFromFH, GZ_Close
+
+
+zlib.library/GZ_Close
+
+	NAME
+	GZ_Close -- Closes a file. (V1.0)
+
+	SYNOPSIS
+	error =   GZ_Close(handle)
+	  D0                 A0
+
+	error = PPCGZ_Close(ZLibBase, handle)
+	  r3                 r3         r4
+
+
+	APTR    GZ_Close(APTR)
+	APTR PPCGZ_Close(APTR)
+
+	FUNCTION
+	This closes a file opened with GZ_Open or GZ_OpenFromFH
+
+	INPUTS
+	handle: the handle returned by the open-functions.
+
+	SEE ALSO
+	GZ_Open, GZ_OpenFromFH
+
+
+zlib.library/GZ_Read
+
+	NAME
+	GZ_Read -- Read some bytes from a zlib-stream. (V1.0)
+
+	SYNOPSIS
+	len =    GZ_Read(handle,buf,len)
+	D0                A0    A1  D0
+
+	len = PPCGZ_Read(ZLibBase, handle,buf,len)
+	r3                r3         r4   r5  r6
+
+
+	long    GZ_Read(APTR,APTR,ULONG)
+	long PPCGZ_Read(struct Library *,APTR,APTR,ULONG)
+
+	FUNCTION
+	This decompresses the supplied number of bytes to memory.
+
+	INPUTS
+	handle: the handle returned by the open-functions.
+	buf:    the memory buffer to store the decompressed bytes.
+	len:    the number of bytes to decompress.
+
+	RESULT
+	len: the actual number of bytes decompressed.
+	     len == 0 indicates the end of the file.
+        len  < 0 indicates an error.
+
+	SEE ALSO
+	dos.library/Read
+
+
+zlib.library/GZ_FGetC
+
+	NAME
+	GZ_FGetC -- Read a single byte from a zlib-stream. (V1.0)
+
+	SYNOPSIS
+	byte =    GZ_FGetC(handle)
+	 D0                 A0
+
+	byte = PPCGZ_FGetS(ZLibBase, handle)
+	 r3                 r3         r4
+
+
+	long    GZ_FGetS(APTR)
+	long PPCGZ_FGetS(struct Library *,APTR)
+
+	FUNCTION
+	This reads a single byte from a zlib-stream.
+
+	INPUTS
+	handle: the handle returned by the open-functions.
+
+	RESULT
+	byte: the byte read (0 - 255). A value < 0 indicates an error.
+
+	SEE ALSO
+	dos.library/FGetC
+
+
+zlib.library/GZ_FGetS
+
+	NAME
+	GZ_FGetS -- Read a string a zlib-stream. (V1.0)
+
+	SYNOPSIS
+	str =    GZ_FGetS(handle,buf,len)
+	D0                 A0    A1  D0
+
+	str = PPCGZ_FGetS(ZLibBase,handle,buf,len)
+	r3                 r3       r4    r5  r6
+
+
+	char *   GZ_FGetS(APTR,char *,ULONG)
+	char *PPCGZ_FGetS(struct Library *,APTR,char *,ULONG)
+
+	FUNCTION
+	This reads a string from a zlib-stream to memory.
+	The functions stops reading in case of a '\n', '\0' byte read or error.
+
+	INPUTS
+	handle: the handle returned by the open-functions.
+	buf:    the memory buffer to store the string.
+	len:    the length of the memory buffer
+
+	RESULT
+	str: returns the string buffer or "0" in case of an error.
+
+	SEE ALSO
+	dos.library/FGetS
+
+
+zlib.library/GZ_Write
+
+	NAME
+	GZ_Write -- Writes some bytes to a zlib-stream. (V1.0)
+
+	SYNOPSIS
+	len =    GZ_Write(handle,buf,len)
+	D0                 A0    A1  D0
+
+	len = PPCGZ_Write(ZLibBase,handle,buf,len)
+   r3                 r3        r4   r5  r6
+
+
+	long    GZ_Write(APTR,APTR,ULONG)
+	long PPCGZ_Write(struct Library *,APTR,APTR,ULONG)
+
+	FUNCTION
+	This compresses the supplied number of bytes given in memory to the zlib-stream.
+
+	INPUTS
+	handle: the handle returned by the open-functions.
+	buf:    the memory buffer to compress from.
+	len:    the number of bytes to compress.
+
+	RESULT
+	len: the actual number of bytes written.
+        len  < 0 indicates an error.
+
+	SEE ALSO
+	dos.library/Write
+
+
+zlib.library/GZ_CompressMem
+
+	NAME
+	GZ_CompressMem -- Compresses a piece of memory to another memory-array. (V2.0)
+
+	SYNOPSIS
+	error =    GZ_CompressMem(srcbuf, srclen, destbuf, destlen, strategy, level, poutlen);
+	  D0                        A0        D0      A1        D1     D2       D3      A2
+
+	error = PPCGZ_CompressMem(ZLibBase,srcbuf, srclen, destbuf, destlen, strategy, level, poutlen);
+	  r3                         r3        r4     r5        r6     r7       r8       r9      r10
+
+	LONG    GZ_Compress(APTR,ULONG,APTR,ULONG,ULONG,ULONG,ULONG *)
+	LONG PPCGZ_Compress(struct Library *,APTR,ULONG,APTR,ULONG,ULONG,ULONG,ULONG *)
+
+	FUNCTION
+	This compresses a memory array to another memory array.
+
+	Please take care, that the destination buffer is large enough to hold the compressed data.
+	Usually you should alloc at least destlen+destlen/1000+12 bytes.
+
+	INPUTS
+	srcbuf - Pointer of the source buffer.
+	srclen - Number of bytes to compress.
+	destbuf - The pointer of the destination buffer to hold the compressed data.
+	destlen - The length of the destination buffer.
+	poutlen - Pointer to a ULONG-variable that holds the number of compressed bytes.
+	          You may pass a NULL-pointer.
+
+	Strategy symbols and compression level see GZ_Open
+
+	RESULT
+	Returns a value != 0 in case of error.
+
+	SEE ALSO
+	GZ_DecompressMem
+
+
+zlib.library/GZ_DecompressMem
+
+	NAME
+	GZ_DecompressMem -- Decompresses a piece of memory to another memory-array. (V2.0)
+
+	SYNOPSIS
+	error =    GZ_DecompressMem(srcbuf, srclen, destbuf, destlen);
+	  D0                        A0        D0      A1        D1
+
+	error = PPCGZ_DecompressMem(ZLibBase,srcbuf, srclen, destbuf, destlen);
+	  r3                           r3        r4     r5        r6     r7
+
+	LONG    GZ_DecompressMem(APTR,ULONG,APTR,ULONG)
+	LONG PPCGZ_DecompressMem(struct Library *,APTR,ULONG,APTR,ULONG)
+
+	FUNCTION
+	This decompresses a memory array to another memory array.
+
+	Please take care, that the destination buffer is large enough to hold the decompressed data !
+
+	INPUTS
+	srcbuf - Pointer of the source buffer.
+	srclen - Number of bytes to decompress.
+	destbuf - The pointer of the destination buffer to hold the decompressed data.
+	destlen - The length of the destination buffer.
+
+	RESULT
+	Returns a value != 0 in case of error.
+
+	SEE ALSO
+	GZ_CompressMem
+
+
+zlib.library/GZ_FileLength
+
+	NAME
+	GZ_FileLength -- Reads the uncompressed length of a compressed file. (V3.0)
+
+	SYNOPSIS
+	len =    GZ_FileLength(handle);
+	 D0                    A0
+
+	len = PPCGZ_FileLength(ZLibBase, handle);
+	 r3                    r3        r4
+
+	ULONG    GZ_FileLength(APTR)
+	ULONG PPCGZ_FileLength(struct Library *,APTR)
+
+	FUNCTION
+	The function reads the uncompressed length of a compressed file.
+	No error checking is done.
+
+	It is recommended to use this function directly after you have opened a gzip stream.
+	This function can be useful for progress reports.
+

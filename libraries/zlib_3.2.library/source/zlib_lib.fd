@@ -1,0 +1,32 @@
+* "zlib.library"
+##base _ZLibBase
+##bias 30
+##public
+GZ_Open(filename,openmode,strategy,level)(a0,d0/d1/d2)
+GZ_OpenFromFH(fh,openmode,strategy,level)(a0,d0/d1/d2)
+GZ_Close(handle)(a0)
+GZ_Read(handle,buf,len)(a0/a1,d0)
+GZ_FGetS(handle,buf,len)(a0/a1,d0)
+GZ_FGetC(handle)(a0)
+GZ_Write(handle,buf,len)(a0/a1,d0)
+##private
+PPCGZ_Open()()
+PPCGZ_OpenFromFH()()
+PPCGZ_Close()()
+PPCGZ_Read()()
+PPCGZ_FGetS()()
+PPCGZ_FGetC()()
+PPCGZ_Write()()
+##public
+*--- V2.0 ---
+GZ_CompressMem(srcbuf,srclen,destbuf,destlen,strategy,level,poutlen)(a0,d0/a1,d1/d2/d3/a2)
+GZ_DecompressMem(srcbuf,srclen,destbuf,destlen)(a0,d0/a1,d1)
+##private
+PPCGZ_CompressMem()()
+PPCGZ_DecompressMem()()
+##public
+*--- V3.0 ---
+GZ_FileLength(handle)(a0)
+##private
+PPCGZ_FileLength()()
+##end

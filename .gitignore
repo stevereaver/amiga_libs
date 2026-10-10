@@ -1,0 +1,6 @@
+libraries/*/binary
+libraries/*/binary/*
+libraries/*/work
+libraries/*/work/*
+libraries/*/tools
+libraries/*/tools/*
