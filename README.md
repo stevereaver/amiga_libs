@@ -78,4 +78,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `amigaflight_1.2.library` | AmigaFlight BETA debugger console I/O toolkit reconstructed in C+asm; hex-parse/format vectors + EnterAddress prompt decoded; dead duplicate routine + quirks filed (AMIGALIBS-35) |
 | `xpkSLZ3_1.3_000_.library` | Froehling fastLZ-family LZSS XPK sublib reconstructed in C (64K hash + 4K chain workmem); codec round-trips host-verified; PackReset underflow + quirks filed (AMIGALIBS-36) |
 | `xpkLZW3_3.3_020_.library` | Froehling 'LZ-Welsh' greedy-LZ XPK sublib reconstructed in C (512KB hash+chain workmem); codec round-trips verified; PackReset-wipes-alloc-size 512KB leak + 020+ quirks filed (AMIGALIBS-37) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~76/1482 done) |
+| `services_37.10.library` | Commodore nipc service registrar reconstructed in C; SvcControl entity sequence + SvcFormat RawDoFmt decoded; undocumented nipc LVOs + init-alert quirk filed (AMIGALIBS-38) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~77/1482 done) |
