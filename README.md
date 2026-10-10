@@ -81,5 +81,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkFBR2_4.1_000_.library` | Froehling 'FastBytesRunner' multi-mode RLE XPK sublib reconstructed in C; round-trips verified + shipped tag-90/expect-100 ByteByte decode-break defect filed (AMIGALIBS-40) |
 | `xpkCBR0_1.0.library` | Bilbo 'Cmp Byte Run 0' XPK sublib reconstructed in C; literal/run RLE verified (~42k round-trips); LIBF_SUMMING-as-DELEXP flag quirk + OOB peek filed (AMIGALIBS-39) |
 | `xpkLZW2_2.3_000_.library` | Froehling 'LZ-Welsh' V2.3 greedy-LZ XPK sublib reconstructed in C (320KB hash+chain workmem, lazy-insert); round-trips verified; 5KB PackReset underflow -> 320KB PackFree leak + quirks filed (AMIGALIBS-41) |
+| `reqattack_0.03.library` | ReqAttack requester-attack proxy reconstructed in C (SAS/C manual-init, WarpCore port+46 forwarding to intuition EasyRequest/BuildEasyRequest); double-Permit + decorative-RomTag defects filed (AMIGALIBS-42) |
 | `services_37.10.library` | Commodore nipc service registrar reconstructed in C; SvcControl entity sequence + SvcFormat RawDoFmt decoded; undocumented nipc LVOs + init-alert quirk filed (AMIGALIBS-38) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~80/1482 done) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~81/1482 done) |
