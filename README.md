@@ -90,4 +90,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `mcpsupport2_5.2.library` | ALiENDESiGN MCP support lib reconstructed in C; file-loader, CLI-name getters and recursive AmigaDOS wildcard matcher (21 host cases pass); version-mismatch + expunge-leak defects filed (AMIGALIBS-47) |
 | `warpHW_1.0.library` | WarpUp BlizzardPPC hardware driver reconstructed in C+asm; register-poke sequences + embedded PPC blob byte-faithful; functional-equivalent (SAS/C 3-hunk far-data) noted (AMIGALIBS-48) |
 | `shutdown_2.3.library` | Shutdown-hook registry reconstructed in C (semaphore-guarded callback list, dos+utility per context); Register/Unregister/FireShutdown decoded; SAS/C manual-init far-data functional equivalent |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~88/1482 done) |
+| `xpkDMCB_1.1.library` | Froehling 'Dynamic Markov Compression' DMC arithmetic-coding XPK sublib reconstructed in C (68020+68881-gated, 2MB state-cloning Markov model); 3866 host round-trips verified + unreachable-clone and bound quirks filed (AMIGALIBS-50) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~89/1482 done) |
