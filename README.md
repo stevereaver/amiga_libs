@@ -105,4 +105,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `rexxapp (Jan 91)` | ARexx application-host interface lib ("dissidents Jan 91") reconstructed in C — old-style non-AUTOINIT layout, A5-carried context, 3 distinct callback ABIs; fold-boundary + result-clobber quirks filed (AMIGALIBS-62) |
 | `Ted_1.0.library` | Shared-state/method-dispatch shim reconstructed in C — 20 LONG vectors over code-hunk globals + context method calls (AMIGALIBS-63) |
 | `cachefile_1.67.library` | Ralph Schmidt disk-file cache + embedded CacheFile_Notify daemon (CreateNewProc into own hunk) reconstructed in C — 11 vectors resolved; dead-expunge, nested-sem-deadlock and V39-only-LVO defects filed (AMIGALIBS-64) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~102/1482 done) |
+| `xpkLZW5_5.3_020_.library` | Froehling 'LZ-Speeder' tiered-token LZ XPK sublib reconstructed in C (2-bit flags: short/med/long tiers, 16 items/long, mode/34 lazy budget); byte-exact encoder vs independent model + ~90KB PackReset heap-clobber and self-corrupting tier-boundary tokens filed (AMIGALIBS-65) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~103/1482 done) |
