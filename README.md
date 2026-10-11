@@ -103,4 +103,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `epu1.library` | 'Easy Pack Utility' lh.library front end reconstructed in C; EpuPack/EpuUnpack ctx+block plumbing, AutoRequest RETRY/CANCEL retry dialogs decoded; stale-chain, upside-down-dialog and a0-Remove quirks filed (AMIGALIBS-60) |
 | `xpkSMPL_1.1.library` | Froehling dynamic-Huffman + delta-precoding XPK sublib reconstructed in C (binary trie + 10-bit fast table, byte-sized bitspace accounting); byte-exact stream verification + critical len-0 accumulator-wipe desync defect filed — streams only valid when all 256 deltas occur (AMIGALIBS-61) |
 | `rexxapp (Jan 91)` | ARexx application-host interface lib ("dissidents Jan 91") reconstructed in C — old-style non-AUTOINIT layout, A5-carried context, 3 distinct callback ABIs; fold-boundary + result-clobber quirks filed (AMIGALIBS-62) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~100/1482 done) |
+| `Ted_1.0.library` | Shared-state/method-dispatch shim reconstructed in C — 20 LONG vectors over code-hunk globals + context method calls (AMIGALIBS-63) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~101/1482 done) |

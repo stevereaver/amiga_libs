@@ -63,22 +63,22 @@ _functab:
 	.long	_close			| -12
 	.long	_expunge		| -18
 	.long	_reserved		| -24
-	.long	_setg1			| -30  g1 = a0
-	.long	_setg2			| -36  g2 = a0
-	.long	_getg1			| -42  d0 = *g1 (long)
-	.long	_getg2w			| -48  d0 = *g2 (uword)
-	.long	_setg3			| -54  g3 = a0
-	.long	_getg3			| -60  d0 = g3
-	.long	_callg3m12		| -66  jmp *(g3+12)
-	.long	_setg4			| -72  g4 = a0
-	.long	_setg5			| -78  g5 = a0
-	.long	_getg4			| -84  d0 = *g4
-	.long	_getg5			| -90  d0 = *g5
-	.long	_callg3m100		| -96  d0 = buf after jsr *(g3+100)(a1=buf)
-	.long	_strg3p104		| -102 d0 = buf = strcpy(*(g3+104))
-	.long	_strg3p108		| -108 d0 = buf = strcpy(*(g3+108))
-	.long	_getg3p112m2		| -114 d0 = *(*(g3+112)-2)
-	.long	_getg3p116m2		| -120 d0 = *(*(g3+116)-2)
+	.long	_ted_setg1			| -30  g1 = a0
+	.long	_ted_setg2			| -36  g2 = a0
+	.long	_ted_getg1			| -42  d0 = *g1 (long)
+	.long	_ted_getg2w			| -48  d0 = *g2 (uword)
+	.long	_ted_setg3			| -54  g3 = a0
+	.long	_ted_getg3			| -60  d0 = g3
+	.long	_ted_callg3m12		| -66  jmp *(g3+12)
+	.long	_ted_setg4			| -72  g4 = a0
+	.long	_ted_setg5			| -78  g5 = a0
+	.long	_ted_getg4			| -84  d0 = *g4
+	.long	_ted_getg5			| -90  d0 = *g5
+	.long	_ted_callg3m100		| -96  d0 = buf after jsr *(g3+100)(a1=buf)
+	.long	_ted_strg3p104		| -102 d0 = buf = strcpy(*(g3+104))
+	.long	_ted_strg3p108		| -108 d0 = buf = strcpy(*(g3+108))
+	.long	_ted_getg3p112m2		| -114 d0 = *(*(g3+112)-2)
+	.long	_ted_getg3p116m2		| -120 d0 = *(*(g3+116)-2)
 	.long	-1
 
 | InitStruct data (exec/initializers.i 16-bit-offset form):
@@ -96,6 +96,7 @@ _datatab:
 	.byte	0x80,0x18		| INITLONG @0x18
 	.long	_idstr			|   lib_IdString
 	.word	0			| end
+	.word	0			| pad (shipped: 2 zero words)
 
 | initFunc (d0=base, a0=seglist, a6=sysbase): store pointers,
 | open dos.library v0 -> base+40, always return the base.
@@ -159,113 +160,8 @@ _reserved:
 	moveq	#0,d0
 	rts
 
-| -30/-36/-54/-72/-78: store a0 in a code-hunk global
-_setg1:
-	movel	a0,_g1
-	rts
-_setg2:
-	movel	a0,_g2
-	rts
-_setg3:
-	movel	a0,_g3
-	rts
-_setg4:
-	movel	a0,_g4
-	rts
-_setg5:
-	movel	a0,_g5
-	rts
-
-| -42: d0 = *g1 (long)
-_getg1:
-	moveal	_g1,a0
-	movel	a0@,d0
-	rts
-
-| -48: d0 = *g2 (uword, zero-extended)
-_getg2w:
-	moveal	_g2,a0
-	moveq	#0,d0
-	movew	a0@,d0
-	rts
-
-| -60: d0 = g3 (the pointer itself)
-_getg3:
-	movel	_g3,d0
-	rts
-
-| -66: tail-call the function pointer at g3+12
-_callg3m12:
-	moveal	_g3,a1
-	lea	12(a1),a1
-	moveal	(a1),a1
-	jmp	(a1)
-
-| -84/-90: d0 = *g4 / *g5 (long)
-_getg4:
-	moveal	_g4,a0
-	movel	a0@,d0
-	rts
-_getg5:
-	moveal	_g5,a0
-	movel	a0@,d0
-	rts
-
-| -96: call *(g3+100) with a1 = scratch buffer; returns &buffer.
-| Saves/restores every register except d0/d1/a0/a1.
-_callg3m100:
-	moveml	d2-d7/a2-a5,-(sp)
-	moveal	_g3,a2
-	lea	100(a2),a2
-	moveal	(a2),a2
-	lea	_buf(pc),a1
-	jsr	(a2)
-	moveml	(sp)+,d2-d7/a2-a5
-	movel	#_buf,d0
-	rts
-
-| -102: copy the string at *(g3+104) into the scratch buffer,
-| returns &buffer.
-_strg3p104:
-	movel	a2,-(sp)
-	moveal	_g3,a1
-	lea	104(a1),a1
-	moveal	(a1)+,a0
-	lea	_buf(pc),a2
-1:	moveb	(a0)+,(a2)+
-	bne	1b
-	moveal	(sp)+,a2
-	movel	#_buf,d0
-	rts
-
-| -108: same for *(g3+108)
-_strg3p108:
-	movel	a2,-(sp)
-	moveal	_g3,a1
-	lea	108(a1),a1
-	moveal	(a1)+,a0
-	lea	_buf(pc),a2
-1:	moveb	(a0)+,(a2)+
-	bne	1b
-	moveal	(sp)+,a2
-	movel	#_buf,d0
-	rts
-
-| -114: d0 = longword at (*(g3+112))-2
-_getg3p112m2:
-	moveal	_g3,a1
-	moveal	112(a1),a1
-	movel	a1@(-2),d0
-	rts
-
-| -120: d0 = longword at (*(g3+116))-2
-_getg3p116m2:
-	moveal	_g3,a1
-	moveal	116(a1),a1
-	movel	a1@(-2),d0
-	rts
-
 | code-hunk globals (absolute-addressed like the original)
+	.globl	_g1,_g2,_g3,_g4,_g5,_buf
 _g1:	.long	0
 _g2:	.long	0
 _g3:	.long	0

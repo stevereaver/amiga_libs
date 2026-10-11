@@ -1,21 +1,20 @@
-# Makefile for ted.library 1.0 reconstruction
-#
-# Single-code-hunk module, all assembly (code-hunk globals are
-# addressed absolutely, as in the shipped binary).  Single pass.
-
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 ASFLAGS = -m68000
+CFLAGS  = -m68000 -O2 -nostdlib -nostartfiles -fno-builtin
 LDFLAGS = -nostdlib -nostartfiles
 
 TARGET  = ted.library
 
 all: $(TARGET)
 
-$(TARGET): ted_lib.o
-	$(CC) $(LDFLAGS) -o $@ ted_lib.o
+$(TARGET): ted_lib.o ted.o
+	$(CC) $(LDFLAGS) -o $@ ted_lib.o ted.o
 
 ted_lib.o: ted_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ ted_lib.s
+
+ted.o: ted.c
+	$(CC) $(CFLAGS) -c -o $@ ted.c
 
 clean:
 	rm -f *.o $(TARGET)
