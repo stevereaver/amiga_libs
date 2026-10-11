@@ -97,4 +97,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `explode_4.6.library` | 'Executable exploder' V4.6 decruncher+relocating loader reconstructed in C; LoadSeg hook install + inline-data Explode entry + tail-jump decoded; dead-end-alert and never-expunge quirks filed (AMIGALIBS-54) |
 | `i2c_40.0.library` | Apollo I2C bus driver reconstructed in C; 9-clock bit-bang engine ($de0080/$de0081), CIAA-timed edges, I2CDELAY env init, packed error strings decoded; dead-status and in-code-hunk-buffer quirks filed (AMIGALIBS-55) |
 | `bfbplayMED__1.0.library` | Teijo Kinnunen MED/OctaMED player wrapper reconstructed in C; tag-driven InitModule (file/handle/memory sources), medplayer.library vector map decoded; uninit-clamp and wild-free defects filed (AMIGALIBS-56) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~95/1482 done) |
+| `xpkSLZ3_1.1.library` | Froehling 'SpeedLZ' LZ77 XPK sublib reconstructed in C (256KB 2-byte-context LRU match table, 12-bit-off/4-bit-len tokens); 2000 host round-trips verified + seglist-store, packmem-descriptor and null-vector quirks filed (AMIGALIBS-57) |
+| all genfunctab-based reconstructions (43 libs) | Systematic functab defect repaired: undersized two-pass stubs + RELRELOC16 inline diffs had placed every vector offset inside mid-function code; all stubs resized, mathffp converted to two-pass, every vector re-verified against linked symbols (AMIGALIBS-58) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~96/1482 done) |
