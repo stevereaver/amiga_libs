@@ -4,9 +4,7 @@
 |||	final .text address is known; genfunctab.py then emits
 |||	functab.s with the real word offsets.
 |||
-|||	12 words: marker(-1) + 10 entries + terminator(-1) = 0x18.
-|||	(The extra trailing -1 pad word in the original lives at
-|||	the top of datatab.s.)
+|||	12 words: marker(-1) + 10 entries + terminator(-1).
 |||
 
 	.section .text

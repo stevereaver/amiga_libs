@@ -22,9 +22,6 @@ functab.s: dummy.library genfunctab.py
 	$(NM) dummy.library > dummy.nm
 	python3 genfunctab.py dummy.nm > $@
 
-functab_stub.s:
-	printf '\t.section .text\n\t.globl _functab\n_functab:\n\t.word -1\n\t.word -1\n' > $@
-
 functab_stub.o: functab_stub.s
 	$(CC) $(ASFLAGS) -c -o $@ functab_stub.s
 
@@ -44,6 +41,6 @@ $(TARGET): xpkBLZW_lib.o functab.o xpkBLZW.o endmodule.o
 	$(CC) $(LDFLAGS) -o $@ xpkBLZW_lib.o functab.o xpkBLZW.o endmodule.o
 
 clean:
-	rm -f *.o *.nm *.library functab.s functab_stub.s
+	rm -f *.o *.nm *.library functab.s
 
 .PHONY: all clean

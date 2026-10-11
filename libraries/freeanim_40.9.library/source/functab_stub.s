@@ -4,7 +4,7 @@
 |||	final .text address is known; genfunctab.py then emits
 |||	functab.s with the real word offsets.
 |||
-|||	6 words: marker(-1) + 4 entries + terminator(-1) = 0x0c.
+|||	6 words: marker(-1) + 4 entries + terminator(-1).
 |||
 
 	.section .text

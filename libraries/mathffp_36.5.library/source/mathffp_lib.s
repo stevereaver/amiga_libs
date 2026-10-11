@@ -40,6 +40,7 @@ _datatab:
 	.long	_idstr2
 	.word	0x0000			| end
 
+	.globl	_initfn
 _initfn:
 	rts				| no per-base init
 
@@ -47,6 +48,7 @@ _initfn:
 | LVO -18  Expunge: if opencnt -> set DELEXP, ret 0.  Else unlink node,
 | FreeMem(base-negsize, negsize+possize).  (No seglist returned: quirk
 | of the ROM-era original.)
+	.globl	_LibExpunge
 _LibExpunge:
 	tst.w	32(a6)			| lib_OpenCnt
 	bnes	1f
@@ -71,6 +73,7 @@ _LibExpunge:
 	rts
 
 | LVO -6   Open: DELEXP set -> -1; else opencnt++, return base
+	.globl	_LibOpen
 _LibOpen:
 	btst	#3,14(a6)
 	bnes	2f
@@ -82,6 +85,7 @@ _LibOpen:
 
 | LVO -12  Close: opencnt--; if zero ret 0 (NO auto-expunge — quirk);
 | if nonzero and DELEXP, expunge attempt (Expunge re-sets flag). 
+	.globl	_LibClose
 _LibClose:
 	subq.w	#1,32(a6)
 	beqs	3f
@@ -91,24 +95,6 @@ _LibClose:
 3:	moveq	#0,d0
 	rts
 
-_functab:
-	.word	-1			| word-offset table marker
-	.word	_LibOpen-_functab	| -6
-	.word	_LibClose-_functab	| -12
-	.word	_LibExpunge-_functab	| -18
-	.word	_initfn-_functab	| -24 ExtFunc → bare rts (returns garbage d0)
-	.word	_SPFix-_functab		| -30
-	.word	_SPFlt-_functab		| -36
-	.word	_SPCmp-_functab		| -42
-	.word	_SPTst-_functab		| -48
-	.word	_SPAbs-_functab		| -54
-	.word	_SPNeg-_functab		| -60
-	.word	_SPAdd-_functab		| -66
-	.word	_SPSub-_functab		| -72
-	.word	_SPMul-_functab		| -78
-	.word	_SPDiv-_functab		| -84
-	.word	_SPFloor-_functab	| -90
-	.word	_SPCeil-_functab	| -96
 	.word	-1			| terminator
 
 | Motorola firmware copyright banner (was hunk1 in the original)

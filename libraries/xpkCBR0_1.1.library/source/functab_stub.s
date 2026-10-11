@@ -4,11 +4,10 @@
 |||	final .text address is known; genfunctab.py then emits
 |||	functab.s with the real word offsets.
 |||
-|||	12 words: marker(-1) + 10 entries + terminator(-1) = 0x18.
+|||	12 words: marker(-1) + 10 entries + terminator(-1).
 |||
 
 	.section .text
-
 	.globl	_functab
 _functab:
 	.word	-1
