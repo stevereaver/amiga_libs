@@ -106,4 +106,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `Ted_1.0.library` | Shared-state/method-dispatch shim reconstructed in C — 20 LONG vectors over code-hunk globals + context method calls (AMIGALIBS-63) |
 | `cachefile_1.67.library` | Ralph Schmidt disk-file cache + embedded CacheFile_Notify daemon (CreateNewProc into own hunk) reconstructed in C — 11 vectors resolved; dead-expunge, nested-sem-deadlock and V39-only-LVO defects filed (AMIGALIBS-64) |
 | `xpkLZW5_5.3_020_.library` | Froehling 'LZ-Speeder' tiered-token LZ XPK sublib reconstructed in C (2-bit flags: short/med/long tiers, 16 items/long, mode/34 lazy budget); byte-exact encoder vs independent model + ~90KB PackReset heap-clobber and self-corrupting tier-boundary tokens filed (AMIGALIBS-65) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~103/1482 done) |
+| `memorymanage_1.01_030_.library` | 68030 PMMU memory-management lib reconstructed in C+asm — 3-level page tables (128x32M/128x256K/64x4K), PMMU supervisor bodies (pmove/pflusha/ptestr) byte-exact, 11 vectors resolved; 7 defects filed (no CPU check, stale ctx, no locking) (AMIGALIBS-66) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~104/1482 done) |
