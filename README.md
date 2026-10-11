@@ -99,4 +99,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `bfbplayMED__1.0.library` | Teijo Kinnunen MED/OctaMED player wrapper reconstructed in C; tag-driven InitModule (file/handle/memory sources), medplayer.library vector map decoded; uninit-clamp and wild-free defects filed (AMIGALIBS-56) |
 | `xpkSLZ3_1.1.library` | Froehling 'SpeedLZ' LZ77 XPK sublib reconstructed in C (256KB 2-byte-context LRU match table, 12-bit-off/4-bit-len tokens); 2000 host round-trips verified + seglist-store, packmem-descriptor and null-vector quirks filed (AMIGALIBS-57) |
 | all genfunctab-based reconstructions (43 libs) | Systematic functab defect repaired: undersized two-pass stubs + RELRELOC16 inline diffs had placed every vector offset inside mid-function code; all stubs resized, mathffp converted to two-pass, every vector re-verified against linked symbols (AMIGALIBS-58) |
-| all others | Binary collected; `source/` and `okf/` in progress by size order (~96/1482 done) |
+| `xpkLZW4_4.3_020_.library` | Froehling 'LZ-Speeder' lazy hash-chain LZ XPK sublib reconstructed in C (512KB head+chain workmem, MSB-first flag longs, [-dist:u16][len-3] tokens, mode-scaled lazy budget); 5000 host round-trips verified + tail-overread defect filed (AMIGALIBS-59) |
+| all others | Binary collected; `source/` and `okf/` in progress by size order (~97/1482 done) |
