@@ -2,10 +2,10 @@
 
 ## 1. PackReset clobbers ~90 KB below the allocation (severe)
 
-The shipped fill writes `3 + 14 + 14*5*1260 = 88,217` longs
-(352,868 bytes) DOWNWARD from `sub+0x40000` with pre-decrement
+The shipped fill writes `3 + 14 + 14*4*1260 = 70,577` longs
+(282,308 bytes) DOWNWARD from `sub+0x40000` with pre-decrement
 movem stores.  It clears the whole 64K-long head table and then
-keeps going 90,724 bytes past `sub+0` -- i.e. 90,720 bytes below
+keeps going 20,164 bytes past `sub+0` -- i.e. 20,160 bytes below
 the start of the 0x80004 AllocMem block, into whatever lives
 underneath in the heap.
 
@@ -13,7 +13,7 @@ The chain ring at sub+0x40000..0x7ffff is never initialised
 (stale entries are harmless because the >=64KB distance bound
 kills garbage candidates), but the underflow is a real write
 overrun: every XpksPackChunk call -- PackReset is invoked inside
-the packer, not just from the API -- smashes ~88.6 KB of other
+the packer, not just from the API -- smashes ~20 KB of other
 allocations.  On a real system this is fatal.  Reproduced
 faithfully in the C (the reconstruction writes the same range;
 the host harness pads the arena to observe it safely).

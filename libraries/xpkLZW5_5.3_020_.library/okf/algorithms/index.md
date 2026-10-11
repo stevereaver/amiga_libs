@@ -29,4 +29,4 @@
 | len range | 3..258 | 3..5, 6..17, 6..258 by tier |
 | lazy budget | (mode-1)/25 | mode/34 |
 | modes | 4 | 3 (cremation/ashes/oblivion) |
-| PackReset | exactly 65536 longs | 88217 (overruns ~90 KB) |
+| PackReset | exactly 65536 longs | 70577 (overruns ~20 KB) |

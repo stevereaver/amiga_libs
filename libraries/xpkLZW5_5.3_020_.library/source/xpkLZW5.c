@@ -28,8 +28,8 @@
  *     (d1 = 0xffff0000|key, so d1.l*4 wraps to sub+0 + key*4); the
  *     key's add.b only touches the low byte, no carry into b0's half.
  *   - PackReset fills DOWNWARD with pre-decrement movem writes from
- *     sub+0x40000: 3 + 14 + 14*5*1260 = 88,217 longs = 352,868 bytes
- *     -- it clears the whole head table and then 90,724 bytes BELOW
+ *     sub+0x40000: 3 + 14 + 14*4*1260 = 70,577 longs = 282,308 bytes
+ *     -- it clears the whole head table and then 20,164 bytes BELOW
  *     the allocation start.  The chain ring above sub+0x40000 is
  *     never initialised; stale entries are harmless because distance
  *     >= 64KB terminates the walk (LZW4 cleared exactly 65,536).
@@ -169,11 +169,11 @@ LONG XpksPackFree(struct XpkSubParams *p __asm("a0"))
 /*
 **	-48 XpksPackReset -- the downward fill
 **
-**	The shipped movem fill writes 3 + 14 + 14*5*1260 = 88,217
+**	The shipped movem fill writes 3 + 14 + 14*4*1260 = 70,577
 **	longs DOWNWARD from sub+0x40000: the entire 64K-long head
-**	table is zeroed and then the fill continues 90,724 bytes
+**	table is zeroed and then the fill continues 20,164 bytes
 **	past the start of the allocation.  Modelled faithfully:
-**	clear head[65536], then clobber the 22,681 longs below sub.
+**	clear head[65536], then clobber the 5,041 longs below sub.
 **	The chain ring above sub+0x40000 is left stale on purpose
 **	(dist >= 64KB kills any garbage candidate).
 */
@@ -184,7 +184,7 @@ LONG XpksPackReset(struct XpkSubParams *p __asm("a0"))
     if (sub) {
 	ULONG *w = sub + 0x10000;		/* one past head end */
 	LONG  i;
-	for (i = 0; i < 88217; i++)	/* shipped count */
+	for (i = 0; i < 70577; i++)	/* shipped count */
 	    *--w = 0;
     }
 

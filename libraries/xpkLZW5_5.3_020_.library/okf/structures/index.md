@@ -27,7 +27,7 @@
 - buf+0  ULONG alloc size (0x80004)
 - sub+0       head[65536] ULONG -- newest position per hash key
 - sub+0x40000 chain[65536] ULONG -- prev position, pos&0xffff ring
-- PackReset underflows 90,724 bytes BELOW sub+0 (defect #1)
+- PackReset underflows 20,164 bytes BELOW sub+0 (defect #1)
 
 ## XpkInfo descriptor (verified byte-exact)
 - ver 1, lib 5, master 2, modes 0
