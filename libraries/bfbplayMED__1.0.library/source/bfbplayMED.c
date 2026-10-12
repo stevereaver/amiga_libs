@@ -60,7 +60,7 @@ struct BfbSess {
 
 /* -------- exec / dos LVO calls ---------------------------------- */
 #define OPENLIB_E(name,ver) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register const char * __p_name __asm("a1") = (name);\
   register ULONG __p_ver __asm("d0") = (ULONG)(ver);\
   register APTR __p_res __asm("d0");\
@@ -88,7 +88,7 @@ struct BfbSess {
     : "a"(__p_sys)\
     : "d1","a0","fp0","fp1","cc","memory");})
 #define CLOSLIB_E(lib) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register APTR __p_l __asm("a1") = (APTR)(lib);\
   __asm volatile ("jsr %/a6@(-414:W)\n"\
     : "+a"(__p_l)\

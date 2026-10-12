@@ -76,7 +76,7 @@ struct I2CBase {
 
 /* -------- exec calls --------------------------------------------- */
 #define OPENLIB_E(name,ver) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register const char * __p_name __asm("a1") = (name);\
   register ULONG __p_ver __asm("d0") = (ULONG)(ver);\
   register APTR __p_res __asm("d0");\
@@ -130,7 +130,7 @@ struct I2CBase {
     : "a"(__p_sys)\
     : "a0","fp0","fp1","cc","memory");})
 #define ALERT(num) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register ULONG __p_n __asm("d7") = (ULONG)(num);\
   __asm volatile ("jsr %/a6@(-108:W)\n"\
     : "+d"(__p_n)\

@@ -85,7 +85,7 @@ struct HfmnBase {
 
 /* -------- exec LVO calls ------------------------------------------ */
 #define ALLOCMEM_E(size,fl) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register ULONG __p_size __asm("d0") = (ULONG)(size);\
   register ULONG __p_fl __asm("d1") = (ULONG)(fl);\
   register APTR __p_res __asm("d0");\
@@ -95,7 +95,7 @@ struct HfmnBase {
     : "a0","a1","fp0","fp1","cc","memory");\
   __p_res;})
 #define FREEMEM_E(mem,sz) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register APTR __p_m __asm("a1") = (APTR)(mem);\
   register ULONG __p_s __asm("d0") = (ULONG)(sz);\
   __asm volatile ("jsr %/a6@(-210:W)\n"\
@@ -103,7 +103,7 @@ struct HfmnBase {
     : "a"(__p_sys)\
     : "d1","a0","fp0","fp1","cc","memory");})
 #define REMOVENODE_E(node) ({\
-  register struct ExecBase * __p_sys __asm("a6") = (struct ExecBase *)4;\
+  register struct ExecBase * __p_sys __asm("a6") = *(struct ExecBase **)4;\
   register APTR __p_n __asm("a1") = (APTR)(node);\
   __asm volatile ("jsr %/a6@(-252:W)\n"\
     : "+a"(__p_n)\
