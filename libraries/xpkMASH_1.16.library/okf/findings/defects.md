@@ -1,23 +1,42 @@
 # Defects & quirks — xpkMASH 1.16
 
-## 1. Len-2 matches at distance >= 512 corrupt the stream (fatal)
+## 1. Len-2 matches at distance >= 512 are silently dropped
 
 The len-2 match token bypasses the classed `emit_dist` path and emits
 `d3 << 5` as a single 11-bit field — i.e. `dist[10:0]` raw, where the
-top 2 bits double as the `00` token selector the decoder needs to see.
-For `dist < 0x200` those top bits are 0 and the token reads `00` +
-9-bit dist as intended; for `dist >= 0x200` bit(s) 9-10 are set, the
-decoder parses a different token type entirely, and the stream desyncs
-permanently (output diverges from that match onward).
+top 2 bits double as the `00` token selector.  A `dist >= 0x200` would
+therefore decode as a different token type entirely.
 
-Confirmed empirically: every packed stream containing a `len2` token
-with `dist >= 512` decodes corrupt from that token onward, in BOTH the
-original (instruction-level simulated) decoder and the reconstruction —
-the first divergence point matches exactly on every test input.  ~9 of
-36 stress inputs exhibit it.  This is presumably why the author shipped
-V1.98 shortly after ("good packer").
+But such tokens are never emitted: `find`'s exit does
+`subq.w #2,d3` and — for len-2 only — `move.l d3,d0; addi.l
+#0xfe000000,d0`.  That "dead" add sets the carry flag iff
+`dist >= 0x200`, which lands in the caller's `BCS` and marks the
+match as *not found*.  The packer simply loses profitable len-2
+matches at far distances (output stays valid, ratio suffers).
 
-The reconstruction reproduces the defect bit-exact on purpose.
+The reconstruction models this in `find`'s return (len-2 with
+dist >= 512 returns no-match).
+
+## 1a. > 64 KiB inputs: distance arithmetic wraps mod 64 KiB
+
+`find` computes `dist = pw - cand.w` on pointer LOW WORDS (and the
+chain table is indexed by `pw*2` sign-extended).  When the input
+buffer spans a 64 KiB address boundary, positions past the wrap have
+small low words again, so `pw - cand` for candidates before the wrap
+comes out negative/wrong — the emitted distance points at the wrong
+source and the stream decodes corrupt from there.  Reproduced via the
+same low-word arithmetic; on host it additionally makes packing
+nondeterministic (malloc'd base low-word varies run to run).
+
+## 1b. > 64 KiB inputs: packer can hang on a delta-0 self-loop
+
+When `insert` runs at a position whose low-word equals the value still
+stored in `head[h]` — inevitable past the 64 KiB wrap, since heads
+hold stale low-words — it writes `CHAIN[pw] = 0`.  A later chain walk
+landing on that entry does `cand -= 0` and spins forever.  Verified on
+the V1.26 port (`D0LOOP at cur=132361 cand=131072`); the same insert
+and walk exist here.  Hash/heap-layout dependent: when it doesn't
+fire, >64KB output is just corrupt per 1a.
 
 ## 2. Chain table sign-extension aliasing
 

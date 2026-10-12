@@ -109,8 +109,8 @@ static void emit(struct pctx *c, ULONG d0, ULONG d1)
 			c->eslot = c->epos++;
 			c->eacc  = 1;
 		}
-		c->eacc = (c->eacc << 1) | (d0 >> 31);
-		d0 <<= 1;
+		c->eacc = (c->eacc << 1) | ((d0 >> 31) & 1);
+		d0 = (d0 << 1) & 0xffffffff;	/* ULONG is 64-bit on host */
 		if (c->eacc & 0x100) {
 			*c->eslot = (UBYTE)c->eacc;
 			c->eacc = 0;
@@ -278,7 +278,14 @@ walk:		for (;;) {		/* LAB_0047/48: chain + filter */
 		}
 	}
 done:
-	return d3 | (UWORD)(len - 2);
+	/* LAB_0049 tail: `subq.w #2,d3` then, for len-2 only,
+	 * `addi.l #0xfe000000,d0` (d0 = dist<<16) -- its carry lands in
+	 * the caller's BCS, so a len-2 match with dist >= 512 returns
+	 * "no match" and the corrupt '00'+9-bit token is never emitted. */
+	len -= 2;
+	if (!len && (d3 >> 16) >= 0x200)
+		return -1;
+	return d3 | (UWORD)len;
 }
 
 /* ---- hash-insert one position (LAB_003B body) ---------------------- */

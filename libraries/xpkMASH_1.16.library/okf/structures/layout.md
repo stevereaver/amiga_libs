@@ -70,4 +70,6 @@ LZ77-family"`, Desc `"WindowSize: 32KB, 2 mixed streams  Dynamic
 Buffer Allocation,  Nice CF"`, ID `'MASH'`, Flags 0x8009,
 MaxPkInChunk 0x000f0000-ish, MinPkInChunk 0x50, DefPkInChunk 0x10000,
 msgs Mashing/UnMashing/Mashed/UnMashed, DefMode 100, one mode record
-`{0,100, 0,0,0, pspeed 18, uspeed 300, ratio 480, " -->    "}`.
+`{next 0, upto 100, flags 0, pmem 0, umem 0, pspeed 18, uspeed 300,
+ratio 480, chunk 0, " -->    ", tail 0xffff}` (long fields except
+ratio/chunk words; name 12 bytes).

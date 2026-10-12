@@ -124,7 +124,7 @@ _xmodes:
 	.word	480			/* xm_Ratio		    */
 	.word	0			/* xm_ChunkSize	    */
 	.ascii	" -->    "
-	.byte	0,0,0
+	.byte	0,0,0,0
 	.word	0xffff
 	.even
 

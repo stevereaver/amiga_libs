@@ -33,19 +33,19 @@ movea.l (sp)+,a5; rts
 1. `bound = outbuf + inlen - 50` — output must stay 50 bytes under the
    input size or the pack fails with **-17** ("not compressible").
 2. `tries = 1 << (mode/10)` from `xsp_Mode` (+0x1c).
-3. AllocMem 0x10000 (flag 0) into `Sub+0` — fail -> **-7**.  This buffer
-   holds the 0x8000-entry chain table (UWORD deltas) **plus** the hash
-   heads at `buf + 0x10000 - (2<<shift)` — the head table shares the
-   tail of the same allocation.
-4. Second allocation starting at 0x20000, halving until <= 0x3000 —
-   "Dynamic Buffer Allocation": `alloc2 -> 0x20000,0x10000,...,0x4000`,
-   `shift = log2(alloc2>>1)` (d3 = d1-1 where 2^d1 = alloc2).  Fail ->
-   free alloc1, return **-7**.  `Sub+1` = alloc2, used as the *chain
-   table*; alloc1 is the hash head table.  `memset` clears `alloc2+0x100`
-   bytes of `alloc1` (see defects).
+3. AllocMem 0x10000 (flag 1) into alloc1 — fail -> **-7**.  This buffer
+   holds the chain table: base `alloc1+0x8000`, entry
+   `sext16(pw)*2` (UWORD deltas); filled with 0xffff at init.
+4. Second allocation halving from 0x20000 down to 0x400 —
+   "Dynamic Buffer Allocation": alloc2 = `512<<shift` bytes,
+   `shift` = 8..1.  Fail -> free alloc1, return **-7**.  alloc2 is the
+   hash head table (`256<<shift` UWORDs, hash =
+   `((b1<<shift)&0xff00) | b0`), seeded with `in.w`.
+   The `filldown` memset underwrites each allocation by 0x100 bytes
+   (see defects).
 5. Loop from in+1: `insert(cur)` (hash + store delta into chain), then
-   `find(cur)`: walk `chain` back from `head[h]`, bound by `cur-0x8000`
-   (32KB window) and by `tries` *filter rejections*; the first
+   `find(cur)`: walk `chain` back from `head[h]`, bound by `cur-32415`
+   (~32KB window) and by `tries` *filter rejections*; the first
    candidate is always compared (unconditional best), later candidates
    only if `cand[len] == filt` (the byte that ended the last best
    compare — a cheap "does the match get longer" heuristic).
