@@ -26,11 +26,12 @@ through `moveal 4,a0/a6` (abs SysBase).
 | wk+0 | 0x20000 | `head[65536]` UWORD — rolling 16-bit pair-key table (pass1); later overwritten by the pass2 record stream |
 | wk+0x20000 | 2*inlen | `gaps[inlen]` WORD — gap[i] = distance from the byte pair at i to its previous occurrence (or -1) |
 
-Pass2 writes the record stream at wk+0 — unaligned 6-byte
-records `{pos.w, dist.w, len-2.w}` at byte addresses, which
-is why this build needs a 68020+ (word stores at odd
-offsets).  Once the record stream exceeds 0x20000 bytes it
-overlaps the still-live gap array (defect).
+Pass2 writes the record stream at wk+0 — 6-byte records
+`{pos.w, dist.w, len-2.w}` (all stores land on even
+addresses; the 020-only features are the scaled-index
+addressing modes and the AFB_68020 LibInit gate).  Once the
+record stream exceeds 0x20000 bytes it overlaps the
+still-live gap array (defect).
 
 ## XpkInfo descriptor (code+0x6d4; returned by LVO -30)
 

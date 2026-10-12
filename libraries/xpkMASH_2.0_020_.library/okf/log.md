@@ -37,7 +37,7 @@ Disassembly (objdump; IRA was dropping extension words).
   second phase (>=16203) clamps gaps >= 32415 to -1;
   `gaps[inlen-1] = -1` sentinel.
 - pass2 @0x320: lazy gap-chain matcher, tries=1024,
-  unbounded `cmpmb`, records = unaligned 6-byte triples
+  unbounded `cmpmb`, records = 6-byte triples
   `{pos.w, dist.w, len-2.w}` over the head table.
 - emit @0x4ce: flag-slot byte + literal interleave,
   runw/lenw/distw/distor tables at 0x496/0x476/0x436/0x456.
@@ -71,7 +71,7 @@ Results:
 
 `source/xpkMASH.c` — codec + C_* vector bodies
 (transliterated, defects preserved; UWORD cursor for the
-unaligned records keeps host byte order out).
+records via a word cursor keeps host byte order out).
 `source/xpkMASH_lib.s` — RomTag/InitTable/datatab verbatim,
 lifecycle asm, vector stubs, XpkInfo + mode record.
 `genfunctab.py`/`functab_stub.s`/`Makefile` — two-pass

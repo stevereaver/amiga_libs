@@ -7,7 +7,7 @@ description: >-
   different matcher: pass1 builds a per-position gap array
   from a 64K-entry rolling 16-bit pair-key head table,
   pass2 is a lazy matcher walking gap chains that writes
-  unaligned 6-byte {pos.w, dist.w, len-2.w} records back
+  6-byte {pos.w, dist.w, len-2.w} records back
   over the head table, and a third pass emits the mixed
   flag-bit / literal-byte stream.  Verified byte-identical
   against the original under a Musashi oracle.
@@ -17,9 +17,9 @@ timestamp: 2026-10-28T00:00:00Z
 # xpkMASH.library 2.0(020)
 
 "Mashiner 020+ V2.0" — XPK sublibrary, -m68020 required:
-the record format is unaligned 6-byte triples {pos.w,
-dist.w, len-2.w} written at byte addresses (word stores
-at odd offsets are 68020+ only).
+the 020-ness is the scaled-index addressing and the
+AFB_68020 LibInit gate (the 6-byte records themselves
+stay even-aligned on both builds).
 
 ## Binary facts
 

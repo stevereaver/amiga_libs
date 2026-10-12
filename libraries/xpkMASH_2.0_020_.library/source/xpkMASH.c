@@ -4,7 +4,8 @@
  *   $VER: xpkMASH V2.0 (1 Oct 2013) by Zdenek Kadelac
  *
  * Bit-packed LZ77, 32KB window ("WindowSize: 32KB, 2 mixed streams").
- * Same wire format family as V1.16, but V2.0 is a 68020+ build with a
+ * Same wire format family as V1.16, but V2.0 is a 68020+ build
+ * (scaled-index addressing + AFB_68020 init gate) with a
  * completely different matcher: pass1 builds a per-position "gap"
  * array (distance to previous occurrence of the byte pair starting at
  * each index, from a 64K-entry rolling-key head table at wk+0), pass2
@@ -317,7 +318,9 @@ static void pass1(UBYTE *in, UWORD *head, WORD *gaps, ULONG inlen)
 
 /* pass2 writes records of three words {pos, dist, len-2} over the
  * head table -- the original stores pos+info as movew+movel, i.e. a
- * 6-byte unaligned record (that's why this build needs a 68020+).
+ * 6-byte record.  The 020-vs-000 difference is elsewhere: the 020
+ * build uses scaled-index addressing (%a2@(d3:w:2) etc, 68020+ only)
+ * and gates LibInit on AFB_68020.
  * Using a word cursor keeps host byte order out of it. */
 static void pass2(UBYTE *in, WORD *gaps, UWORD *recs,
 		  UBYTE *end, ULONG tries)
