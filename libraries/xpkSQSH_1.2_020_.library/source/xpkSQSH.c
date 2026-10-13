@@ -126,8 +126,11 @@ struct pk {
 static void putbits(struct pk *p, ULONG v, LONG w)
 {
 	while (w-- > 0) {
+		LONG m = 0x80 >> (p->bitpos & 7);
 		if ((v >> w) & 1)
-			p->out[p->bitpos >> 3] |= 0x80 >> (p->bitpos & 7);
+			p->out[p->bitpos >> 3] |= m;
+		else
+			p->out[p->bitpos >> 3] &= ~m;
 		p->bitpos++;
 	}
 }
@@ -205,7 +208,8 @@ next_token:;
 						for (;;)
 							if (*ca++ != *cb++ || --r < 0)
 								break;
-						UWORD *sp = &p->node[d2 * 2 + (r > 0)];
+						UWORD *sp = &p->node[d2 * 2 +
+							((char)ca[-1] < (char)cb[-1])];
 						if (!((char)d7 < (char)r) &&
 						    !((short)d2 <= (short)floor)) {
 							floor = d2;
@@ -301,7 +305,7 @@ next_token:;
 }
 
 /* -36 XpksPackChunk */
-LONG XpksPackChunk(struct XpkSubParams *xsp)
+LONG XpksPackChunk(struct XpkSubParams *xsp __asm("a0"))
 {
 	struct pk P;
 	LONG r;
@@ -326,7 +330,7 @@ LONG XpksPackChunk(struct XpkSubParams *xsp)
 }
 
 /* -42 XpksPackFree / -60 (same routine in the original) */
-LONG XpksPackFree(struct XpkSubParams *xsp)
+LONG XpksPackFree(struct XpkSubParams *xsp __asm("a0"))
 {
 	APTR wm = xsp->xsp_Sub[0];
 	if (wm)
@@ -354,7 +358,7 @@ static __inline LONG getbits_s(const UBYTE *s, LONG p, LONG w)
 }
 
 /* -54 XpksUnpackChunk */
-LONG XpksUnpackChunk(struct XpkSubParams *xsp)
+LONG XpksUnpackChunk(struct XpkSubParams *xsp __asm("a0"))
 {
 	UBYTE *src = xsp->xsp_InBuf, *out = xsp->xsp_OutBuf;
 	UBYTE *end = out + ((src[0] << 8) | src[1]);

@@ -27,3 +27,20 @@
 - Periodic sines compress ~16:1 (8000 -> ~500 bytes).
 - m68k build verified: header/idstr/descriptor byte-exact; LVO table
   resolves; built `-m68020`.
+- Reconstruction fixes found while building the 68000 twin
+  (xpkSQSH_1.2(000)) and running the 020 under machine68k for the
+  first time (earlier verification was host-only):
+  1. entry points now take `xsp` in `a0` (`__asm("a0")`) per the XPK
+     ABI — the previous build read it from the stack, which only
+     worked in host tests;
+  2. `putbits` writes zero-bits explicitly (`bfins` semantics) — the
+     `|=` form left stale buffer bytes in streams under the emulator;
+  3. match-chain node slot is `ca[-1] < cb[-1]` (signed final-byte
+     relation from `cmpm.b`/`dbne`/`bles`), not `r > 0` — this was the
+     last stream-divergence cause.
+  After the fixes the rebuilt 020 library produces all 16 corpus
+  streams byte-identical to the original under machine68k and every
+  packable input round-trips.
+- Confirmed the litpress gates are strict `> 7` (opcode 0x62 is BHI;
+  earlier "off-by-one"/"emulator flag bug" notes were wrong —
+  machine68k compares behave correctly).
