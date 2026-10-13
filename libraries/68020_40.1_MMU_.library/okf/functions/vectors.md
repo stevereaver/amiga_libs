@@ -98,22 +98,27 @@ ends the table.  For liboff==0 records the patcher stores
 | 72 | -30  | +0x128 | input.device BeginIO → pf_beginio |
 | 56 | -30  | +0x14a | expansion AddConfigDev → pf_addconfigdev |
 
-### Table C (data+0x1f0) — exception vectors
+### Table C (data+0x1f0) — 68881 exception vectors
 
 Read by `super_excvec` directly, not via SetFunction.
 Record format: `{newfn .long, vbroff .word, saveoff .word}`:
 
-| newfn | vbr off | saveoff | vector |
-|-------|---------|---------|--------|
-| pf_trap5 | 0xc0 | lib+0x50 | TRAP #5 (in 68020 exc frame order) |
-| pf_trap3 | 0xc4 | lib+0x54 | TRAP #3 |
-| pf_trap6 | 0xc8 | lib+0x58 | TRAP #6 |
-| pf_trap4 | 0xcc | lib+0x5c | TRAP #4 |
-| pf_trap0 | 0xd0 | lib+0x60 | TRAP #0 |
-| pf_trap1 | 0xd4 | lib+0x64 | TRAP #1 |
-| pf_trap2 | 0xd8 | lib+0x68 | TRAP #2 |
+| newfn | vbr off | vector | saveoff | flag bit |
+|-------|---------|--------|---------|----------|
+| pf_trap5 | 0xd4 | 53 FPOverflow     | lib+0x64 | 4 |
+| pf_trap3 | 0xcc | 51 FPUnderflow    | lib+0x5c | 3 |
+| pf_trap6 | 0xd8 | 54 FPSignalNaN    | lib+0x68 | 5 |
+| pf_trap4 | 0xd0 | 52 FPOperandError | lib+0x60 | 6 |
+| pf_trap0 | 0xc0 | 48 FPBSUN         | lib+0x50 | 0 |
+| pf_trap1 | 0xc4 | 49 FPInexact      | lib+0x54 | 1 |
+| pf_trap2 | 0xc8 | 50 FPDivZero      | lib+0x58 | 2 |
 
-(VBR-relative offsets 0xc0..0xd8 = vectors 48..54.)
+VBR-relative offsets 0xc0..0xd8 = vectors 48..54, the
+68881/68882 FPU exception vectors.  The pf_trapN names follow
+the flag bit N in the FPUFlags byte (lib+34), not the vector
+number: bit0→48 BSUN, bit1→49 Inexact, bit2→50 DivZero,
+bit3→51 Underflow, bit4→53 Overflow, bit5→54 SNAN,
+bit6→52 OperandError.
 
 `super_excvec`: `ori #0x700,sr` (raise IPL), `movec vbr,a0`,
 walks the table — saves `a0@(vbroff)` into `a4@(saveoff)`,
@@ -147,7 +152,7 @@ writes the handler to **both** `a0@(vbroff)` (VBR table) and
 - **pf_addconfigdev** (expansion -30): push old vector;
   Alert(0x3f000015) (recoverable — a "board rejected" marker);
   tail-call old AddConfigDev.
-- **pf_trapN** (TRAP #0..#6): `btst #N, patch_lib@(22)` — the
+- **pf_trapN** (68881 exceptions): `btst #N, patch_lib@(22)` — the
   byte at lib+34 is the FPUControl flag byte; if the flag bit
   is set, fall into `pf_fsavefix` (68881 `fsave`/`frestore`
   frame fixup + `rte`); otherwise push the saved vector from

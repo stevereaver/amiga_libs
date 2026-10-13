@@ -11,7 +11,7 @@
   AFF_68030, require AFF_68020), expansion+utility v37 opens,
   DeviceList FindName("input.device"), Table A ColdReboot
   patch, mmu.library open + GetMMUType (-54), optional
-  Supervisor-based TRAP-vector install, Table B install of ten
+  Supervisor-based exception-vector install, Table B install of ten
   SetFunction patches, fail tail = alert + close opened libs +
   FreeMem(base-NegSize, NegSize+PosSize) + return NULL.
 - Decoded patch tables A/B (liboff/vecoff/fnoff records,
@@ -22,7 +22,7 @@
 - Identified pf_* stubs: CacheClearU trampolines (5× +
   2 moveml variants), INTENA-based GetMsg, BeginIO icache
   flush on IND_ADDHANDLER(9), recoverable-alert AddConfigDev,
-  ColdReboot PMMU-off + ROM-reset jump, 7 TRAP handlers gated
+  ColdReboot PMMU-off + ROM-reset jump, 7 68881 handlers gated
   on FPUFlags byte + shared fsave/frestore fixup.
 - Reconstructed in C (`68020.c`) + hand asm (`68020_patch.s`,
   `68020_lib.s`); `.word` encodings used for PC-memory-
@@ -37,7 +37,7 @@
   - attn=0x12 (68881): additionally `Supervisor(super_excvec)`
     + CacheClearU before Table B; VBR/abs vector writes and
     lib+0x50..0x68 saves verified identical; all 7 installed
-    TRAP handlers tail-call the saved vectors identically.
+    68881 handlers tail-call the saved vectors identically.
   - Fail paths identical: expansion→alert 0x3f02800a,
     utility→0x3f02800c, input.device→0x3f028021, mmu→
     0x3f02803e + UnpatchTable-A, all ending close-opened-libs

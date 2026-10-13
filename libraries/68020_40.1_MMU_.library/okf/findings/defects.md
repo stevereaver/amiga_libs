@@ -23,7 +23,7 @@ If `mmu.library` can't be opened, only **table A**
 (ColdReboot) is unpatched (0x28e path) before the cleanup
 tail — correct, since table B hasn't run yet.  But once
 resident, `LibExpunge` (LVO -18) is a pure null stub: the
-patches are never removed and the TRAP vectors/SetFunction
+patches are never removed and the exception vectors/SetFunction
 slots stay patched forever — the library can only be torn
 down by reboot (which is why ColdReboot itself is patched, to
 shut the PMMU down first).
@@ -59,7 +59,7 @@ function with a valid interrupt frame so `super_excvec` can
 `ori #0x700,sr` (raise to IPL 7) and `rte` — works on KS 2.x/
 3.x exec where Supervisor synthesizes an exception frame.
 Both VBR-relative *and* absolute low-memory vector slots are
-written, so TRAP interception works whether or not VBR is 0.
+written, so the FPU handlers are installed whether or not VBR is 0.
 
 ## InitTable functab vs code layout
 

@@ -11,15 +11,15 @@ trampolines on the lib/dev/resource/task/int-server entry
 points, an INTENA-based GetMsg reimplementation, a
 recoverable-alert AddConfigDev patch, a BeginIO icache flush,
 and a ColdReboot hook that shuts the PMMU down) and — only
-when an FPU is present — installs TRAP #0..#6 exception
-handlers through a Supervisor routine that writes both the
+when an FPU is present — installs the 68881/68882 FPU
+exception handlers (vectors 48-54) through a Supervisor routine that writes both the
 VBR-based and the absolute low-memory vector slots.
 
 - Binary: `binary/68020_40.1(MMU).library` — 2188 bytes, m68k,
   two hunks (CODE 0x54c / DATA 0x200), AUTOINIT.
 - Reconstruction: `source/` — `68020.c` (init/lifecycle/
   PatchTable drivers/FPUControl), `68020_patch.s` (patch
-  stubs, supervisor body, TRAP handlers — PMMU/FPU/VBR
+  stubs, supervisor body, 68881 exception handlers — PMMU/FPU/VBR
   instructions plus PC-memory-indirect operands that C cannot
   express), `68020_lib.s` (RomTag, AUTOINIT InitTable, functab,
   strings, patch tables).

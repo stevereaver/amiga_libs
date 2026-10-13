@@ -5,7 +5,7 @@
 |||
 |||	The original binary keeps a contiguous "patch region" that
 |||	starts with a code-hunk slot storing ExecBase and ends with
-|||	the 68881 TRAP exception handlers.  Each installed patch
+|||	the 68881 exception handlers.  Each installed patch
 |||	function is preceded by a 4-byte slot holding the vector it
 |||	replaced (SetFunction's return value); the stubs push that
 |||	slot and "rts" into the original vector.
@@ -29,12 +29,12 @@
 |||	  +0x128  BeginIO patch: flush icache on IND_ADDHANDLER (cmd 9)
 |||	  +0x146  slot: old expansion/AddConfigDev
 |||	  +0x14a  AddConfigDev patch: recoverable alert 0x3f000015
-|||	  +0x168  InstallExcVecs wrapper (installs TRAP handlers
+|||	  +0x168  InstallExcVecs wrapper (installs the 68881 handlers
 |||	          through Supervisor + CacheClearU)
 |||	  +0x18c  supervisor function writing VBR and absolute
 |||	          (VBR=0) exception vectors from table C
 |||	  +0x1b6  slot: this library's base
-|||	  +0x1ba  TRAP #3,#0,#5,#6,#4,#1,#2 handlers (flag-gated
+|||	  +0x1ba  68881 vectors 51,48,53,54,52,49,50 (flag-gated
 |||	          tail calls to the saved vectors)
 |||	  +0x262  68881 fsave-frame fixup + rte
 |||
@@ -265,7 +265,7 @@ _InstallExcVecs:			| +0x168 (a6 = library base)
 	moveml	%sp@+,%a2/%a4-%a6
 	rts
 
-||| supervisor body: install TRAP handlers into both the VBR-based
+||| supervisor body: install the 68881 handlers into both the VBR-based
 ||| vector table and the absolute low-memory copy (covers VBR = 0).
 ||| Exits with rte -- exec's Supervisor entry frame carries SR.
 
@@ -285,7 +285,7 @@ super_excvec:				| +0x18c
 2:
 	rte
 
-||| ---- the library-base slot + TRAP exception handlers --------------
+||| ---- the library-base slot + 68881 exception handlers -------------
 
 _patch_lib:				| +0x1b6 (0x45c in the original)
 	.long	0			| library base, stored by init
@@ -302,7 +302,7 @@ _patch_lib:				| +0x1b6 (0x45c in the original)
 ||| the handler lengths reproduce the shipped layout exactly.
 
 	.globl pf_trap3
-pf_trap3:				| +0x1ba (0x460) TRAP #3, flag bit3
+pf_trap3:				| +0x1ba (0x460) FPUnderflow, flag bit3
 	.word	0x083b,0x0003,0x0162
 	.word	_patch_lib - . + 2	| bd -> _patch_lib
 	.word	0x0022			| od = 22
@@ -315,7 +315,7 @@ pf_trap3:				| +0x1ba (0x460) TRAP #3, flag bit3
 	bra.w	pf_fsavefix
 
 	.globl pf_trap0
-pf_trap0:				| +0x1d4 (0x47a) TRAP #0, flag bit0
+pf_trap0:				| +0x1d4 (0x47a) FPBSUN, flag bit0
 	.word	0x083b,0x0000,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022
@@ -328,7 +328,7 @@ pf_trap0:				| +0x1d4 (0x47a) TRAP #0, flag bit0
 	bra.s	pf_fsavefix
 
 	.globl pf_trap5
-pf_trap5:				| +0x1e8 (0x492) TRAP #5, flag bit4
+pf_trap5:				| +0x1e8 (0x492) FPOverflow, flag bit4
 	.word	0x083b,0x0004,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022
@@ -341,7 +341,7 @@ pf_trap5:				| +0x1e8 (0x492) TRAP #5, flag bit4
 	bra.s	pf_fsavefix
 
 	.globl pf_trap6
-pf_trap6:				| +0x1fc (0x4aa) TRAP #6, flag bit5
+pf_trap6:				| +0x1fc (0x4aa) FPSignalNaN, flag bit5
 	.word	0x083b,0x0005,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022
@@ -354,7 +354,7 @@ pf_trap6:				| +0x1fc (0x4aa) TRAP #6, flag bit5
 	bra.s	pf_fsavefix
 
 	.globl pf_trap4
-pf_trap4:				| +0x210 (0x4c2) TRAP #4, flag bit6
+pf_trap4:				| +0x210 (0x4c2) FPOperandErr, flag bit6
 	.word	0x083b,0x0006,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022
@@ -367,7 +367,7 @@ pf_trap4:				| +0x210 (0x4c2) TRAP #4, flag bit6
 	bra.s	pf_fsavefix
 
 	.globl pf_trap1
-pf_trap1:				| +0x224 (0x4da) TRAP #1, flag bit1
+pf_trap1:				| +0x224 (0x4da) FPInexact, flag bit1
 	.word	0x083b,0x0001,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022
@@ -380,7 +380,7 @@ pf_trap1:				| +0x224 (0x4da) TRAP #1, flag bit1
 	bra.s	pf_fsavefix
 
 	.globl pf_trap2
-pf_trap2:				| +0x238 (0x4f2) TRAP #2, flag bit2
+pf_trap2:				| +0x238 (0x4f2) FPDivZero, flag bit2
 	.word	0x083b,0x0002,0x0162
 	.word	_patch_lib - . + 2
 	.word	0x0022

@@ -155,23 +155,25 @@ _patchtable_b:
 
 ||| exception-vector table: {newfn, vbr offset, lib save offset}.
 ||| Installed in supervisor mode by super_excvec (only when a 68881
-||| FPU is present).  Record order is TRAP 5,3,6,4,0,1,2 as shipped.
+||| FPU is present).  Vectors 48-54 = the 68881 FPU
+||| exceptions (BSUN,Inexact,DivZero,Underflow,OperandError,
+||| Overflow,SNaN); pf_trapN names the FPUFlags bit N.
 	.balign	4
 _patchtable_c:
 	.long	pf_trap5
-	.word	0xd4,0x64		| VBR+0xd4 TRAP #5 -> lib+0x64
+	.word	0xd4,0x64		| VBR+0xd4 FPOverflow -> lib+0x64
 	.long	pf_trap3
-	.word	0xcc,0x5c		| VBR+0xcc TRAP #3 -> lib+0x5c
+	.word	0xcc,0x5c		| VBR+0xcc FPUnderflow -> lib+0x5c
 	.long	pf_trap6
-	.word	0xd8,0x68		| VBR+0xd8 TRAP #6 -> lib+0x68
+	.word	0xd8,0x68		| VBR+0xd8 FPSignalNaN -> lib+0x68
 	.long	pf_trap4
-	.word	0xd0,0x60		| VBR+0xd0 TRAP #4 -> lib+0x60
+	.word	0xd0,0x60		| VBR+0xd0 FPOperandErr -> lib+0x60
 	.long	pf_trap0
-	.word	0xc0,0x50		| VBR+0xc0 TRAP #0 -> lib+0x50
+	.word	0xc0,0x50		| VBR+0xc0 FPBSUN -> lib+0x50
 	.long	pf_trap1
-	.word	0xc4,0x54		| VBR+0xc4 TRAP #1 -> lib+0x54
+	.word	0xc4,0x54		| VBR+0xc4 FPInexact -> lib+0x54
 	.long	pf_trap2
-	.word	0xc8,0x58		| VBR+0xc8 TRAP #2 -> lib+0x58
+	.word	0xc8,0x58		| VBR+0xc8 FPDivZero -> lib+0x58
 	.long	0
 
 	.end

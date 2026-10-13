@@ -15,7 +15,8 @@
 **	a ColdReboot hook that shuts the PMMU down), patches
 **	input.device BeginIO (icache flush on IND_ADDHANDLER) and
 **	expansion.library AddConfigDev, and -- only when a 68881/882
-**	FPU is present -- installs TRAP #0..#6 exception handlers.
+**	FPU is present -- installs the 68881 exception handlers
+**	(vectors 48-54, VBR+0xc0..0xd8).
 **
 **	The only real public vector besides the standard ones is
 **	FPUControl at LVO -222 (get/set the FPU flags byte at lib+34).
@@ -56,7 +57,8 @@ struct Lib68020Base
     struct Library     *b_MMU;	    /* 0x44 mmu.library base		    */
     struct Node	       *b_Input;    /* 0x48 input.device (FindName)	    */
     ULONG		b_pad4c;    /* 0x4c unused			    */
-    ULONG		b_TrapSave[7];/* 0x50..0x68 saved TRAP vectors	    */
+    ULONG		b_TrapSave[7];/* 0x50..0x68 saved 68881
+				    ** exception vectors (VBR+0xc0..0xd8) */
     ULONG		b_pad6c;    /* 0x6c unused			    */
 };				    /* total: 0x70 bytes		    */
 
@@ -73,7 +75,7 @@ extern const char inputname[];
 
 extern UWORD patchtable_a[];	/* ColdReboot patch			  */
 extern UWORD patchtable_b[];	/* exec + input.device + expansion	  */
-extern UWORD patchtable_c[];	/* TRAP #0-6 exception vectors	  */
+extern UWORD patchtable_c[];	/* 68881 exception vectors 48-54	  */
 
 /* slots inside the patch region (68020_patch.s) */
 extern ULONG patch_sysbase;	/* ExecBase copy for the non-exec stubs */

@@ -37,7 +37,7 @@ resolves them) — not by data-hunk pointers.
 | off | field |
 |-----|-------|
 | +0x00 | struct Library (34 B): ln_Type=9, ln_Name=data+0xa8, lib_Flags=6, NegSize=222, PosSize=112, Version=40, Revision=1, IdString=data+0x127 |
-| +0x22 | FPUFlags byte — FPUControl get/set target, also the TRAP-handler gate bits |
+| +0x22 | FPUFlags byte — FPUControl get/set target, also the 68881-handler gate bits |
 | +0x24 | 'THOR' magic (0x54484f52) |
 | +0x2b | CPUFlags byte — bit0: no 68881 (skip excvec install), bit1: mmu.library GetMMUType()==0 |
 | +0x2c | seglist (a0 at init) |
@@ -46,7 +46,7 @@ resolves them) — not by data-hunk pointers.
 | +0x38 | expansion.library base |
 | +0x44 | mmu.library base |
 | +0x48 | input.device node (from SysBase->DeviceList) |
-| +0x50..+0x6b | saved TRAP vectors #5,#3,#6,#4,#0,#1,#2 (table C order) |
+| +0x50..+0x6b | saved 68881 exception vectors 48-54 (table C order: vec 53,51,54,52,48,49,50) |
 | +0x6c..+0x6f | unused tail |
 
 ## Patch region (inside the code hunk)
