@@ -11,11 +11,13 @@
   (idstring, revision 10, "Squash 1.10" longname).
 - **Overlay (bytes 2232..2935)**: dead data — sits after HUNK_END, no
   hunk header, and none of the 22 relocations or any vector/reference
-  reach it. Disassembles as a hand-written `btst`-loop decoder
-  fragment (68000-style, no bfins/bfextu): literal-run + width ladder
-  + len/dist fields + `cmpw #31` litpress clamp + match copy, ending
-  in what looks like a widtab-style table at 0xada. Likely a build
-  artifact cat'ed from a related (68000) SQSH build.
+  reach it. Verified: it is BYTE-IDENTICAL to
+  `xpkSQSH_1.10(a).library`'s bytes at the same file offsets — i.e.
+  this file is a damaged repack of the real (a) build, its code hunk
+  truncated at 525 longs (the 1.00 size) with a 1.00-style
+  reloc+END written in and the original tail left appended. In (a)
+  the same range is mid-hunk live code (a `btst`-loop 68000-style
+  decoder) plus the start of (a)'s reloc table.
 - Reconstruction: `source/xpkSQSH.c` is verbatim the 1.00 codec;
   `source/xpkSQSH_lib.s` carries the 1.10 metadata. The overlay is
   documentation-only (not part of the loadable image).

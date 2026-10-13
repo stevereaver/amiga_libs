@@ -11,6 +11,10 @@
   0xada, and a trailing `03ec` reloc block — the tail of whatever
   hunk it was cut from. Backward `bltw` at 0x91e -> 0x7b6 shows it
   was assembled contiguously against a same-prefix build.
+- Stronger finding: the full 704 overlay bytes are byte-identical to
+  `xpkSQSH_1.10(a).library` at the same file offsets — this file is a
+  damaged repack of the (a) build (hunk truncated at 525 longs,
+  1.00-style reloc+END inserted, original tail left appended).
 - Conclusion: dead appended fragment; loadable image == the
   xpksqsh_1.10(older) twin. Reused that source verbatim.
 - machine68k (M68020): rev=10, correct idstr/descriptor, PackerInfo
