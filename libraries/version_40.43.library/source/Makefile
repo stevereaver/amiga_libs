@@ -1,53 +1,23 @@
-# Makefile for version.library 40.43 C reconstruction
-#
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-#
-# The AUTOINIT function table is a list of word offsets relative to
-# the table start.  gas cannot express "extern_sym - local_sym" in
-# a .word across objects, so the table is generated in a second link
-# pass: a dummy table of the right size is linked, symbol addresses
-# are read with nm, and genfunctab.py emits the real .word values.
-
+# Makefile for version.library reconstruction (WB-version stubs).
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
-CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
-          -I/opt/amiga/m68k-amigaos/ndk-include \
-          -Wall -Wno-unused-parameter
 ASFLAGS = -m68000
-LDFLAGS = -nostdlib -nostartfiles
-NM      = /opt/amiga/bin/m68k-amigaos-nm
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
 
+ORIG    := $(wildcard ../binary/*)
 TARGET  = version.library
 
 all: $(TARGET)
 
-# pass 1: dummy table (same size as the real one), just to learn the
-# final addresses of every function in the code hunk.
-dummy.library: version_lib.o functab_stub.o version.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ version_lib.o functab_stub.o version.o endmodule.o
+$(TARGET): version.o
+	$(CC) $(LDFLAGS) -o $(TARGET) version.o
 
-functab.s: dummy.library genfunctab.py
-	$(NM) dummy.library > dummy.nm
-	python3 genfunctab.py dummy.nm > $@
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
 
-functab.o: functab.s
-	$(CC) $(ASFLAGS) -c -o $@ functab.s
-
-$(TARGET): version_lib.o functab.o version.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ version_lib.o functab.o version.o endmodule.o
-
-version_lib.o: version_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ version_lib.s
-
-functab_stub.o: functab_stub.s
-	$(CC) $(ASFLAGS) -c -o $@ functab_stub.s
-
-version.o: version.c versionbase.h
-	$(CC) $(CFLAGS) -c -o $@ version.c
-
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
+verify: $(TARGET)
+	cmp -l $(TARGET) $(ORIG) && echo IDENTICAL || echo DIFFERS
 
 clean:
-	rm -f *.o *.nm functab.s dummy.library $(TARGET)
+	rm -f *.o $(TARGET)
 
-.PHONY: all clean
+.PHONY: all verify clean

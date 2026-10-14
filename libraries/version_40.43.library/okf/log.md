@@ -1,19 +1,9 @@
----
-type: Log
-title: Work Log
-description: Chronological journal of analysis sessions for this library. Newest first.
----
+# version40.43 — RE log
 
-# Log
-
-## 2026-10-10
-- Disassembled `version_40.43.library` (ira -M68000 +
-  objdump cross-check): single 0xc0 code hunk, 7 relocs, sha256
-  ffe8886e…ce95700b.
-- Decoded AUTOINIT InitTable: dataSize 0x2a, 4-entry word-offset
-  function table; Expunge/ExtFunc share the null stub at 0xba.
-- Noted quirky semantics: no LIBF_DELEXP anywhere, LibClose
-  self-expunges at OpenCnt==0, Expunge vector is inert.
-- Reconstructed `source/` (C + header .s, two-pass functab);
-  `make` produces a valid .library with matching RomTag, strings,
-  vector order and reloc profile.
+- 272 B, single CODE hunk 48 lw. Parsed RomTag + packed strings
+  + InitTable + word-mode functab; all offsets resolved.
+- Transcribed source/version.s (shares template with the other
+  WB version stubs). `.byte 0` pad after idstr (not word).
+- `make` -> byte-identical, md5 0b11ee4ec9d693cd5aef262c2e54b1f1.
+- No oracle: only external call is exec FreeMem(-210) in the
+  last-close expunge path; behavior covered by byte identity.

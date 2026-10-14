@@ -1,32 +1,18 @@
----
-type: Library
-title: freeanim.library 40.29
-description: AUTOINIT stub library — every vector and the init routine are a single "return 0".
-tags: [stub, autoinit]
----
+# freeanim.library 40.29 (1.4.94) — OKF index
 
-# freeanim.library 40.29 — Knowledge Bundle
+Stub/placeholder library. Single CODE hunk (27 longs, 108 B);
+file 188 B, MD5 `d55fa1c912ce38fd8d480cadbcc6ac72`.
 
-## Overview
+Reconstruction: `source/freeanim.s` + `Makefile`, byte-identical.
+No runtime oracle needed — the library has no external calls; all
+four API vectors and the initfn are the same `moveq #0,d0; rts`
+stub at h0+0x66.
 
-Binary: `binary/freeanim_40.29.library`, 188 bytes,
-SHA256 `a9d8665b98a5d1212e6d96fd278e89818640d61e06803803d84e10c0238f8b72`.
-ID string `freeanim 40.29 (1.4.94)` (no `$VER:` prefix, unlike the
-$VER:-style string found in v40.9).
+RomTag @ h0+4: AUTOINIT (0x80), v40, NT_LIBRARY pri 0,
+name/idstr at h0+0x1e/0x2f, InitTable at h0+0x4a
+(dsize 0x2a, functab->0x5a, datatab 0, initfn->0x66).
+Functab is word-offset mode (0xffff marker): four entries 0x000c
+-> functab+0xc = h0+0x66. EndSkip = 0x6a (points past the stub).
 
-Single code hunk, one RomTag (`RTF_AUTOINIT`, version 40, NT_LIBRARY,
-priority 0).  The AUTOINIT table contains only the four mandatory
-system vectors (-6/-12/-18/-24); there are no public API vectors.
-All four entries, and the InitTable init routine, point at the same
-`moveq #0,d0 / rts` at code+0x66.  InitTable dataSize is 0x2a
-(Library + 2 unused longs); there is no InitStruct data table.
-
-Reconstructed in `source/` (asm RomTag + C stub, two-pass generated
-function table).  `make` produces a valid HUNK `.library`.
-
-## Categories
-
-- [functions/](functions/index.md) — LVO entries
-- [structures/](structures/index.md) — hunk map, RomTag/InitTable, base layout
-- [findings/](findings/index.md) — quirks and open questions
-- [log.md](log.md) — work journal
+See `functions/vectors.md`, `structures/layout.md`,
+`findings/quirks.md`, `log.md`.
