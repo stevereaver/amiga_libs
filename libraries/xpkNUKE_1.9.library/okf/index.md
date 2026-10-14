@@ -21,5 +21,5 @@
 - `structures/layout.md` — lib base + workspace map + XpkSubParams use
 - `functions/vectors.md` — vector map, entry/exit behaviour per LVO
 - `algorithms/codec.md` — NUKE stream format, hash chains, emit order
-- `findings/quirks.md` — original defects/limitations reproduced
+- `findings/defects.md` — original defects/limitations reproduced
 - `log.md` — chronological work log

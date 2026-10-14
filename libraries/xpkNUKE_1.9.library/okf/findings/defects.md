@@ -1,6 +1,6 @@
 ---
 type: Finding
-title: xpkNUKE_1.9 quirks reproduced
+title: xpkNUKE_1.9 defects reproduced
 timestamp: 2026-10-14T00:00:00Z
 ---
 

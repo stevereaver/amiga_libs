@@ -6,6 +6,18 @@ timestamp: 2026-10-14T00:00:00Z
 
 # Work log (newest first)
 
+## Final pass — verification re-run + findings rename
+
+- Re-ran `work/oracle.py` against `binary/` (tag O) and
+  `source/xpkNUKE.library` (tag M): 20/20 packed streams in
+  `work/streamsM/` byte-identical to `work/streamsO/`; normalized
+  oracle logs identical except descriptor-internal code offsets
+  (relocated pointers — all referenced content identical).
+- Rebuilt target with `make` (`-m68000`, two-pass functab): clean.
+- Renamed `okf/findings/quirks.md` -> `defects.md` to match the
+  deliverable layout used by SQSH/ZENO/HUFF/BZIP/TDCS.
+- Repo-wide MD5 scan: `07c317d397b2b2c02945cf034c89225a` is unique.
+
 ## 2026-10-14 — packer match-gate resolved, full byte-parity
 
 - Root-caused the last packer divergence (`txt`/`ramp`/`rnd8k`):
