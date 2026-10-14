@@ -6,6 +6,11 @@ description: Chronological journal of analysis sessions for this library. Newest
 
 # Log
 
+## 2026-02-20
+- `source/version.s` byte-exact rebuild (supersedes C model for
+  binary fidelity; C model retained under `make cmodel`).
+- machine68k oracle identical to original (lifecycle + hook probe).
+
 ## 2026-10-10
 - Disassembled `version_44.2(WB3.5).library` (ira -M68000 +
   objdump cross-check): single 0x10c code hunk, 7 relocs, sha256

@@ -27,7 +27,9 @@ table) that XOR-deobfuscates a semaphore name and calls exec
 [findings/HiddenSemaphoreCheck](findings/HiddenSemaphoreCheck.md).
 
 Status: **FULL** -- all four LVOs plus the hidden routine
-reconstructed, `source/` rebuilds a working .library.
+reconstructed; `source/version.s` rebuilds **byte-identically**
+(`make`); earlier C model retained under `make cmodel`.
+machine68k oracle trace identical to original.
 
 ## Categories
 

@@ -33,9 +33,10 @@ Open/Close/Expunge/ExtFunc — and exists to be found by
 
 ## Status
 
-FULL — reconstructed in C (`source/`), builds with
-m68k-amigaos-gcc -m68000 via the two-pass genfunctab link.
-Semantics verified against IRA disassembly of the original.
+FULL — `source/version.s` rebuilds the binary **byte-identically**
+(`make`); the earlier C model remains buildable via `make cmodel`.
+machine68k oracle: init/open/close/expunge/deferred-expunge/stub
+traces identical to the original.
 
 ## Contents
 

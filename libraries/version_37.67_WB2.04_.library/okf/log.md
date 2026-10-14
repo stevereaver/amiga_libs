@@ -7,6 +7,12 @@ timestamp: 2026-10-10T19:00:00Z
 
 # Log
 
+## 2026-02-20
+- `source/version.s` + `fixup.py` byte-exact rebuild incl. the
+  empty second CODE hunk record and original reloc ordering.
+- machine68k oracle identical: InitStruct fills hdr (type 9, ver 37,
+  rev 67); Open/Close/Expunge via private DELEXP bit at lib+42; -24 stub.
+
 ## 2026-10-10
 - Phase 1: recorded binary facts (size 384, sha256 f2ed7a7d12e74d3fc073785385a2397760fc4d9c01aa8b361fc719f0bcbdcde3,
   $VER "version 37.67 (16.7.91)", hunk map).  Disassembled with IRA 2.09 into

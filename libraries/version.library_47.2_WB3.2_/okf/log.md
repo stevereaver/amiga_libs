@@ -6,6 +6,12 @@ description: Chronological journal of analysis sessions. Newest first.
 
 # Log
 
+## 2026-02-20
+- Word-offset functab (4 vectors); real DELEXP lifecycle.
+- `source/version.s` byte-exact rebuild; md5 `51f78258bcde8be428f3131c250b7aeb`.
+- machine68k oracle: init/open/close/expunge/deferred-expunge/stub
+  all trace-identical (RUNTIME IDENTICAL).
+
 ## 2026-10-10
 - Parsed 308-byte single-CODE-hunk module: entry `moveq #-1,d0/
   rts`, RomTag (AUTOINIT, ver 47, NT_LIBRARY), name

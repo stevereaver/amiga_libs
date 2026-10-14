@@ -6,6 +6,11 @@ description: Chronological journal of analysis sessions. Newest first.
 
 # Log
 
+## 2026-02-20
+- Identical code to 47.2; rev word 3, id `version 47.3 (13.7.2021)`.
+- `source/version.s` byte-exact rebuild; md5 `ccdd381ce50512fe42f894c745424a41`.
+- machine68k oracle identical to original.
+
 ## 2026-10-10
 - Parsed 308-byte single-CODE-hunk module — byte-layout identical
   to version.library 47.2 except idstring `version 47.3

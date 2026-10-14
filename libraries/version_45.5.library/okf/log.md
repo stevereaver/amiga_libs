@@ -6,6 +6,11 @@ description: Chronological journal of analysis sessions for this library. Newest
 
 # Log
 
+## 2026-02-20
+- `source/version.s` byte-exact rebuild; stale date constant
+  0x11081999 @lib+46 preserved (id says 25.4.2010).
+- machine68k oracle identical to original.
+
 ## 2026-10-10
 - Disassembled `version_45.5.library` (ira -M68000 +
   objdump cross-check): single 0x10c code hunk, 7 relocs, sha256

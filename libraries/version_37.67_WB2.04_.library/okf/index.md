@@ -16,10 +16,12 @@ Expunge and a reserved null vector).
 
 ## Status
 
-Fully disassembled and reconstructed.  `source/` builds with
-m68k-amigaos-gcc into a loadable HUNK `.library`; RomTag, strings,
-InitTable, function table and InitStruct data are byte-identical to
-the shipped binary (sha256 `f2ed7a7d12e74d3f…`).
+Fully disassembled and reconstructed.  `source/version.s` +
+`fixup.py` rebuild the binary **byte-identically**, including the
+empty second CODE hunk record and original RELOC32 ordering
+(`make`); the earlier C model remains under `make cmodel`.
+machine68k oracle: InitStruct header fill, lifecycle vectors and
+the lib+42 DELEXP bit all trace-identical to the original.
 
 ## Contents
 

@@ -1,13 +1,8 @@
-# Makefile for version.library 37.67 (WB2.04) C reconstruction
+# Makefile for version.library 37.67 reconstruction.
 #
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-#
-# Unlike iffparse.library (which uses a word-offset AUTOINIT table),
-# this binary's function table holds absolute longword pointers, so a
-# single link pass suffices -- gas/ld emit the HUNK_RELOC32 entries for
-# the .long vector entries directly.  No genfunctab.py second pass is
-# needed.
-
+# `make`        -> byte-identical rebuild from version.s + fixup.py
+# `make cmodel` -> earlier C-model build (functionally equivalent,
+#                  not byte-identical; kept as semantic documentation)
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin -fno-toplevel-reorder \
           -I/opt/amiga/m68k-amigaos/ndk-include \
@@ -19,19 +14,21 @@ TARGET  = version.library
 
 all: $(TARGET)
 
-$(TARGET): version_lib.o version.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ version_lib.o version.o endmodule.o
+$(TARGET): version.o fixup.py
+	$(CC) $(LDFLAGS) -Wl,-s -o $(TARGET) version.o
+	python3 fixup.py $(TARGET)
 
-version_lib.o: version_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ version_lib.s
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
 
-version.o: version.c
+# --- earlier C model ---
+cmodel: version_lib.o version_c.o endmodule.o
+	$(CC) $(LDFLAGS) -o version-c.library version_lib.o version_c.o endmodule.o
+
+version_c.o: version.c
 	$(CC) $(CFLAGS) -c -o $@ version.c
 
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
-
 clean:
-	rm -f *.o *.nm $(TARGET)
+	rm -f *.o version-c.library $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean
