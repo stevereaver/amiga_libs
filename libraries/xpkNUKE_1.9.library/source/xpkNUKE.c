@@ -278,12 +278,25 @@ LONG XpksPackChunk(struct XpkSubParams *xsp REGPARM_A0)
 	ULONG pair;
 
 	if (!xsp->xsp_Sub[0]) {
+#ifdef HOST_TEST
+		/* LP64: struct Work exceeds the 92-byte m68k header, so the
+		 * tables (which must not overlap the header fields) are placed
+		 * after the host struct.  Same 0x30000 bytes of tables. */
+		w = (struct Work *)ALLOCMEM(sizeof(struct Work) + 0x30000,
+					      0x10000);
+		xsp->xsp_Sub[0] = w;
+		if (!w)
+			return -7;
+		w->tab1 = (UWORD *)((UBYTE *)w + sizeof(struct Work));
+		w->tab2 = (UWORD *)((UBYTE *)w->tab1 + 0x20000);
+#else
 		w = (struct Work *)ALLOCMEM(WORKSIZE, 0x10000); /* MEMF_CLEAR */
 		xsp->xsp_Sub[0] = w;
 		if (!w)
 			return -7;
 		w->tab1 = (UWORD *)((UBYTE *)w + 92);
 		w->tab2 = (UWORD *)((UBYTE *)w + 92 + 0x20000);
+#endif
 	} else {
 		UBYTE *p;
 		w = (struct Work *)xsp->xsp_Sub[0];
