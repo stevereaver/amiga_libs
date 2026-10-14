@@ -1,54 +1,84 @@
-# cyberlayers_40.8.library -- layout
+# cyberlayers.library 40.8 — layout
 
-## File
+## Hunks
 
-| off    | content |
-|--------|---------|
-| 0x0000 | hunk header: 0x3f3, 2 hunks, sizes {0x211, 0xa7} longs |
-| 0x001c | hunk0 tag 0x3e9 + size; body @0x24 (2116 B) |
-| 0x0868 | hunk0 relocs: tag 0x3f7 + u16 groups + pad + 0x3f2 |
-| 0x089c | hunk1 tag 0x3e9 + size; body @0x8a4 (668 B) |
-| 0x0b40 | 0x3f2 HUNK_END |
+| # | type | body | contents |
+|---|------|------|----------|
+| 0 | CODE | 0x844 B (0x211 L) | DOS stub + RomTag @+4, strings @+0x1e..0xc1, InitTable @0xc2, word-offset functab @0xd2, datatab @0xde, initfn @0xfe, _initctx @0x152, _patchinstall @0x454, patchtab @0x48c, own vectors @0x4b2-0x51d, CYBL record+SwapBits @0x51e-0x843 |
+| 1 | CODE | 0x29c B (0xa7 L)  | five CYBL records @0x00/0x1c/0xd2/0xf6/0x11e + the five patched layers functions + _roverlap @0x26e; rt_EndSkip = +0x29c (EOF) |
 
-## hunk0 map
+Relocation: **HUNK_RELOC32SHORT** (0x3f7) on hunk0 only —
+- h0 -> h0 {0x6, 0x12, 0x16, 0x1a, 0xc6, 0xca, 0xce, 0xe4, 0xf6, 0x4ac}
+- h0 -> h1 {0xa, 0x48e, 0x494, 0x49a, 0x4a0, 0x4a6}
 
-| off   | content |
-|-------|---------|
-| 0x00  | `moveq #-1,d0; rts` entry stub |
-| 0x04  | RomTag (AUTOINIT, v40, pri 0); EndSkip->h1 end |
-| 0x1e  | "cyberlayers.library" |
-| 0x32  | idstr; then "layers.library"@0x78, "cybergraphics.library"@0x87, "graphics.library"@0x9d, "layersdummy.library"@0xae |
-| 0xc2  | InitTable {dsize=0x76, ftab->0xd2, dtab->0xde, init->0xfe} |
-| 0xd2  | word-mode functab {ffff,3e0,3ee,402,448,ffff} -> 0x4b2/0x4c0/0x4d4/0x51a |
-| 0xde  | InitStruct datatab (name/ver=40/rev=8/idstr) |
-| 0xfe  | initfn |
-| 0x152 | _clone routine |
-| 0x454 | _install routine |
-| 0x48c | patch table {LVO.w, fn.l} x6 + 0 term |
-| 0x4b2 | -6 Open |
-| 0x4c0 | -12 Close |
-| 0x4d4 | -18 Expunge |
-| 0x51a | -24 stub |
-| 0x51e | embedded CYBL block (ver 0x27), code @0x530 = layers -126 replacement |
+All code is pc-relative; the only relocated words are RomTag/InitTable/
+datatab/patchtab data longs (hence the compact form).
 
-## hunk1 map
+## RomTag (h0+4)
 
-| off   | content |
-|-------|---------|
-| 0x00  | CYBL blk0 hdr (ver 0x27); code @0x12 = layers -36 |
-| 0x1c  | CYBL blk1 hdr; code @0x2e = layers -186 (+ shared trampoline tail) |
-| 0xd2  | CYBL blk2 hdr; code @0xe4 = layers -60 |
-| 0xf6  | CYBL blk3 hdr; code @0x108 = layers -66 |
-| 0x11e | CYBL blk4 hdr; code @0x130 = layers -180 (also bsr target of -60/-66) |
-| 0x26a | tail helper (rect compare: `cmpw` chains -> d0 0/1) |
+`4afc`, matchtag->h0+4, endskip->h1+0x29c, `80 28 09 00` (AUTOINIT,
+ver 40, NT_LIBRARY, pri 0), name->h0+0x1e `"cyberlayers.library"`,
+idstr->h0+0x32, init->h0+0xc2.
 
-## library structure (dsize 0x76 = 118 bytes)
+## InitTable (h0+0xc2) + datatab (h0+0xde)
+
+`{dsize=0x76, functab->0xd2, datatab->0xde, initfn->0xfe}`.
+
+datatab ops: initbyte +8=9 (ln_Type), initlong +10=name, initbyte
++14=6 (ln_Flags LIBF_CHANGED|LIBF_SUMUSED), initword +20=40/+22=8,
+initlong +24=idstr.
+
+functab @0xd2 = relative format (`ffff`) + `{0x3e0,0x3ee,0x402,0x448}`
+-> 0x4b2/0x4c0/0x4d4/0x51a + `ffff`. NegSize=24, PosSize=0x76.
+
+## cyberlayers library base (dsize 0x76)
 
 | off | field |
 |-----|-------|
-| +34 | exec base |
-| +38 | seglist |
-| +42 | layers.library base |
-| +46 | graphics.library base |
-| +50 | own stub fn (h0+0x51a) |
-| +54 | cybergraphics.library base |
+| 0x00-0x21 | struct Library (via datatab) |
+| 34 | SysBase |
+| 38 | seglist |
+| 42 | layers.library base (OpenLibrary v39) |
+| 46 | graphics.library base (v39) |
+| 50 | &ExtFunc stub (h0+0x51a) |
+| 54 | cybergraphics.library base (v40) — NULL aborts init |
+| 58 | SwapBits bitmap cache: 30 x {bitmap@0, buffer@4} — NOTE: spans +58..+298, past the 118-B positive size (see quirks) |
+
+## CYBL record (18 B, preceding each patched function)
+
+| off | field |
+|-----|-------|
+| +0  | 'CYBL' magic |
+| +4  | w: required exec version (0x27 = 39; patchinstall gate) |
+| +6  | w: 1 |
+| +8  | w: 0 |
+| +0xa | l: filled with cyberlayers lib base at install time |
+| +0xe | l: filled with the previous vector (tail-call target) |
+
+Records at h1+0x00/0x1c/0xd2/0xf6/0x11e (funcs at +0x12/+0x2e/+0xe4/
++0x108/+0x130) and h0+0x51e (func at +0x530). The patchtab
+(h0+0x48c) drives installation: `{-36,h1+0x12},{-186,h1+0x2e},
+{-60,h1+0xe4},{-180,h1+0x130},{-66,h1+0x108},{-126,h0+0x530},{0}`.
+
+## Packed Resident view used by _initctx
+
+The copy code treats the layers Resident as a packed 26-byte struct:
+`+0 matchword, +2 matchtag, +6 endskip, +8 fl/v/t/p, +14 name,
++18 idstr, +22 init` — plus pointers at init+4/+8/+12/+40 rewritten
+into copy-relative form (InitTable fields + an interior pointer).
+
+## Foreign structures touched
+
+- **struct Layer (internal CGX-era layout)**: +0 front, +8 ClipRect,
+  +12 rp (RastPort*), +16-22 bounds {MinX,MinY,MaxX,MaxY}, +30 Flags
+  (u16; type bits at low byte +31: SIMPLE=1/SMART=2/SUPER=4;
+  mask 0x680 cleared by CUHL), +68 LayerInfo*, +118 backfill hook
+  (LAYERS_NOBACKFILL = (Hook*)1 sentinel), +156 ClipRegion*.
+- **struct ClipRect**: +0 Next, +8 lobs (non-zero = obscured clip),
+  +16-22 bounds.
+- **struct ClipRect (SwapBits arg)**: +12 BitMap*, +16-22 bounds.
+- **struct BitMap (CGX-extended)**: +1 bit0 "native/chunky" flag,
+  +36 'CYBR' magic when CGX-managed.
+- **struct RastPort**: +4 BitMap*.
+- **exec**: version@+20, AttnFlags@+297 (bit3 = 68020 gate for the
+  non-CYBR native path).

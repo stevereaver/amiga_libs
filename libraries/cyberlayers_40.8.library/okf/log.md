@@ -1,38 +1,61 @@
-# cyberlayers_40.8.library -- work log
+# cyberlayers.library 40.8 — work log
 
-- Parsed hunk file: 2 CODE hunks (h0 0x211 longs / 2116 B, h1 0xa7
-  longs / 668 B). Relocations use a nonstandard tag `0x3f7` block:
-  u16 count + u16 target-hunk + u16 offsets, count-0 terminated,
-  trailing pad word, then `0x3f2`. Groups: h0->h0 ten offsets
-  {6,12,16,1a,c6,ca,ce,e4,f6,4ac}, h0->h1 six offsets
-  {a,48e,494,49a,4a0,4a6}. Note `0xa` = rt_EndSkip is relocated to
-  hunk1, so EndSkip = end of hunk1 -- the resident spans both hunks.
-- RomTag @h0+4: AUTOINIT 0x80, v40, NT_LIBRARY, pri 0.
-  name->0x1e, idstr->0x32, init->0xc2 (InitTable).
-- InitTable @0xc2: dsize 0x76 (118 B), functab->0xd2, datatab->0xde,
-  initfn->0xfe. Functab is word-mode (`ffff` sentinel + u16 offsets
-  rel. table base): only 4 vectors.
-- Disassembled h0 (objdump, /tmp/cl0.txt) and h1. h1 = five `CYBL`
-  blocks (18-byte headers: magic, ver=0x27, flag word, three zero
-  longs filled at install with {oldfunc, ourlib} at +0xa/+0xe) plus a
-  shared compare helper; h0 embeds a sixth CYBL block @0x51e.
-- Reconstruction: `cyberlayers_h0.s`/`cyberlayers_h1.s` mnemonic
-  assembly; the 16 relocated fields are `.long` symbol refs (incl.
-  h0->h1 refs for EndSkip and the five CYBL fn pointers, and h0+0x530
-  for the embedded block). The word-mode functab emits
-  `_fn-_functab` deltas, matching the original table format.
-- Linker detail: input section must be plain `.text` for the amiga
-  backend to type the hunk CODE (custom `.h0`/`.h1` section names
-  came out DATA/0x3ea).
-- `fixup.py` replaces the linker's RELOC32 tail with the exact 0x3f7
-  group layout; hunk1 has no relocs (bare HUNK_END).
-- Result: byte-identical (cmp + md5 51ee1a5be1b9c2af4cf7740c3b91d591).
-- Oracle: machine68k harness with a fabricated word-mode-functab
-  layers resident (incl. a `4eba` self-call to its -126 fn so the
-  in-clone scan hits), fake layers/graphics/cybergraphics bases and a
-  real MakeLibrary-emulating InitResident. Observed: AllocVec(202)+
-  CopyMem clone, clone rebase + InitResident -> 0x209768, the 4eba->
-  `jsr -126` site patch, CacheClearU, Forbid, 33x SetFunction
-  (-30..-216 -> clone fns), Permit, CloseLibrary, then 6x SetFunction
-  installing CYBL bodies; lifecycle vectors and all six patched
-  vectors called. orig.log == rebuild.log.
+## Phase 1 — hunk & disassembly recon
+
+- `work/analyze_hunks.py`: hunk walk -> CODE h0 0x844 B, h1 0x29c B;
+  h0 relocs are RELOC32SHORT (w-words) in two groups: h0->h0
+  {0x6,0x12,0x16,0x1a,0xc6,0xca,0xce,0xe4,0xf6,0x4ac} then h0->h1
+  {0xa,0x48e,0x494,0x49a,0x4a0,0x4a6}. h1 clean.
+- Extracted hunk bodies to `work/orig_h0.bin`/`orig_h1.bin`; linear
+  objdump + hand analysis. Identified: packed RomTag @h0+4
+  (endskip->h1+0x29c=EOF), strings, InitTable@0xc2 (dsize 0x76,
+  word-offset functab@0xd2 -> Open/Close/Expunge/ExtFunc
+  @0x4b2/0x4c0/0x4d4/0x51a), initfn@0xfe, the layers-Resident cloning
+  block @0x152, SetFunction walker @0x454 + patchtab@0x48c, six CYBL
+  records + patched functions (SwapBits in h0, five layers hooks in
+  h1), and the h1+0x26e rect-overlap helper.
+- Semantics: CyberGraphX layers accelerator — clones layers into
+  "layersdummy.library", transplants all 32 vectors, rewrites clone
+  `jsr pc@(-126 target)` -> `jsr a6@(-126)`, hooks
+  -36/-186/-60/-66/-180/-126.
+
+## Phase 2 — assembly reconstruction
+
+- `source/cyberlayers_h0.s`, `source/cyberlayers_h1.s` rewritten by
+  hand; `source/Makefile` (m68k-amigaos-gcc, two input sections,
+  generated `hunks.x` ordering h0 then h1) + `source/fixup.py`
+  (rewrites GNU ld output: reorders into h0/h1/reloc/h0relocs/end and
+  emits RELOC32SHORT; diffs every long against the original).
+- Fixups needed for byte identity (all as `.short` raw emits):
+  `b07c` non-cmpi compares; explicit zero displacements (`4aa9 0000`,
+  `b1e9 0000`, `202a 0000`, `3f68 xxxx 000y`, `b269 0000`,
+  `3228 0000`); `2c79 00000004` abs.l moveal; `203c ...` immediate
+  moves; `4cdf` pop masks; `b27c/927c/1f3c` non-quick forms; the
+  4-byte `bsr.b` at h0+0x4a8 emitted as `bsrw + .short` trick.
+- Fixup bug: first fixup.py packed 7 fields with a 6-field struct
+  format — corrected to `'>IIIIIII'`.
+- Result: **byte-identical** — md5
+  `51ee1a5be1b9c2af4cf7740c3b91d591` for both
+  `binary/cyberlayers_40.8.library` and `source/cyberlayers.library`.
+
+## Phase 3 — runtime oracle
+
+- `work/oracle.py` (machine68k): loads both hunks, applies
+  RELOC32SHORT; fake exec (FindResident/InitResident/SetFunction/
+  AllocVec/CopyMem/InitStruct path via real InitResident/OpenLibrary/
+  CloseLibrary/Remove/FreeMem…), packed fake layers Resident, fake
+  layersdummy base with jmp table + a `4eba` self-call site for the
+  rewrite scan, graphics/cybergraphics bases, and a `*(layers+34)`
+  engine base with -30/-918/-924.
+- Exercises: full init (30 vector repoints + 6 CYBL installs), CUL/
+  CUHL (NULL/sentinel/SUPER/normal paths), ML/SL/MSL (degenerate,
+  noop, non-smart tailcall, fast, lobs-obscured, front-overlap),
+  SwapBits (orig, cache miss+hit, native-'CYBR', 68020 path,
+  fallback), Open/Close/Expunge incl. deferred expunge, no-cgx abort
+  and exec<39 early-exit.
+- Bugs hit along the way: Machine RAM arg overflow; negative regs
+  need `&0xffffffff` on w_reg; alloc-heap colliding with hunk1
+  (moved to 0x80000); `jsr pc@` target out of d16 range (dummy stubs
+  at 0x7c000); walrus-in-kwarg syntax; overlap test needed non-zero
+  deltas (0-delta hits the MSL noop path).
+- Result: `orig.log == new.log` — `=== ORACLE IDENTICAL ===`.

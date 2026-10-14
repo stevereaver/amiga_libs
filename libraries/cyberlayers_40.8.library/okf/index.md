@@ -1,44 +1,45 @@
-# cyberlayers.library 40.8 -- OKF index
+# cyberlayers 40.8.library — OKF index
 
-- **File**: `binary/cyberlayers_40.8.library` (2884 bytes, 2 hunks)
-- **ID string**: `cyberlayers.library 40.8 (02.01.96) \xa9 by Vision Factory Development\r\n`
-- **Vendor**: Vision Factory Development (CyberGraphX ecosystem)
-- **Kind**: AUTOINIT library, version 40, revision 8, NT_LIBRARY, pri 0
-- **Reconstruction**: `source/` -- byte-exact assembly transcription
-  (`cyberlayers_h0.s`, `cyberlayers_h1.s`, hand-written
-  mnemonic assembly preserving the mid-instruction pointers and
-  overlapped encodings). `make` in `source/` rebuilds
-  `cyberlayers.library`; `fixup.py` rewrites the relocation tail to
-  the original nonstandard `0x3f7` format.
-- **Build verified**: `cmp` byte-identical, MD5
-  `51ee1a5be1b9c2af4cf7740c3b91d591`
-- **Runtime verified**: `work/oracle.py` (machine68k) -- original and
-  rebuild produce identical logs over init (resident clone + vector
-  redirection + CYBL install), lifecycle vectors, and calls into all
-  six installed CYBL patch routines.
+## Identity
 
-## What this library is
+| field    | value |
+|----------|-------|
+| libname  | `cyberlayers.library` |
+| version  | 40.8 — `"cyberlayers.library 40.8 (02.01.96) © by Vision Factory Development\r\n"` |
+| size     | 2884 bytes |
+| format   | hunk: CODE(2116 B) + CODE(668 B), hunk0 relocs in RELOC32SHORT form |
+| resident | AUTOINIT (`rt_Flags = 0x80`), v40, pri 0, rt_Init -> h0+0xc2 InitTable, rt_EndSkip -> h1+0x29c (end of file) |
+| purpose  | CyberGraphX layers accelerator (Vision Factory = the CGX authors). At init it clones the layers.library Resident into AllocVec'd RAM as "layersdummy.library", InitResident()s the clone, re-points all 32 public layers vectors (-30..-216) of the running layers.library at the clone's jump-table targets, rewrites `jsr pc@(d16)` calls inside the clone that reach its SwapBits vector into `jsr a6@(-126)`, then SetFunctions six of its own hooks into layers.library (-36/-60/-66/-126/-180/-186). The hooks accelerate SMART-refresh and CGX-native-bitmap paths. |
 
-A *library cloner + vector redirector* for `layers.library`, part of
-the CyberGraphX graphics-retargeting system. On init it:
+## Reconstruction
 
-1. Opens `layers.library` (v39), `graphics.library` (v39) and
-   `cybergraphics.library` (v40; failure aborts init).
-2. `FindResident("layers.library")`, allocates `rt_EndSkip-rt` bytes
-   (AllocVec), CopyMem's the resident, rebases its internal pointers
-   (MatchTag, EndSkip, Name->`layersdummy.library`, IdString, Init and
-   the InitTable functab/datatab/initfn/+0x28 fields) onto the copy,
-   then `InitResident`s it -- registering a second library named
-   `layersdummy.library` whose vectors land inside the RAM copy.
-3. Scans the clone for `jmp pc@(d16)` instructions (0x4eba) targeting
-   the clone's -126 vector and rewrites them to `jsr a6@(-126)`, then
-   CacheClearU, Forbid, and 33x `SetFunction` on the *real*
-   layers.library, repointing every vector -30..-216 at the clone's
-   functions, then Permit + CloseLibrary.
-4. Installs six `CYBL` replacement routines over the real
-   layers.library vectors -36, -186, -60, -180, -66, -126. Each CYBL
-   block carries a minimum-exec-version word; blocks requiring more
-   than `SysBase->LibNode.lib_Version` abort the whole install.
+- **Approach**: pure 68k assembly, byte-identical target. Compiler
+  fingerprints: `cmpw #imm,dn` emitted as `b07c` (non-cmpi form),
+  explicit zero displacements (`a2@(0)`, `sp@(0)`), `moveal 4:l`
+  abs-long SysBase loads alongside abs.w loads, `movemw` single-reg
+  pushes, packed Resident layout, word-offset functab.
+- **Source**: `source/cyberlayers_h0.s` (stub+RomTag+strings+InitTable+
+  all hunk0 code + SwapBits CYBL record), `source/cyberlayers_h1.s`
+  (5 CYBL records + 5 patched vectors + rect helper),
+  `source/Makefile` + generated `hunks.x`, `source/fixup.py`
+  (re-emits RELOC32SHORT records in the original group order and
+  verifies byte-identity against `../binary/`).
+- **Result**: `source/cyberlayers.library` byte-identical to the
+  original (MD5 `51ee1a5be1b9c2af4cf7740c3b91d591`).
+- **Runtime**: `work/oracle.py` — machine68k harness; fake exec
+  (FindResident/InitResident/SetFunction/AllocVec/CopyMem/OpenLibrary/
+  Remove/FreeMem…), a packed fake layers Resident, a layersdummy base
+  with `jmp` vector table, fake graphics/cybergraphics bases, and a
+  `*(a6+34)` "engine" base for the SwapBits alloc/blit/free calls.
+  Original and rebuilt traces are identical (orig.log == new.log).
 
-Net effect: layers.library runs CyberGraphX-aware replacement code in
-RAM while `layersdummy.library` holds a pristine copy.
+## Docs
+
+- `functions/vectors.md` — own 4 vectors, the 6 patched layers
+  vectors, and all internal helpers.
+- `structures/layout.md` — hunks, RomTag/InitTable/datatab, lib base,
+  CYBL records, structures touched.
+- `findings/quirks.md` — packed-resident copy, `jsr pc@` rewrite,
+  cache-table overrun, dead code, unbalanced fail path, compiler
+  idioms.
+- `log.md` — work log.
