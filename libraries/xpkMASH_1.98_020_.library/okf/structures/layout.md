@@ -101,16 +101,43 @@ FreeMem via `jsr a6@(-210)`.  PackChunk leaves no state in xsp.
 
 # Code region map (020)
 
-Vector/data offsets are IDENTICAL to the 000 build (the builds differ
-only in compressor inner-loop code -- 68020 encodings make the body
-52 bytes shorter; all entry points, tables and data land at the same
-code offsets).
+Everything from the resident entry through XpksPackerInfo is
+BYTE-IDENTICAL to the 000 build (0x0000..0x355).  The builds diverge
+at 0x356: the 2-byte fill between PackerInfo and the clear loop is
+`0x001c` in the 000 and `0x4b90` (`chk.w (a0),d5` -- dead; both
+builds enter the clear loop via `bsr.w $358`, so it never executes).
+From there on the same code is emitted with 68020 encodings
+(scaled-index addressing etc.); regions land at lower offsets.
+Corresponding region pairs (offsets at region start):
 
+| region | 000 | 020 |
+|---|---|---|
+| dead fill | 0x356 `001c` (2B) | 0x356 `4b90` (2B) |
+| _clear + pass1 | 0x358..0x460 | 0x358..0x458 |
+| dead | 0x460..0x462 | 0x458..0x45a |
+| pass2 lazy matcher | 0x462..0x57a | 0x45a..0x566 |
+| dead | 0x57a..0x580 (6B) | 0x566..0x570 (10B) |
+| coreB chain engine | 0x580..0x612 | 0x570..0x602 |
+| dead | 0x612..0x620 (14B) | 0x602..0x610 (14B) |
+| coreA emit loop | 0x620..0x7c0 | 0x610..0x7b0 |
+| emit tables | 0x7c0..0x830 | 0x7b0..0x820 |
+| emit code | 0x830..0x8a2 | 0x820..0x892 |
+| dead | 0x8a2..0x8aa | 0x892..0x89a |
+| decoder | 0x8aa..0x9be | 0x89a..0x9aa |
+| dead | 0x9be..0x9c0 | 0x9aa..0x9ac |
+| decoder tables | 0x9c0..0xa5c | 0x9ac..0xa48 |
 
+Body sizes: 000 = 0xa5c (2,652), 020 = 0xa48 (2,632) -> 20 bytes
+shorter overall.  Note the pass2 dead fill is 10 bytes in the 020
+vs 6 in the 000, which is why regions after it sit 0x10 lower, not
+0x14.
 
 ```
 0x1b6 LibInit     0x1c4 Open    0x1d2 Close   0x1e2 Expunge
 0x220 ret0 stub   0x224 XpksPackChunk         0x32e ret0 stub
 0x332 XpksUnpackChunk           0x34c XpksPackerInfo
-(same entry offsets as the 000 build)
+0x356 dead fill (4b90)          0x358 _clear  (bsr.w $358)
+0x396 pass1       0x450 _flush/pass2-end      0x570 coreB
+0x610 coreA/emit  0x820 emit tail             0x89a decoder
+0x7b0..0x820 emit tables        0x9ac..0xa48 decoder tables
 ```

@@ -1,17 +1,53 @@
-# xpkMASH.library 1.98 (000) — reconstruction log
+---
+type: Log
+title: xpkMASH_1.98(000) work log
+timestamp: 2026-10-14T00:00:00Z
+---
 
-- Parsed single CODE hunk; decoded RomTag (AUTOINIT v1 rev 98),
-  InitTable (dsize 0x4a, absolute-long functab, datatab, initfn).
-- Full disassembly; transcribed to gas asm (`source/xpkMASH.s`).
-  gas relaxations worked around with raw `.short`: `movea.l 0(An),Am`
-  explicit-zero displacement and the `move.b (Ax)+,(Ay)+` forms.
-- `source/Makefile` + in-recipe linker script produce a byte-identical
-  library: MD5 `1527b4f331464f3013ba90ca44a91e54`.
-- `work/oracle.py`: machine68k harness — hunk loader, fake exec with
-  AllocMem bump arena / FreeMem / Remove list-splice traps, InitStruct
-  application, `Done` endtrap at 0x7f0 (module-level class;
-  `MachineEndExecution` is not an exception type in this machine68k).
-  Trap tids are process-global → orig/rebuilt runs are separate
-  subprocesses via `run_oracle.py` + `difftest.py`.
-- Result: report + 40 packed streams identical (20 cases × modes 100/0,
-  round-trips byte-exact).
+# Work log (newest first)
+
+## Byte-identical reconstruction achieved + verified
+
+- Transcribed the entire code hunk via capstone disassembly ->
+  devin-syntax assembly (`work/genasm.py`).  Authored resident
+  header/RomTag/InitTable/InitStruct/XPK-info/mode-block around it.
+- Assembled+linked with `m68k-amigaos-gcc -m68000 -nostdlib
+  -nostartfiles -Wl,-s` (the -s drops the HUNK_SYMBOL the linker
+  appends; without it a 0x3f0 block follows the code hunk).
+- Iterated `work/fixup.py`: assemble -> byte-compare hunk bodies ->
+  emit the first mismatching instruction as `.short` -> repeat.
+  Then `work/minimize.py` dropped stale patches; 13 remain
+  (`work/patch000.txt`), all two devin encoding limitations:
+  `movea.l $0(An),Am` (devin drops the explicit zero displacement)
+  and `move.b (Ax)+,(Ay)+` (the mem-to-mem byte copy).
+- Result: `source/xpkMASH.s` builds BYTE-IDENTICAL to
+  `binary/xpkMASH_1.98(000).library` — full file compare clean.
+- `work/run_oracle.py` under machine68k: lifecycle
+  (open/open/expunge-deferred/close/close -> Remove+FreeMem),
+  PackerInfo descriptor dump, 20-case x 2-mode corpus -> 40 .pk
+  streams, unpack round-trips, alloc-fail (-7) and partial-alloc
+  (halving loop) paths.
+- `work/difftest.py` runs orig vs rebuilt in SEPARATE processes —
+  machine68k trap dispatch is global per tid; two `Lib` objects in
+  one process clobber each other's AllocMem/endtrap handlers and
+  corrupt results (observed: stale-handler runs returning zeroed or
+  off-by-one-byte streams).  Diff: reports identical modulo the
+  binary path; all 40 streams byte-identical.
+
+## Earlier (previous session)
+
+- Hunk maps recovered: 000 = 2652-byte code hunk + 28 RELOC32.
+- Runtime probe captured: 300x'Z' -> 6-byte stream bf5ac5202000;
+  AllocMem(131688) + FreeMem pattern.
+- Region map, functab order, XPK descriptor and mode record
+  decoded; C reference transliteration written
+  (`work/xpkMASH_ref.c`) documenting both engines and all defects.
+- First C-rebuild attempt produced a working but non-identical
+  library; superseded by the asm transcription which is byte-exact.
+
+## Remaining notes
+
+- The `.s` is the shipped reconstruction; `work/xpkMASH_ref.c`
+  documents the algorithm for readers but is not built.
+- Generator inputs: patch files pin the 13 raw-word sites; removing
+  one changes bytes -> fixup.py re-adds it.

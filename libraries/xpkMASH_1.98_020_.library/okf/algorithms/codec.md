@@ -20,11 +20,12 @@ match:  '00' + dist(9b)                  -> len 2
 
 Tables embedded in the hunk:
 
-- `runw[8]`  @0x7c0  — literal-run classes (word = code<<8|nbits-1)
-- `lenw[16]` @0x7d0  — length classes for len-2 in 0..15
+- `runw[8]`  @0x7b0  — literal-run classes (word = code<<8|nbits-1)
+- `lenw[16]` @0x7c0  — length classes for len-2 in 0..15
 - `distw[8]`/`distor[8]` — distance classes {bits,span} + class<<bits-3
-- decoder copies of the same at 0x9c0..0xa5c (incl. the mirror table
+- decoder copies of the same at 0x9ac..0xa48 (incl. the mirror table
   `0x8000,0x4000,...` and the `_runc` tail `...0x7ffe,0x0001,0xfffe`)
+  (all table offsets are -0x10 / -0x14 vs the 000 build)
 
 # Emitter (V2.0 hybrid)
 
@@ -47,9 +48,10 @@ Allocates `0x20010 + 2*inlen`:
 - pass1 (0x396): `gaps[i]` = distance to previous occurrence of the
   byte pair at i (or -1).  Phase A first ~32K positions with no
   distance clamp; phase B clamps gap >= 32415 to -1.
-- pass2 (0x458): lazy gap-chain matcher; candidate next-byte
-  filtering and distance checks; emits records.
-- coreA (0x620): walks records emitting the mixed stream.
+- pass2 (0x45a region; record-emit helper `_flush` at 0x450): lazy
+  gap-chain matcher; candidate next-byte filtering and distance
+  checks; emits records.
+- coreA (0x610): walks records emitting the mixed stream.
 
 ## Engine B — hash-chain matcher (fallback / big inputs)
 
@@ -64,7 +66,7 @@ Allocates `0x20010 + 2*inlen`:
 - same emit path as engine A (the streams are wire-identical;
   selection may differ in edge cases)
 
-# Decoder (0x8aa)
+# Decoder (0x89a)
 
 Straight-line decoder, BCS-seeded gammas, whole-byte grab on a dry
 accumulator mid-distance-field.  A 0x00 flag byte consumed inside a
@@ -80,8 +82,10 @@ except where mode changes hash-table dimensions.
 
 # 000 vs 020
 
-Same algorithm and identical output streams.  The 020 build adds a
-`CHKW (a0),d5 / lsr.l #8,d0` prologue before the clear loop and uses
-scaled-index addressing to fuse 000's `lea (a3,d1.l),a5; adda d1,a5`
-into `lea (a3,d1.l*2),a5`, `tst.w -4(a2,d3.w*2)` etc.  Code hunk is
+Same algorithm and identical output streams.  Differences are purely
+codegen: the 020 build uses scaled-index addressing to fuse 000's
+`lea (a3,d1.l),a5; adda d1,a5` into `lea (a3,d1.l*2),a5`,
+`tst.w -4(a2,d3.w*2)` etc.  The 2-byte alignment fill at 0x356 is
+`0x4b90` (`chk.w (a0),d5`) vs the 000's `0x001c` — dead in both
+(the clear loop is entered via `bsr.w $358` in each).  Code hunk is
 20 bytes shorter (2632 vs 2652).

@@ -1,8 +1,8 @@
 # xpkMASH_1.98_020_.library — OKF index
 
 - Binary: `binary/xpkMASH_1.98(020).library` (2,796 bytes, single
-  3E9 code hunk of 2,600 bytes + 28 RELOC32 relocs; md5
-  `b92fd3db12b87e806f85949130439ef0`)
+  3E9 code hunk of 2,632 bytes (0x292 longs) + 28 RELOC32 relocs;
+  md5 `b92fd3db12b87e806f85949130439ef0`)
 - Identity: `$VER: xpkMASH.library_020 V1.98`; short name `Mashiner`,
   "MASH.020 V1.98, good packer",
   "WindowSize: 32KB, 2 mixed streams  Dynamic Buffer Allocation"
@@ -29,8 +29,9 @@
   (`cmp` clean; 2,796 bytes).
 - `difftest.py`: reports identical, 40 packed streams identical,
   40/40 unpack round-trips OK on both sides.
-- Cross-check: the 020 build produces identical streams modulo the
-  `_020` id strings.
+- Cross-check: packed streams byte-identical to the 000 build's
+  across the whole corpus; the only differences are the `_020`
+  id/long-name strings.
 
 ## Layout of this bundle
 
@@ -59,4 +60,7 @@
   -> .short patch loop for encodings devin doesn't reproduce
 - `patch000.txt`/`patch020.txt` — offsets emitted as .short
   (`movea.l $0(An),Am` zero-disp forms and `move.b (Ax)+,(Ay)+`)
-- `dis000.txt`, `dis020.txt`, `code000.bin` — earlier disasm dumps
+- `dis020.txt`, `code020.bin` — earlier disasm dumps
+- `streams_orig020/` — earlier single-mode stream captures
+- `streamsO2/`, `streamsO3/`, `streamsR2/`, `streamsR3/` — repeat-run
+  stream captures (stability check)
