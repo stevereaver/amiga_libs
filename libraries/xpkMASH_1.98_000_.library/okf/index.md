@@ -60,3 +60,6 @@
 - `patch000.txt`/`patch020.txt` — offsets emitted as .short
   (`movea.l $0(An),Am` zero-disp forms and `move.b (Ax)+,(Ay)+`)
 - `dis000.txt`, `dis020.txt`, `code000.bin` — earlier disasm dumps
+- `streams_orig000/` — earlier single-mode stream captures
+- `randtest.py` — randomized differential driver (subprocess pair;
+  N=150 -> 740 comparisons, 0 failures)

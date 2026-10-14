@@ -15,3 +15,11 @@
   subprocesses via `run_oracle.py` + `difftest.py`.
 - Result: report + 40 packed streams identical (20 cases × modes 100/0,
   round-trips byte-exact).
+- `work/randtest.py` (Lib-class oracle) with N=150: 740 case×mode
+  comparisons orig vs rebuild — packed streams and unpack round-trips
+  byte-identical, **0 failures**.
+- Note: the bytes at code+0x356 decode as `chk.w (a0),d5` but are dead
+  alignment fill — the clear loop is entered via `bsr.w $358` in both
+  builds (000 uses fill word 0x001c there).  No CPU gate in LibInit.
+- Cross-build: packed streams identical to the 000 build; only the
+  `_020` id/long-name strings differ.

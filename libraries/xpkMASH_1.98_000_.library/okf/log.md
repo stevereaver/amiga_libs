@@ -6,6 +6,23 @@ timestamp: 2026-10-14T00:00:00Z
 
 # Work log (newest first)
 
+## Randomized differential test + oracle consolidation
+
+- `work/randtest.py` ported to the Lib-class oracle and run with
+  N=150 (740 case×mode comparisons: random/periodic/text/runs/
+  near-incompressible inputs up to ~100KB incl. inputs >64KB that
+  force the engine-B fallback): **0 failures** — packed streams and
+  unpack round-trips byte-identical orig vs rebuild.
+- One earlier randtest run reported spurious garbage-return-code
+  diffs (rc values like 30/518, stale OutLen sentinels) that did not
+  reproduce on re-run — orig-vs-orig emits are identical and the
+  clean driver run passes 740/740.  Treated as a transient
+  harness/machine68k artifact, not a real divergence: the binaries
+  are byte-identical, so equal execution is guaranteed.
+- `work/oracle.py` consolidated to the Lib-class API used by
+  `run_oracle.py`/`difftest.py`/`randtest.py` (the earlier
+  function-based load()/makelib() variant is superseded).
+
 ## Byte-identical reconstruction achieved + verified
 
 - Transcribed the entire code hunk via capstone disassembly ->

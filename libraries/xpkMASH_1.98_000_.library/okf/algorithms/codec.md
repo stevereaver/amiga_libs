@@ -80,8 +80,10 @@ except where mode changes hash-table dimensions.
 
 # 000 vs 020
 
-Same algorithm and identical output streams.  The 020 build adds a
-`CHKW (a0),d5 / lsr.l #8,d0` prologue before the clear loop and uses
-scaled-index addressing to fuse 000's `lea (a3,d1.l),a5; adda d1,a5`
-into `lea (a3,d1.l*2),a5`, `tst.w -4(a2,d3.w*2)` etc.  Code hunk is
+Same algorithm and identical output streams.  Differences are purely
+codegen: the 020 build uses scaled-index addressing to fuse the
+000's `lea (a3,d1.l),a5; adda d1,a5` into `lea (a3,d1.l*2),a5`,
+`tst.w -4(a2,d3.w*2)` etc.  The 2-byte alignment fill at 0x356 is
+`0x4b90` (`chk.w (a0),d5`) vs the 000's `0x001c` — dead in both
+(the clear loop is entered via `bsr.w $358` in each).  Code hunk is
 20 bytes shorter (2632 vs 2652).
