@@ -39,7 +39,7 @@ Full byte-level diff of both hunks against the shipped 46.3 binary:
 - CPU gate shifted one bit: require AFB_68030(bit2), reject
   AFB_68040(bit3); the 68020 build required bit1/rejected bit2.
 - `super_nop` → `super_tt`: the NOMMU Supervisor body writes PMMU
-  transparent-translation registers TT0=0x00008407, TT1=0x00ff8107
+  transparent-translation registers TT0=0x00008514, TT1=0x00ff0125
   via `pmove (sp),ttX` instead of running `nop;rte`.
 - `super_coldreboot` gains an unconditional TT0=TT1=0x00ff8707
   setup before the NOMMU-gated `pmove tc=0` shutdown.
@@ -75,3 +75,12 @@ Full byte-level diff of both hunks against the shipped 46.3 binary:
 - ColdReboot chain verified: disable → CacheControl(0,-1) →
   Supervisor(super_coldreboot w/ TT writes + PMMU-off + ROM jump)
   → Alert(0x3f000002) → enable — identical on both binaries.
+
+## Late correction (46.6 work)
+
+- Operand-level diffing (the original 46.3→46.5 pass compared only
+  opcodes/structure) revealed a second real delta: `super_tt`'s
+  constants changed from 46.3's TT0=0x00008407 / TT1=0x00ff8107 to
+  TT0=0x00008514 / TT1=0x00ff0125 — the oracle cannot see `pmove`
+  writes, so this slipped the first pass. Source and docs corrected;
+  super_coldreboot's 0x00ff8707 is unchanged across all versions.

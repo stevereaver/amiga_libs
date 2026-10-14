@@ -43,7 +43,7 @@
 |||||
 |||||	Init helpers unique to this build: _SuperTT performs a
 |||||	Supervisor() call writing the 68030 transparent-translation
-|||||	registers (TT0 = 0x00008407, TT1 = 0x00ff8107) when
+|||||	registers (TT0 = 0x00008514, TT1 = 0x00ff0125) when
 |||||	GetMMUType reports NONE, _CopyMMUObj runs the
 |||||	mmu.library -150/-282 object copy and _P5EmuExpunge the
 |||||	expunge of p5emu.library via its -24 vector.  Init calls
@@ -104,7 +104,7 @@ _DeadVector:
 ||||| -----------------------------------------------------------------
 ||||| _SuperTT -- the 68030-specific NOMMU setup run inside
 ||||| Supervisor(): writes the PMMU transparent-translation registers
-||||| TT0 = 0x00008407 and TT1 = 0x00ff8107 and returns via rte.
+||||| TT0 = 0x00008514 and TT1 = 0x00ff0125 and returns via rte.
 ||||| a6 = library base on entry (init convention: a4 = lib inside).
 ||||| -----------------------------------------------------------------
 
@@ -117,10 +117,10 @@ _SuperTT:
 	rts
 
 super_tt:
-	movel	#0x00008407,%sp@-
+	movel	#0x00008514,%sp@-
 	.word	0xf017,0x0800		| pmove %sp@,%tt0
 	nop
-	movel	#0x00ff8107,%sp@
+	movel	#0x00ff0125,%sp@
 	.word	0xf017,0x0c00		| pmove %sp@,%tt1
 	addql	#4,%sp
 	nop

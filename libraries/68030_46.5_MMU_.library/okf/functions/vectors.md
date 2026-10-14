@@ -24,7 +24,7 @@ in the DATA hunk at `hunk1+0x10` (InitTable at `hunk1+0`).
 | 0x1b0 | init failure tail: FreeMem(neg+pos), return NULL |
 | 0x1f0 | `PatchTable` — Disable, per record SetFunction + save old at fn-4, Enable |
 | 0x230 | `SuperTT` wrapper — `Supervisor(super_tt)` with a5 saved |
-| 0x246 | `super_tt` — `pmove (sp),tt0` / `pmove (sp),tt1` (TT0=0x00008407, TT1=0x00ff8107), rte |
+| 0x246 | `super_tt` — `pmove (sp),tt0` / `pmove (sp),tt1` (TT0=0x00008514, TT1=0x00ff0125), rte |
 | 0x262 | `UnpatchTable` — restores saved vectors for non-NULL slots |
 | 0x29e | `MMUCopy` — mmu -150, then mmu -282(obj,0x83e00403)/-282(obj,0x83e00405), copies 16 bytes src→dst |
 | 0x2ea | `P5emuExpunge` — Forbid, FindName(&LibList,"p5emu.library"), call its -24 with a1=own lib, Permit |

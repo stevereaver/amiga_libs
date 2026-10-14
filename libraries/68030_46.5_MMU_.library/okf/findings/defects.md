@@ -53,11 +53,11 @@
   `super_coldreboot` always programs TT0=TT1=0x00ff8707 before
   consulting CPUFlags bit1; only the `pmove tc` (PMMU disable) is
   gated on the NOMMU flag.  The NOMMU Supervisor call in init also
-  writes TT0=0x00008407 / TT1=0x00ff8107 — different constants from
+  writes TT0=0x00008514 / TT1=0x00ff0125 — different constants from
   the ColdReboot path.
 - **`pmove` operand order looks odd but is correct** — super_tt pushes
-  0x8407, pmove's it to tt0, *overwrites the same stack slot* with
-  0xff8107 and pmove's that to tt1; the ColdReboot version pushes
+  0x8514, pmove's it to tt0, *overwrites the same stack slot* with
+  0xff0125 and pmove's that to tt1; the ColdReboot version pushes
   0xff8707 once and pmove's it to *both* tt0 and tt1.
 - **Exception handlers write two vector tables** — `218a 0190` is an
   absolute-indexed write to the raw byte offset (the VBR=0 low-memory
