@@ -12,8 +12,10 @@
    non-reentrant across its globals.
 
 3. **Globals in a BSS hunk** addressed through a hand-built `lea
-   h1+0,a4` — all h0->h1 relocs are the lea operand sites.
+   h1+0,a4` (abs-long, `.short 0x49f9`) — all h0->h1 relocs are the lea
+   operand sites.
 
-4. No defects found in the verified paths: open×2/close accounting,
-   deferred expunge, buffered read across boundaries, EOF short-read,
-   seek-invalidation, char wrappers all behave consistently.
+4. See `defects.md` for the verified defect list (CloseLibrary(NULL)
+   on utility-open failure, double Close on alloc failure, the
+   mid-instruction `moveq #-1,d0` branch target, rt_EndSkip→Expunge,
+   uninitialized mn_ReplyPort, unchecked mode index).
