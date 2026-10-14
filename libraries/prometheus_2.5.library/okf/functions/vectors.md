@@ -1,43 +1,78 @@
-# prometheus.library 2.5 — vectors
+# prometheus.library 2.5 — vector map
 
-MakeLibrary-style absolute-long functab in hunk1 (DATA), 18 entries +
-`0xffffffff` terminator. Offsets are hunk0-relative.
+Functab = whole of hunk1 (18 absolute-long entries relocated to hunk0,
+`0xffffffff` terminator at +0x48). `rt_Init` calls
+`MakeLibrary(functab, NULL, NULL, dsize=84, seglist=0)` so the table is
+absolute.
 
-| LVO | h0 off | fn | summary |
-|-----|--------|----|---------|
-| -6   | 0x5c6 | Prm_Open  | OpenCnt++, clears LIBF_DELEXP, returns lib. |
-| -12  | 0x5d8 | Prm_Close | OpenCnt--; on last close with DELEXP set, runs Expunge and returns its result. |
-| -18  | 0x5fe | Prm_Expunge | sets DELEXP when open; else Remove, DeletePool(lib+50), CloseLibrary(utility + lazy card base), FreeMem(neg+pos), returns seglist. |
-| -24  | 0x66e | ExtFunc   | `clr.l d0; rts` reserved stub. |
-| -30  | 0x674 | Prm_FindBoardTagList | a0=node (NULL->pb_Cards head), a1=taglist. Walks the PCIBoard MinList; a board matches iff every non-NULL request tag is present in its pn_TagList **and** has an equal ti_Data. NULL taglist matches first board. |
-| -36  | 0x6e2 | Prm_GetBoardAttrsTagList | a0=board, a1=taglist `{tag,&dest}` pairs. For each item, FindTagItem in board->pn_TagList(+12); writes the found ti_Data (or 0) through item->ti_Data. Returns count written. |
-| -42  | 0x748 | Prm_ReadConfigLong | a0=board, d0=offset. `bfextu d0{24:6}` index, long from pn_ConfigBase(+8) + CacheClearU, bswap32 result. |
-| -48  | 0x76e | Prm_ReadConfigWord | same with `{24:7}` + `eoriw #1` word-in-long swap, bswap16. |
-| -54  | 0x79a | Prm_ReadConfigByte | `eorib #3` byte-in-word swap, single byte read. |
-| -60  | 0x7c6 | Prm_WriteConfigLong | a0=board, **d0=offset, d1=data** (reversed vs the public docs — fixed only in v3.0). bswap32 store + CacheClearU. |
-| -66  | 0x7e6 | Prm_WriteConfigWord | `{24:7}`+`eoriw #1`, bswap16 store + CacheClearU. |
-| -72  | 0x806 | Prm_WriteConfigByte | `eorib #3` byte store + CacheClearU. |
-| -78  | 0x82e | Prm_SetBoardAttrsTagList | a0=board, a1=taglist. Only `PRM_BoardOwner (0x6eda0005)` is settable (`_settable` array); copies ti_Data only when the board's existing tag is 0 or the new value is 0. Returns count changed. |
-| -84  | 0x8ac | Prm_AddIntServer | a0=board, a1=interrupt. exec AddIntServer(3,intr) — Prometheus interrupt is int 3. Returns 1 (0 if board NULL). |
-| -90  | 0x8ca | Prm_RemIntServer | RemIntServer(3,intr) if both args non-NULL. |
-| -96  | 0x8f6 | Prm_AllocDMABuffer | d0=size. Lazy-opens `Prometheus.card` v7 into lib+42, forwards to card vector -42. |
-| -102 | 0x930 | Prm_FreeDMABuffer | a0=mem, d0=size; lazy card open, forwards to card -48. |
-| -108 | 0x96a | Prm_GetPhysicalAddress | d0=vaddr. Returns `vaddr & 0x1fffffff` when inside `[board+0x100000, board+0x1fffffff]`, else 0. |
+| LVO  | h0 off | name                    | registers in -> out | behaviour |
+|------|--------|-------------------------|---------------------|-----------|
+| -6   | 0x5c6  | Open                    | a6=lib -> d0=lib    | lib_OpenCnt++, clear DELEXP(14 bit3) |
+| -12  | 0x5d8  | Close                   | a6=lib -> d0        | lib_OpenCnt--; if was 1 and DELEXP -> Expunge, else 0 |
+| -18  | 0x5fe  | Expunge                 | a6=lib -> d0=seg    | opencnt!=0 -> set DELEXP, ret 0; else Remove, DeletePool, CloseLibrary(utility,card), FreeMem(neg+pos), ret seglist |
+| -24  | 0x66e  | (reserved)              | -> d0=0             | `clrl d0; rts` |
+| -30  | 0x674  | FindBoardTagList        | a0=board|NULL, a1=taglist|NULL -> d0 | a0==0 -> head of card MinList else a0->succ; walks `while(node->mln_Succ)`; a1==0 -> next node unfiltered; else every caller tag must be present with equal ti_Data (missing tag does not disqualify, mismatch does) |
+| -36  | 0x6e2  | GetBoardAttrsTagList    | a0=board, a1=taglist -> d0=count | for each caller tag: FindTagItem in board->pn_TagList(+12); found -> `*tag->ti_Data = found->ti_Data`, count++; missing -> `*tag->ti_Data = 0`; NULL ti_Data dest skipped (not counted); NULL board/taglist -> 0 |
+| -42  | 0x748  | ReadConfigLong          | a0=board, d0=offset -> d0 | CacheClearU; idx=(off>>2)&63; `bswap32(cfg[idx])` |
+| -48  | 0x76e  | ReadConfigWord          | a0=board, d0=offset -> d0 | CacheClearU; idx=((off>>1)&127)^1; `bswap16(cfg.w[idx])&0xffff` |
+| -54  | 0x79a  | ReadConfigByte          | a0=board, d0=offset -> d0 | CacheClearU; `cfg.b[off&0xff ^ 3]` |
+| -60  | 0x7c6  | WriteConfigLong         | a0=board, d0=offset, d1=data | idx=(off>>2)&63; `cfg.l[idx]=bswap32(data)`; CacheClearU |
+| -66  | 0x7e6  | WriteConfigWord         | a0=board, d0=offset, d1=data | idx=((off>>1)&127)^1; `cfg.w[idx]=bswap16(data)`; CacheClearU |
+| -72  | 0x806  | WriteConfigByte         | a0=board, d0=offset, d1=data | `cfg.b[off&0xff ^ 3]=data`; CacheClearU |
+| -78  | 0x82e  | SetBoardAttrsTagList    | a0=board, a1=taglist -> d0=count | only `PRM_BoardOwner` is in the settable array; sets owner only if currently NULL (acquire) or new value is NULL (release); count of successful sets |
+| -84  | 0x8ac  | AddIntServer            | a0=board, a1=is -> d0 | board==NULL -> 0; else `exec.AddIntServer(3, is)`, returns 1 (exec result ignored — always reports success) |
+| -90  | 0x8ca  | RemIntServer            | a0=board, a1=is     | board && is != NULL -> `exec.RemIntServer(3, is)` |
+| -96  | 0x8f6  | AllocDMABuffer          | d0=size -> d0=ptr   | lazy `OpenLibrary("Prometheus.card",7)` into lib+42; NULL card -> 0; else `card[-42](size)` |
+| -102 | 0x930  | FreeDMABuffer           | a0=mem, d0=size     | same lazy open; card present -> `card[-48](mem,size)` |
+| -108 | 0x96a  | GetPhysicalAddress      | d0=vaddr -> d0      | `boardaddr+0x100000 <= v <= boardaddr+0x1FFFFFFF` -> `v & 0x1FFFFFFF`, else 0 |
 
-## Internal routines (h0)
+## Internal routines (not in the vector table)
 
-| off | fn | summary |
-|-----|----|---------|
-| 0x078 | _sizetopri | trailing-zero count of size -> ln_Pri (Enqueue priority). |
-| 0x094 | _addreq | (pb,size,type,tag,cfgreg): AllocPooled 30B SpaceReq @ pb+50 pool, ln_Type=0xfe, ln_Pri=log2(size), Enqueue -> pb+0x46 requests. |
-| 0x0ee | _querycard | (pb,cfg,cdev): vendor==0xffff -> skip. AllocPooled ~67B PCIBoard, AddTailMinList -> pb+0x3a cards, fills taglist (vendor/device/class/rev/...), walks 5 BARs + ROM BAR building SpaceReqs for nonzero BARs (type from bit0: mem/io), CacheClearU around probing writes. |
-| 0x296 | _writeaddr | (pb,cdev): allocates BAR windows top-down — mem cursor starts at boardaddr+cd_BoardSize, io cursor at boardaddr+0xf0000; per request writes `(cursor-1..)&sizemask` bswapped into the BAR and the assigned address into sr_Tag->ti_Data; CacheClearU per write. |
-| 0x3fe | _scanboard | (pb,cdev): NewList pb+0x46, pb+54=cd_BoardAddr, cfgbase=board+0xf0000; 4 slots (cfg+0x2000*slot) x 1|8 funcs (headertype bit7); per func _querycard then writes command=0x0700, latency=0 into cfg+4/+13; finally _writeaddr, sets cd_Driver=pb, clears cd_Flags bit1. |
-| 0x4ce | rt_Init | (a0=seglist, a6=SysBase): MakeLibrary(h1 functab, 84B), fills header (type 9, flags 6, ver 2, rev 5, OpenCnt=1), NewList-like init of pb_Cards(+0x3a) & pb_Requests(+0x46), CreatePool(MEMF_CLEAR,752,752)->+50, AddLibrary, OpenLibrary utility 36 + expansion 36, FindConfigDev(0xad47,1) loop -> _scanboard per board; success requires utility open; result=lib or NULL. |
+| h0 off | name        | signature | notes |
+|--------|-------------|-----------|-------|
+| 0x000  | DOS stub    | —         | `moveq #-1,d0; rts` |
+| 0x004  | RomTag      | —         | `4afc`, MatchTag->0x04 (self), EndSkip->0x1e, `rt_Flags=0` COLDSTART, `rt_Version=2`, `rt_Type=9`, `rt_Pri=0`, name->0x20, id->0x34, init->0x4ce |
+| 0x078  | SizeToPri   | sp+4=size -> d0 | trailing-zero count (`log2` of size); `extbl d0` result; two `btst` form (first-iteration pre-test) |
+| 0x094  | AddRequest  | (pb,size,type,tagitem*,cfgaddr) stack args | AllocPooled(30); node: size@14,type@18,tag@22,cfg@26,ln_Type=0xFE,ln_Pri=SizeToPri(size); Enqueue -> pb+70 |
+| 0x0ee  | QueryCard   | (pb, cfg*, cdev) stack args | vendor==0xFFFF -> early out; AllocPooled(188) PCIBoard, AddTailMinList -> pb+58; cfg@8; writes Vendor/Device/Revision/Class/SubClass tags (bswap'd); probes 5 BARs + ROM BAR (write ~0, read mask, size=-mask&size-mask); AddRequest per active BAR; Owner/Slot/Function tags |
+| 0x346  | WriteAddresses | (pb, cdev) | walks request list; mem cursor from `cd_BoardAddr+cd_BoardSize` downward, io cursor from `cd_BoardAddr+0xF0000` down; writes BAR = bswap32 of `(cursor|1)&(boardsize-1)` for type0 (MEM) and `(cursor)&(boardsize-1)` for type1 (IO) — i.e. window-relative offsets, MEM flagged with bit0; tag ti_Data gets the absolute cursor; aborts when mem dips below `board+0x100000` or io below `board+0x10000` |
+| 0x3fe  | ScanBoard   | (pb, cdev) | NewList(pb+70); pb+54=cd_BoardAddr; for slot 0..3 x funcs (1 or 8 per headertype bit7): QueryCard, cfg->command=0x0700 (word, unswapped), cfg->latency=0; then WriteAddresses; `cd_Driver=pb`, `cd_Flags &= ~2` |
+| 0x4ce  | rt_Init     | a0=seglist, a6=SysBase -> d0=lib | COLDSTART: MakeLibrary(84); ln_Type=9, name/idstr abs refs, flags=6, ver2 rev5, opencnt=1, seglist/SysBase/cardbase=0; MinList init at +58; CreatePool(CLEAR,752,752); AddLibrary; OpenLibrary utility v36 -> +38, expansion v36; loop `FindConfigDev(manuf 0xAD47, prod 1)` -> ScanBoard each; on failure path CloseLibrary(utility) etc. |
 
-exec calls used: MakeLibrary -84, AddIntServer -168, RemIntServer -174,
-FreeMem -210, AddTail -246 (MinList variant), Remove -252,
-Enqueue -270, AddLibrary -396, CloseLibrary -414, OpenLibrary -552,
-CacheClearU -636, CreatePool -696, DeletePool -702, AllocPooled -708.
-expansion: FindConfigDev -72. utility: FindTagItem -30, NextTagItem -48,
-TagInArray -90. Prometheus.card: -42 AllocDMABuffer, -48 FreeDMABuffer.
+## Strings / embedded data in hunk0
+
+| off   | content |
+|-------|---------|
+| 0x020 | `prometheus.library\0` (19B) + pad |
+| 0x034 | `$VER: prometheus.library 2.5 (22.07.2003) (c) 2000-2003 by Matay.\n` + pads |
+| 0x4ac | `utility.library\0` |
+| 0x4bc | `expansion.library\0` |
+| 0x826 | settable-tags array: `{0x6eda0005, 0}` |
+| 0x8e6 | `Prometheus.card\0` |
+| 0x92 / 0x672 | `nop` alignment pads |
+
+## External LVO calls
+
+| call site(s) | library | LVO  | function |
+|--------------|---------|------|----------|
+| init         | exec    | -84  | MakeLibrary |
+| expunge      | exec    | -252 | Remove |
+| expunge      | exec    | -210 | FreeMem |
+| expunge      | exec    | -702 | DeletePool |
+| expunge      | exec    | -414 | CloseLibrary (utility, card) |
+| open/close   | —       | —    | inline only |
+| querycard    | exec    | -708 | AllocPooled |
+| querycard    | exec    | -636 | CacheClearU (around every cfg access) |
+| querycard    | exec    | -246 | AddTail (MinList append) |
+| addreq       | exec    | -708/-270 | AllocPooled / Enqueue |
+| init         | exec    | -696 | CreatePool |
+| init, dma    | exec    | -552 | OpenLibrary |
+| init         | exec    | -396 | AddLibrary |
+| init         | expansion | -72 | FindConfigDev |
+| findboard    | utility | -48, -30 | NextTagItem, FindTagItem |
+| getattrs     | utility | -48, -30 | NextTagItem, FindTagItem |
+| setattrs     | utility | -90, -30, -48 | TagInArray, FindTagItem, NextTagItem |
+| addint       | exec    | -168 | AddIntServer (intnum 3) |
+| remint       | exec    | -174 | RemIntServer |
+| allocdma     | card    | -42  | Prometheus.card alloc |
+| freedma      | card    | -48  | Prometheus.card free |
