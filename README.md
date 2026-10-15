@@ -391,6 +391,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `icon_34.2_WB1.3_.library` | Same binary as `icon_34.2` (md5-identical WB1.3 label); shared reconstruction, byte + runtime identical (AMIGALIBS-380) |
 | `icon_34.2_WB1.3.2_.library` | Same binary as `icon_34.2` (WB1.3.2 label); byte + runtime identical (AMIGALIBS-380) |
 | `icon_34.2_WB1.3.3_.library` | Same binary as `icon_34.2` (WB1.3.3 label); byte + runtime identical (AMIGALIBS-380) |
+| `pccard_2.1.library` | PCMCIA CIS tuple parser "pccard.library 2.1 (1.4.2022)"; flat AUTOINIT, 7 vectors, TagItem clone/free engine via utility v36, close-count underflow. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-384) |
 | `newicon_middle-end_40.1.library` | 'newicon middle-end 40.1 (9.3.97)' — NewIcons shim; 2-hunk AUTOINIT w/ functab+InitTable in DATA hunk, 14 vectors, deps dos37+gfx39+icon37, reads ENV:NewIcons.prefs. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-383) |
 | `rexxmathlib_38.03_WB3.9_.library` | 'rexxmathlib 38.03 (26.10.2000) (c) THOR' — WB3.9 ARexx math lib; same 2-hunk CODE->DATA-resident layout as 45.2, 6 vectors. Byte-identical raw asm + fixup; oracle identical |
 | `rexxmathlib_45.2.library` | 'rexxmathlib 45.2 (24.2.2001)' — ARexx math lib; 2-hunk AUTOINIT, resident->DATA relocs, 6 vectors, deps mathieeedoubbas37+mathieeedoubtrans34. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-382) |
