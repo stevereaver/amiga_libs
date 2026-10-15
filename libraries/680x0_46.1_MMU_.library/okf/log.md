@@ -21,3 +21,10 @@ description: Chronological journal of analysis sessions for this library. Newest
   `make` OK; data hunk byte-identical modulo vector relocs; code
   verified against disassembly.
 - Phase 3: okf bundle populated.
+
+- Phase 4 (2026-10-15): verbatim asm `680x0_h0.s` (46.1 deltas from
+  the 40.4 source: version byte 46, ver/rev imm 0x002e0001, driver
+  OpenLibrary arg 46, idstr text) -> BYTE-IDENTICAL
+  (md5 edbf249db38de0b48641bbf9fb62ddf3).  machine68k oracle
+  identical: cpu ladder, self-free on driver-missing/exec-v33,
+  all vectors.

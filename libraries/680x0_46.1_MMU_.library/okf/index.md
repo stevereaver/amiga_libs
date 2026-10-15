@@ -26,13 +26,13 @@ the matching CPU-specific driver `680N0.library` (version >=
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc): C for all logic plus a
-small hand-written `cpuprobe.s` for the supervisor-state CPU/PCR
-probe (VBR redirect + illegal-instruction trampoline - not
-expressible in C).  `make` produces a loadable `.library`; the data
-hunk (InitTable, function table layout, strings) is byte-identical
-to the original modulo the relocated vector pointers, and the code
-was verified function-by-function against the IRA disassembly.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — hand asm `source/680x0_h0.s`
+builds md5 `edbf249db38de0b48641bbf9fb62ddf3`, matching the shipped
+binary.  Same skeleton as the 40.4 rebuild; differs only in
+rt_Version (46), the lib_Version/Revision immediate (46.1), the
+OpenLibrary driver-min-version arg (46, not 40), and the idstring
+text.  `make cmodel` retains the C reconstruction.  machine68k
+oracle identical over the full scenario matrix.
 
 ## Contents
 
