@@ -29,9 +29,14 @@ registered message whose `lm_flag` is still 'ASDG'.
 
 ## Status
 
-Reconstructed (`source/` — same sources as the 0.0 bundle since the
-binaries are identical).  `make` produces a loadable
-`asdg-low-mem.library`.
+Byte-identical.  `make` assembles `source/asdg_h0.s` (verbatim asm,
+all seven vectors) and `fixup.py` rewrites the linked single-hunk
+file into the original 3-hunk envelope (CODE + empty DATA + empty
+BSS).  `md5 45764a4e4bcd377c3c1bf02d4b71a69f`.  `make cmodel`
+builds the earlier C reconstruction for reference.
+Runtime-verified: `work/oracle.py` traces init/Open/Close/Reg/
+DeReg/query plus the -18 alert trigger and the immediate expunge
+at private-count 0 -- original vs rebuild logs identical.
 
 ## Contents
 

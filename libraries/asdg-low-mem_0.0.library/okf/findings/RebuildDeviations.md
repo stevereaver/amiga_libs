@@ -7,11 +7,15 @@ timestamp: 2026-10-10T19:00:00Z
 
 # Rebuild deviations
 
-- Code hunk is 0x31c vs the original 0x2ec (GCC output is slightly
-  larger; all vector semantics match).
-- The rebuilt hunk contains reloc32 entries (original stores the
-  same pointers but the file layout differs slightly in header
-  detail: the original also emits empty DATA/BSS hunks).
-- A latent bug in an earlier draft C copy loop
-  (`*d++ = *s = *portname++` wrote past the end of the caller's
-  string) was corrected to a plain byte copy matching the asm.
+None.  `source/asdg_h0.s` is a byte-verbatim reconstruction: the
+linked hunk is identical and `source/fixup.py` rebuilds the
+envelope (3-hunk header declaring CODE + two empty hunks, empty
+DATA/BSS trailer hunks).  `make` output compares equal to the
+shipped binary (`cmp`), and the `machine68k` oracle
+(`work/oracle.py`) logs identical traces for every vector:
+init/Open x2/Close(-to-expunge)/Reg/DeReg/query/alert-trigger,
+including the dup (-1) and AllocMem-fail (-2) paths.
+
+The historical C reconstruction remains available as
+`make cmodel` (functionally equivalent, not byte-identical --
+it is 0x31c bytes and emits no empty DATA/BSS hunks).
