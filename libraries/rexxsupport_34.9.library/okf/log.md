@@ -55,3 +55,11 @@
 - Final status: main battery + failtest byte-identical between
   original and reconstruction (only stale-a0 on error paths
   differs — a table pointer at different code offsets).
+
+- 2026-10-15 correction: prior committed `rexxsupport.s` was a
+  mnemonic re-disassembly that drifted ~20 bytes and dropped the
+  trailing empty hunk record (DATA size-0 hunk + END). Replaced
+  with verbatim `.byte` emission of the h0 body plus `fixup.py`
+  which restores the 2-hunk header, the RELOC32 tail, and the
+  empty hunk record. Build now BYTE-IDENTICAL (2524B);
+  oracle re-run on the new build: RUNTIME-IDENTICAL.

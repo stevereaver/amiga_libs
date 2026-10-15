@@ -4,6 +4,8 @@ LDFLAGS = -nostdlib -nostartfiles -s
 
 rexxsupport.library: rexxsupport.o
 	$(CC) $(LDFLAGS) -o $@ $^
+	python3 fixup.py $@
+	cmp $@ "../binary/rexxsupport_34.9.library" && echo BYTE-IDENTICAL
 
 rexxsupport.o: rexxsupport.s
 	$(CC) $(ASFLAGS) -c -o $@ $<
