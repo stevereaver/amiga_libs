@@ -372,4 +372,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `mathieeedoubbas_33.9_WB1.2_.library` | 'mathieeedoubbas 33.9' WB1.2 double-precision IEEE math — AUTOINIT, word-offset functab, 16 vectors, full HUNK_SYMBOL debug tail (all routines named). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-326) |
 | `sage_36.2.library` | 'SAGE 36.2 (1 May 1992)' — HiSoft SAGE lib; AUTOINIT w/ InitTable in DATA hunk + functab in CODE (inverted), 10 vectors, graphics v33 dep. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-327) |
 | `dsp3210_6.0.library` | 'dsp3210 6.0 (20.8.2021)' — DSP d32 blob lib; COLDSTART, 15 vectors (new -90 array-free op, reworked -66 guarded free), word-offset functab. Byte-identical asm + fixup; oracle identical (AMIGALIBS-328) |
+| `containerkit_1.1.library` | 'containerkit 1.1' — container helper lib; AUTOINIT, resident+InitTable inside tiny DATA hunk (GCC-style), 29 vectors. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-329) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
