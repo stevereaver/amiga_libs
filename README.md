@@ -397,5 +397,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `cwrite_1.31.library` | CWrite 1.31 console-writer lib (1992); AUTOINIT, 12 abs-long vectors (NULL hole at -24). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-352) |
 | `notifyintuition_2.41.library` | notifyintuition 2.41 — sibling of 2.40 (+60B, rev 41): same 7-vector API, reworked dispatch stubs, +4B private tail. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-353) |
 | `hgrexxsupport__18.7.94_.library` | hgrexxsupport (Goebel 1994) — ARexx host lib, 3 hunks (CODE+DATA+BSS), extended 26B resident w/ extra pointer field, 5-entry functab. Byte-identical merged asm + resplit; oracle identical (AMIGALIBS-354) |
+| `virtualmem_1.2.library` | virtualmem 1.2 (1997) — vmem manager, 17 vectors, deps dos37+multiuser39, extended 26B resident (same stub family as hgrexxsupport). Byte-identical merged asm + resplit; oracle identical (AMIGALIBS-355) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
