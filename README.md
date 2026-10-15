@@ -391,6 +391,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `icon_34.2_WB1.3_.library` | Same binary as `icon_34.2` (md5-identical WB1.3 label); shared reconstruction, byte + runtime identical (AMIGALIBS-380) |
 | `icon_34.2_WB1.3.2_.library` | Same binary as `icon_34.2` (WB1.3.2 label); byte + runtime identical (AMIGALIBS-380) |
 | `icon_34.2_WB1.3.3_.library` | Same binary as `icon_34.2` (WB1.3.3 label); byte + runtime identical (AMIGALIBS-380) |
+| `rexxmathlib_38.03_WB3.9_.library` | 'rexxmathlib 38.03 (26.10.2000) (c) THOR' — WB3.9 ARexx math lib; same 2-hunk CODE->DATA-resident layout as 45.2, 6 vectors. Byte-identical raw asm + fixup; oracle identical |
 | `rexxmathlib_45.2.library` | 'rexxmathlib 45.2 (24.2.2001)' — ARexx math lib; 2-hunk AUTOINIT, resident->DATA relocs, 6 vectors, deps mathieeedoubbas37+mathieeedoubtrans34. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-382) |
 | `dg8svx_2.1.library` | 'dg8svx 2.1 (15.7.94) (c) Optonica' — 8SVX/IFF sample-streaming player; 2-hunk AUTOINIT, 12 vectors (tag-arg play, chunk find, mono/stereo feeders, fib-delta decoders), lazy dep-opens (dos/gfx/toolkit/dgiff/dgaudio); ln_Type never-set defect filed. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-381) |
 | `akcc_35.1.library` | 'akcc 35.1 (08 Jan 92)' — 6-hunk AUTOINIT lib (BSS alloc-vs-record quirk, 4B dead stub hunk); 41 abs-long vectors, many forwarding to an embedded second lib; deps dos+intuition+graphics. Byte-identical raw asm + resplit; oracle identical (AMIGALIBS-377) |
