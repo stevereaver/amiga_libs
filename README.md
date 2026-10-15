@@ -401,5 +401,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkLIN1_1.1_000_.library` | xpkLIN1 1.1 (2013) — XPK 'Lino1' codec, 10 word vectors w/ 3 NULL holes, 'minimal' mode. Byte-identical; sibling oracle identical (AMIGALIBS-356) |
 | `regexp_38.1.library` | regexp 38.1 (1998) — regex lib, 2-hunk w/ resident+InitTable+functab in DATA, 8 vectors, dep dos37. Byte-identical; oracle identical (AMIGALIBS-357) |
 | `slre_37.0.library` | slre 37.0 — regex engine, 4 hunks w/ cross-hunk resident, char-class table copied to libbase, 5 vectors (-24 stub). Byte-identical; oracle regex probe identical (AMIGALIBS-358) |
+| `powerpacker_35.254.library` | powerpacker 35.254 'pplib' (1991) — PP cruncher, CODE+BSS, 22 vectors, datatab-initialized. Byte-identical; oracle identical (AMIGALIBS-359) |
+| `catharsis_2.11.library` | catharsis 2.11 (2003) — 3-hunk AUTOINIT (CODE+DATA+BSS), 23 vectors, -30 reloc-lands-on-CODE+0 quirk, deferred expunge. Byte-identical; oracle identical (AMIGALIBS-360) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
