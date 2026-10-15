@@ -30,18 +30,25 @@ at +0 (SigBit bit7 doubles as the "initialising" mark), cmd table at +62.
 ## Layout
 - `7000 4e75` stub, packed RomTag at hunk+4 (no AUTOINIT flag)
 - jmp table hunk+0x1e (14 entries), node/base hunk+0x72, init hunk+0x9c
-- resident id string pointer lands mid-string: `(dissidents Jan 91)
-  rexxapp.library` at hunk+0x586 with the id field pointing at `dissidents…`
+- shared-tail strings: idString at hunk+0x563 = `(dissidents Jan 91)
+  rexxapp.library`; rt_Name/ln_Name = +0x577 (the `rexxapp.library`
+  tail inside it); rexxsyslib name likewise reuses the tail of the
+  `Can't find rexxsyslib.library` error string
 - second hunk is empty (HUNK_CODE size 0 — toolchain artifact)
 - 21 abs-32 relocs: RomTag fields, all 14 jmp operands (incl. the null
   vectors → hunk+0), node name/idstr
 
 ## Dependencies
-- `exec.library` — ports, signals, TDNestCnt manual Forbid
+- `exec.library` — ports, signals, IDNestCnt manual Forbid
 - `rexxsyslib.library` — opened lazily on first send; CreateRexxMsg -144,
   DeleteRexxMsg -150, CreateArgstring -126, DeleteArgstring -132, private -96
 - `REXX` public port — looked up under Forbid each send
 
 ## Rebuild
-`source/` holds `rexxapp.c` + `rexxapp_lib.s` (vector table/lifecycle —
-kept local per repo policy); `make` needs m68k-amigaos-gcc.
+Verbatim 68k asm in `source/RexxApp_h0.s` (m68k-amigaos-gcc -m68000,
+`-nostdlib -nostartfiles -s`); `source/fixup.py` rewrites GNU ld's
+1-hunk header into the original 2-hunk header and appends the trailing
+empty CODE hunk.  Result is byte-identical: md5
+`1724406df58c813c7db58aef2ff35320`.  `work/oracle.py` (machine68k,
+M68020) exercises all 14 LVOs + setup/dispatch/send/cleanup/setresult
+and every error path; orig vs rebuild logs diff clean.

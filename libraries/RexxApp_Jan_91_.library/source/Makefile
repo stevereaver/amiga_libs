@@ -1,18 +1,17 @@
-CC = /opt/amiga/bin/m68k-amigaos-gcc
-CFLAGS = -m68000 -O2 -ffixed-a5 -nostdlib -nostartfiles -fno-builtin
+CC      = /opt/amiga/bin/m68k-amigaos-gcc
+ASFLAGS = -m68000
+LDFLAGS = -nostdlib -nostartfiles -s
 
-all: rexxapp.library
+rexxapp.library: rexxapp.ld
+	python3 fixup.py rexxapp.ld $@
 
-rexxapp_lib.o: rexxapp_lib.s
-	$(CC) -m68000 -c -o $@ $<
+rexxapp.ld: RexxApp_h0.o
+	$(CC) $(LDFLAGS) -o $@ $^
 
-rexxapp.o: rexxapp.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-rexxapp.library: rexxapp_lib.o rexxapp.o
-	$(CC) -nostdlib -nostartfiles -o $@ rexxapp_lib.o rexxapp.o
+RexxApp_h0.o: RexxApp_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o rexxapp.library
+	rm -f RexxApp_h0.o rexxapp.ld rexxapp.library
 
-.PHONY: all clean
+.PHONY: clean

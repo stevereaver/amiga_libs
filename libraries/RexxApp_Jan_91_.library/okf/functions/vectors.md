@@ -33,8 +33,9 @@ Args: a0=cmd, a1=cb→args15, a2=orig→args14, d0=action, d1=validator.
 - reply (ReplyPort==ctx): resultproc(0xf8) via jmp-a6 trampoline, then
   args15 cb (register args), then freemsg(0x370).
 - incoming: skip ' '/'\t'; r1=r2=0; flags bit7 → r1=100, ReplyMsg.
-  Verb match = case-fold prefix compare with quirk: fold requires the
-  *command* char |0x20 in (97,122) exclusive — 'a'/'z' never fold-match.
+  Verb match = case-fold prefix compare; fold applies to the input
+  char (|0x20) and requires the folded char in ['a','z'] inclusive
+  (oracle-verified: 'a'/'z' fold-match, '{'/'`' miss).
   match → handler; nonzero rc → ReplyMsg.  No match → fileext=ctx->ext;
   ext ? send_body(cmd, fwd_reply, msg, RXCOMM, 0) : r1=30 + ReplyMsg.
 

@@ -2,11 +2,14 @@
 
 ## Defects / suspicious behavior (reproduced verbatim)
 
-1. **Verb fold quirk** — the case-insensitive verb compare only
-   fold-matches command chars whose `|0x20` form is in (97,122)
-   exclusive: `'a'` and `'z'` never match an uppercase verb char.
-   `subb d1,d0;bhis` uses unsigned 'a'≥c1 and `cmpib #122;blss` cuts at
-   'z' — both boundaries exclusive.
+1. **Verb fold bound** — the case-insensitive verb compare folds the
+   *input* char (`bset #5,d1`) and requires the folded form in
+   ['a','z'] **inclusive**: `subb d1,d0;bhi` misses when c1<97 and
+   `cmpib #122,d1;bls` misses when c1>122.  Empirically (oracle):
+   "PAZ" fold-matches "paz" (so 'a' AND 'z' both fold), while
+   "["/"{" (|0x20='{'>z) and "@"/"`" (|0x20='`'<a) miss.  Only the
+   case-fold path is guarded — already-equal chars match before the
+   check, so mixed/uppercase verbs still work case-sensitively.
 
 2. **fwd_reply drops string results** — the forward-completion helper
    (0x3b2) calls setresult with a0=0; when the forwarded msg returns
@@ -47,8 +50,14 @@
 
 ## Reconstruction notes
 
-- `rexxapp_lib.s` reproduces the stub/RomTag/vector-table/node/init
-  block byte-for-byte (lifecycle code at hunk+0x9c..0xd6 identical).
-- C side rebuilt with `-ffixed-a5` so gcc never allocates the ABI
-  register; all LVO calls go through named-register inline asm.
+- `source/RexxApp_h0.s` is a verbatim 68k transcription (gas
+  %-register syntax): stub/RomTag/14-entry jmp table/node template/
+  init and all bodies assemble byte-for-byte; the 21 RELOC32 fixups
+  come out in original order.
+- `source/fixup.py` rewrites the linked hunk header (1 hunk → the
+  original 2-hunk table `[0x162, 0]`) and appends the vestigial empty
+  `HUNK_CODE`/`HUNK_END` tail — byte-identical, md5
+  `1724406df58c813c7db58aef2ff35320`.
+- `work/oracle.py` (machine68k): identical deterministic logs on
+  original vs rebuild across all vectors and error paths.
 - Callback conventions differ per site — see structures/context.md.
