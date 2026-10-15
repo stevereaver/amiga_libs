@@ -409,5 +409,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `mathieeedoubbas_36.55.library` | mdb 36.55 (1989) — IEEE double math, COLDSTART attn/fpsp matrix, 16 vectors. Byte-identical; oracle identical (AMIGALIBS-364) |
 | `dtimage_3.3.library` | dtimage 3.3 (2008) — datatypes image helper, packed-resident 2-hunk, 6 vectors, opens picture.datatype v43. Byte-identical; oracle identical (AMIGALIBS-365) |
 | `newicon_39.1.library` | newicon 39.1 (1996) — NewIcons helper, 2-hunk w/ InitTable in DATA, 12 vectors, deps dos37/gfx39/icon37. Byte-identical; oracle identical (AMIGALIBS-366) |
+| `ire_3.17.library` | ire 3.17 (2008, J. van de Loo) — intuition ext, 4-hunk w/ DREL16 tail, 9 vectors, dep dos36. Byte-identical; oracle identical (AMIGALIBS-367) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
