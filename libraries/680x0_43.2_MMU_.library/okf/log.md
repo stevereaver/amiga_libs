@@ -21,3 +21,8 @@ description: Chronological journal of analysis sessions for this library. Newest
   `make` OK; data hunk byte-identical modulo vector relocs; code
   verified against disassembly.
 - Phase 3: okf bundle populated.
+
+- Phase 4 (2026-10-15): file confirmed byte-identical to
+  680x0_40.4.library (md5 15b5c19179d162c850fa5dfe7dcfa93d);
+  mirrored the verbatim 680x0_h0.s + Makefile + machine68k oracle;
+  orig vs rebuild logs identical (7-scenario matrix).

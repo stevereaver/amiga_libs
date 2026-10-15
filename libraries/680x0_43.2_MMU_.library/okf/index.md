@@ -28,13 +28,13 @@ The shipped file is named "680x0_43.2(MMU).library" but its bytes are **identica
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc): C for all logic plus a
-small hand-written `cpuprobe.s` for the supervisor-state CPU/PCR
-probe (VBR redirect + illegal-instruction trampoline - not
-expressible in C).  `make` produces a loadable `.library`; the data
-hunk (InitTable, function table layout, strings) is byte-identical
-to the original modulo the relocated vector pointers, and the code
-was verified function-by-function against the IRA disassembly.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — the shipped file is a
+byte-identical duplicate of `680x0_40.4.library` (same md5
+15b5c19179d162c850fa5dfe7dcfa93d); the verbatim asm
+`source/680x0_h0.s` from the 40.4 rebuild compiles to the same
+bytes.  `make cmodel` retains the C reconstruction.
+`work/oracle.py` (same harness as 40.4) verifies identical
+orig/rebuild behaviour over the full scenario matrix.
 
 ## Contents
 
