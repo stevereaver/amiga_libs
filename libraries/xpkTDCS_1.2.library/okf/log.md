@@ -57,3 +57,10 @@ original's `bhis` overrun check behaves as `>`; the C keeps `>=`
 (true to the binary on real hardware).
 
 Plane: AMIGALIBS-111.
+
+- Phase 5 (2026-10-15): verbatim asm `xpkTDCS_h0.s` via the
+  objdump-transcription pipeline + fixup.py reloc splice ->
+  BYTE-IDENTICAL (md5 a42a86a4ed1d3d29a31aaf66ed104e4b).
+  Existing machine68k oracle re-run orig-vs-rebuild: all test
+  streams byte-identical (RUNTIME-IDENTICAL), incl. the
+  pool/hash encoder paths and the -17 overflow cases.

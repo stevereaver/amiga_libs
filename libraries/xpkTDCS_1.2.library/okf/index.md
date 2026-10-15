@@ -63,10 +63,16 @@ corrupt output (see findings/defects.md).
 
 ## Reconstruction
 
-`source/` — Makefile + genfunctab.py (two-pass word-offset table),
-xpkTDCS_lib.s (RomTag/InitTable/datatab/LibInit/stubs),
-xpkTDCS_data.s (XpkInfo descriptor + strings), endmodule.s,
-xpkTDCS.c (all non-null vectors incl. the full codec).
+`source/` — `xpkTDCS_h0.s` is a **byte-verbatim**
+transcription of the whole CODE hunk (m68k mnemonics + raw
+.short for noncanonical `orib`-style extension words,
+`b0bc`/`c03c` noncanonical cmp/and opcodes, absolute-memory
+and indexed-disp operands; .byte for the string/struct tail
+that objdump decodes as instructions); `fixup.py` splices
+the original's 18-entry descending RELOC32 tail.  `make`
+produces md5 `a42a86a4ed1d3d29a31aaf66ed104e4b` — identical
+to the shipped binary.  The semantic C model stays under
+`make cmodel` (xpkTDCS.c + xpkTDCS_lib.s + genfunctab.py).
 
 Oracle: `work/oracle.py` (machine68k M68020, emulates MakeLibrary/
 InitStruct + exec mem/pool calls).  Verified: every test stream

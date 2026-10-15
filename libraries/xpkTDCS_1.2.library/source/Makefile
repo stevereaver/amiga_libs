@@ -16,6 +16,21 @@ TARGET  = xpkTDCS.library
 
 all: $(TARGET)
 
+# ---- byte-verbatim rebuild (hand asm) ----
+
+$(TARGET): xpkTDCS_h0.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ xpkTDCS_h0.o
+	python3 fixup.py $@
+	@cmp -s $@ ../binary/xpkTDCS_1.2.library && echo BYTE-IDENTICAL \
+	  || echo DIFFERS
+
+xpkTDCS_h0.o: xpkTDCS_h0.s
+	$(CC) -m68020 -c -o $@ $<
+
+# ---- C reconstruction model (functional, NOT byte-identical) ----
+
+cmodel: cmodel.library
+
 # pass 1: dummy link to resolve symbol addresses
 dummy.library: xpkTDCS_lib.o functab_stub.o xpkTDCS.o xpkTDCS_data.o endmodule.o
 	$(CC) $(LDFLAGS) -o $@ xpkTDCS_lib.o functab_stub.o xpkTDCS.o xpkTDCS_data.o endmodule.o
@@ -28,7 +43,7 @@ functab.o: functab.s
 	$(CC) $(ASFLAGS) -c -o $@ functab.s
 
 # pass 2: final link with the real functab
-$(TARGET): xpkTDCS_lib.o functab.o xpkTDCS.o xpkTDCS_data.o endmodule.o
+cmodel.library: xpkTDCS_lib.o functab.o xpkTDCS.o xpkTDCS_data.o endmodule.o
 	$(CC) $(LDFLAGS) -o $@ xpkTDCS_lib.o functab.o xpkTDCS.o xpkTDCS_data.o endmodule.o
 
 xpkTDCS_lib.o: xpkTDCS_lib.s
@@ -49,4 +64,4 @@ xpkTDCS.o: xpkTDCS.c
 clean:
 	rm -f *.o $(TARGET) dummy.library dummy.nm functab.s
 
-.PHONY: all clean
+.PHONY: cmodel  all clean
