@@ -22,3 +22,12 @@ title: Reconstruction log
   continuation, all pass.  Fixed a pointer/index
   off-by-one introduced in the first draft.
 - Phase 4: this OKF bundle; defects filed in Plane.
+
+- 2026-10-15: byte-verbatim asm reconstruction
+  (`source/xpkDLTA_h0.s`); `cmp` identical incl. the 27
+  ascending RELOC32 entries.  machine68k oracle identical
+  across every vector: init (returns base, links
+  xi_ModeDesc), Open x2, stubs, XpkInfo (embedded at
+  base+0x26), byte-delta pack/unpack round-trip +
+  chunked continuation, -10/-11 bounds, deferred + real
+  expunge (dead bsr-to-rts hook exercised).

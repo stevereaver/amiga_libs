@@ -1,23 +1,27 @@
-# Makefile for xpkDLTA.library V0.1 C reconstruction
+# Makefile for xpkDLTA.library V0.1
 #
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-# Absolute-longword AUTOINIT functab -- single link pass.
+# Default target: byte-verbatim assembly reconstruction (xpkDLTA_h0.s).
+# `make cmodel` builds the earlier C reconstruction for reference.
 
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
           -Wall -Wno-unused-parameter
 ASFLAGS = -m68000
-LDFLAGS = -nostdlib -nostartfiles
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
 
 TARGET  = xpkDLTA.library
 
-all: $(TARGET)
+all: $(TARGET) verify
 
-OBJS = xpkDLTA_lib.o xpkDLTA.o endmodule.o
+$(TARGET): xpkDLTA_h0.o
+	$(CC) $(LDFLAGS) -o $@ $<
 
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+xpkDLTA_h0.o: xpkDLTA_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+cmodel: xpkDLTA_lib.o xpkDLTA.o endmodule.o
+	$(CC) -nostdlib -nostartfiles -o $(TARGET) $^
 
 xpkDLTA_lib.o: xpkDLTA_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ $<
@@ -28,7 +32,11 @@ endmodule.o: endmodule.s
 xpkDLTA.o: xpkDLTA.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+verify:
+	@cmp -s $(TARGET) ../binary/xpkDLTA_0.1.library && echo BYTE-IDENTICAL \
+	  || echo "DIFFERS (see work/)"
+
 clean:
 	rm -f *.o $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel verify clean

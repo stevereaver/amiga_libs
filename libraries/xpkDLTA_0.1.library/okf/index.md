@@ -41,12 +41,17 @@ patches xi_ModeDesc and the seglist), and a v0.1
 
 ## Status
 
-FULL — reconstructed (`source/`): C framework + delta
-codecs + dead word/long kernels (xpkDLTA.c), resident
-tables/InitStruct stream/strings (xpkDLTA_lib.s),
-single-pass link.  Codec round-trip verified on host
-(20k random + chunked-continuation); InitStruct stream
-byte-identical to the original.
+Byte-identical.  `make` assembles `source/xpkDLTA_h0.s`
+(verbatim asm; the functab's absolute longs and all RomTag
+/datatab pointers relocate normally -- 27 ascending
+RELOC32 entries, no fixup needed).  `make cmodel` builds
+the earlier C reconstruction.
+Runtime-verified: `work/oracle.py` (machine68k) logs
+identical for original vs rebuild across init, Open/Close,
+deferred+real expunge (incl. the dead bsr-to-rts hook),
+all stubs, XpkInfo layout, pack/unpack round-trip with
+xsp+0x34/0x38 chunk chaining, and -10/-11 error paths.
+
 
 ## Contents
 
