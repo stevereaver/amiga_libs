@@ -26,3 +26,19 @@ description: Chronological journal of analysis sessions. Newest first.
   lib_Flags — recorded as inconsistency (AMIGALIBS card).
 - Reconstructed: C framework + verbatim math.s; `make` builds;
   objdump confirms identical FPU encodings.
+
+## 2026-10-12
+- Rewrote the reconstruction as single-object verbatim asm
+  (`source/mst406_v.s`): RomTag/strings/InitTable/absolute functab/
+  datatab/initfn/lifecycle + all 19 F-line vector bodies emitted as
+  raw `.short` pairs.  `make` is **byte-identical** (md5
+  `5773e040cf29e8272f16209143db46ec`); reloc tail is ascending, no
+  fixup needed.
+- New oracle (`work/oracle.py`, adapted from the 10.881 line-F
+  harness): identical traces over the init gate matrix (requires
+  AFF_68020 AND AFF_68881), all vectors, Pow edge cases, deferred
+  and real expunge (Remove+FreeMem through exec LVO stubs).
+- Corrected decoding details: rt_EndSkip=0x82 (InitTable, mid-module);
+  Pow's `f281 0006` is `fbeq.w +6` (skip sign restore for even
+  exponents), `f28e fdde` is `fbne.w` -> CODE+0 (early return 0).
+  -102/-108 confirmed as bare-rts stubs sharing 0x258.

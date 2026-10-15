@@ -37,10 +37,16 @@ seventeen vectors that are each a single 68881 instruction.
 
 ## Status
 
-FULL — reconstructed (`source/`): C framework + verbatim 68881
-vectors in math.s; m68k-amigaos-gcc -m68020, single-pass link
-(absolute functab).  FPU encodings verified instruction-for-
-instruction against the original.
+FULL — **byte-identical and runtime-identical**.  `make` builds
+`source/mst406_v.s` (verbatim 68k asm, F-line words emitted raw)
+into a `cmp`-clean copy of the shipped binary (md5
+`5773e040cf29e8272f16209143db46ec`).  `work/oracle.py`
+(machine68k + line-F shim) gives identical traces over the
+AttnFlags init-gate matrix, all 21 vectors incl. Pow parity/sign
+paths, and deferred + real expunge.  Earlier C framework retained
+via `make cmodel`.
+Additional quirk: rt_EndSkip = InitTable (0x82) — the resident
+copy ends mid-module.
 
 ## Contents
 
