@@ -4,18 +4,39 @@ title: No-FPU init path
 description: Behaviour of the init routine when AttnFlags lacks AFF_68881.
 ---
 
-# No-FPU init path
+# No-FPU init path (corrected)
 
-on missing AFF_68881: OpenLibrary("Libs:NoFPU/mathieeesingtrans.library",36), CloseLibrary(result), then runs the shared NegSize/PosSize free tail on the base OpenLibrary returned and fails the resident init.
+On missing AFF_68881 the init routine (code+0x68) does:
 
-The init routine runs with a6 = ExecBase, d0 = new base, a0 = seglist.
+```
+move.l  d0,-(sp)              ; push the fresh library base
+moveq   #36,d0                ; version 36
+lea     "Libs:NoFPU/..."(pc),a1
+jsr     -552(a6)              ; exec OpenLibrary -> d0
+movea.l d0,a1
+jsr     -414(a6)              ; exec CloseLibrary(result) -- runs even if 0
+movea.l (sp)+,a1              ; a1 = the NEW base again
+bra     0xe8                  ; shared Expunge free tail
+```
 
-For this library the odd part is that after `OpenLibrary`/`CloseLibrary`
-on `Libs:NoFPU/...` the code runs the shared **free tail** on the base
-OpenLibrary returned -- i.e. it FreeMem()s `base - NegSize` of size
-`NegSize + PosSize` for the *fallback* library's base (or, if OpenLibrary
-failed, dereferences a NULL base's NegSize/PosSize and frees whatever that
-yields). The pushed-then-popped copy of the new base (into d1) is a dead
-restore. The reconstruction preserves this control flow verbatim; whether
-it is intentional (the close already dropped OpenCnt to 0 causing an
-internal expunge) or a bug is an open question.
+The shared tail FreeMem()s `base - NegSize` of `NegSize + PosSize`
+bytes and returns the longword at code+0x2c — the seglist cell, still 0
+because the `move.l a0,(a1)` store on the FPU path was skipped — so the
+resident init fails.
+
+## Corrections vs the earlier note / C model
+
+- The freed block is the **newly allocated library base**, not the base
+  OpenLibrary returned.  The pushed base is restored into **a1** (the
+  free-tail argument register), not d1 — it is not a dead restore.
+- `OpenLibrary + CloseLibrary` of the fallback is a semantic no-op:
+  whatever it returns (NULL or a live base) is closed again at once.
+  It looks like a leftover attempt to pre-load the NoFPU software
+  replacement — as written it can only ever warm/bump the open count
+  transiently.  Verified by the oracle (`openlib`/`closelib`/`freemem`
+  logged in that order, init returns 0, both for a NULL and a non-NULL
+  OpenLibrary result).
+- If OpenLibrary returned non-NULL, `CloseLibrary(a1)` on that library
+  decrements its open count — potentially expunging it — before the new
+  base is freed.  If it returned NULL, real exec CloseLibrary must cope
+  with a NULL a1 (V36 does).

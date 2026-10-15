@@ -63,14 +63,16 @@ ULONG LibInit(ULONG base __asm("d0"), APTR seg __asm("a0"), struct ExecBase *eb 
 
     if (!(eb->AttnFlags & AFF_68881)) {
         /*
-         * No coprocessor: as shipped -- open + immediately close the
-         * Libs:NoFPU/ fallback library, then run the free tail on the
-         * base OpenLibrary returned.  (The original pushed the new
-         * base and popped it into d1, unused -- dead restore.)
+         * No coprocessor: as shipped -- push the new base, open +
+         * immediately close the Libs:NoFPU/ fallback library
+         * (a semantic no-op: the result is closed at once, NULL or
+         * not), then pop the base back into a1 and run the shared
+         * free tail on it.  FreeMem()s the freshly allocated base
+         * and returns the still-zero segcell -> resident init fails.
          */
         struct Library *nofpu = XOpenLibrary(nofpuname, 36, eb);
         XCloseLibrary(nofpu, eb);
-        return FreeTail(nofpu);
+        return FreeTail(lib);
     }
 
     segcell[0] = (ULONG)seg;            /* stashed for expunge */
@@ -79,10 +81,10 @@ ULONG LibInit(ULONG base __asm("d0"), APTR seg __asm("a0"), struct ExecBase *eb 
 
 /* ----------------------------------------------------------------
  * LibOpen -- a6 = lib base.
- *   Original code reads FPCR, and writes 0x80 unless FPCR is
- *   already nonzero-and-not-single-precision (the shipped beq
- *   actually tests the caller's CCR -- FMOVE.L FPCR,Dn does not
- *   set condition codes; reconstructed as the intended fpcr==0).
+ *   Original code reads FPCR into d0 (a transfer into an integer
+ *   data register DOES update the CCR -- the following beq tests
+ *   fpcr == 0), and writes 0x80 when FPCR is 0 or already in the
+ *   single-precision band 0x40..0x7f.
  *   Then OpenCnt++, clears LIBF_DELEXP, returns the base.
  * ---------------------------------------------------------------- */
 struct Library *LibOpen(struct Library *lib __asm("a6"))
