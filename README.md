@@ -386,5 +386,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `calculus_37.3.library` | 'calculus 37.3' — math helper lib; COLDSTART SAS/C a4-frame, 5-vector abs functab. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-341) |
 | `xpkCYB2_1.0.library` | XPK 'CYB2' lowlevel codec sublib (Nasr 1996); AUTOINIT, 10 abs-long vectors, single 'Wow!!' mode. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-342) |
 | `stopus_1.1.library` | STopus 1.1 sample-player lib (Martson/Inovatronics 1991); AUTOINIT, 11 abs-long vectors. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-343) |
+| `dsp3210_7.1.library` | dsp3210 7.1 (Winischhofer 2021) — sibling of 7.0: same COLDSTART 15-vector container/loader build. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-344) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
