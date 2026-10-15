@@ -378,5 +378,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkSHR3_3.0_000_.library` | XPK 'SHR3' Shrink compressor sublib (68000 build); AUTOINIT, 10 word-offset vectors, identical wire format to 020 sibling. Byte-identical raw asm + fixup; oracle identical incl. real pack round-trip (AMIGALIBS-334) |
 | `xpkSHR3_3.0_020_.library` | XPK 'SHR3' Shrink compressor sublib (020 build); AUTOINIT, 10 word-offset vectors, 7-mode packer info, lazily-allocated hash ctx (3.4MB). Byte-identical raw asm + fixup; oracle identical incl. real pack round-trip (AMIGALIBS-333) |
 | `realtime_34.5.library` | 'realtime 34.5' — CIA timer scheduler lib; AUTOINIT, 19 installed vectors (functab entry0 NULL). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-335) |
+| `mathieeedoubbas_34.46.library` | IEEE double-precision math base (WB1.3); COLDSTART, 3 word-offset functabs selected by AttnFlags/MathIEEE.resource, 16 vectors. Byte-identical raw asm + fixup; oracle identical incl. FPU-line math (AMIGALIBS-336) |
+| `mathieeedoubbas_34.46_WB1.3_.library` | Same binary as mathieeedoubbas_34.46 (WB1.3-labelled copy). Byte+runtime identical (AMIGALIBS-336/337) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
