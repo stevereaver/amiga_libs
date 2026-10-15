@@ -22,3 +22,23 @@ description: Chronological journal of analysis sessions for this library. Newest
 - `make` produces a valid HUNK .library; FPU instruction streams verified
   byte-identical against the shipped disassembly; framework code is
   semantically equivalent but larger (see findings).
+
+## 2026-10-15 (byte-exact upgrade)
+
+- Wrote `source/mathieeedoubbas_h0.s`: verbatim reconstruction of the
+  0x230-byte CODE hunk — bare-rts entry, RomTag @0x02, InitTable,
+  seglist cell @0x2c, word-offset functab (16 vectors), InitStruct
+  data, init/Close/Expunge/Open + all 12 IEEE DP FPU ops, mid-string
+  name pointer, string islands, per-function `0000` pad words.
+- `fixup.py` rewrites the reloc tail into the original 0x3f7 DREL16
+  chunk (8 refs, descending). Output byte-identical
+  (md5 `d045e9dab808f9331ad97bfc85e795dd`).
+- Corrected stale findings: Open writes FPCR:=0x10 unconditionally
+  (not the conditional rewrite previously described); the no-FPU init
+  path frees the NEW lib base (not the OpenLibrary result) and returns
+  0; this build has no Pow vector (16 LVOs, -6..-96).
+- New `work/oracle.py`: machine68k + python 68881 line-F subset using
+  USP for stack EAs; identical traces original vs rebuild including
+  no-FPU init (openlib path name, closelib 0, freemem of the fresh
+  lib), FPCR write, all math vectors, deferred + real expunge.
+- Mirrored identical rebuild to the `_UAE_` twin (same md5).

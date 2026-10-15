@@ -22,3 +22,11 @@ description: Chronological journal of analysis sessions for this library. Newest
 - `make` produces a valid HUNK .library; FPU instruction streams verified
   byte-identical against the shipped disassembly; framework code is
   semantically equivalent but larger (see findings).
+
+## 2026-10-15 (byte-exact upgrade)
+
+- Mirrored `mathieeedoubbas_h0.s` + `fixup.py` + oracle from the
+  non-UAE twin (identical binary, md5 `d045e9dab808f9331ad97bfc85e795dd`).
+  Byte-identical build; oracle traces identical.
+- Stale findings corrected (unconditional FPCR write; no-FPU path frees
+  the new lib base; no Pow vector in this 16-LVO build).

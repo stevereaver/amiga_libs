@@ -16,11 +16,15 @@ RomTag version 45 (0x2d), NT_LIBRARY, RTF_AUTOINIT; single code hunk.
 - Original SHA256: `398aa5cc85e5c7124d5f13861d83ede69f562136c77ba27f0381705775083df0`
 - Original size: 624 bytes, single `.text` hunk of 0x230 bytes
 - UAE twin: `../mathieeedoubbas_10.881.library` is **byte-for-byte identical** to this binary (same SHA256)
-- No-FPU path: on missing AFF_68881: OpenLibrary("Libs:NoFPU/mathieeedoubbas.library",36), CloseLibrary(result), then runs the shared NegSize/PosSize free tail on the base OpenLibrary returned and fails the resident init
+- No-FPU path: on missing AFF_68881, init OpenLibrarys (and immediately
+  CloseLibrarys) the *path* `Libs:NoFPU/mathieeedoubbas.library` — which
+  always fails — then FreeMem()s the freshly allocated library base
+  without unlinking it and returns 0 (init fails)
 - FPCR written by Open: 0x10 (unconditional)
-- Reconstruction: `source/` builds a valid HUNK `.library` via the two-pass
-  word-offset AUTOINIT table (`genfunctab.py`). Semantics verified against
-  the disassembly; layout/size differ from the shipped binary (see findings).
+- Reconstruction: `source/mathieeedoubbas_h0.s` + `fixup.py` build a
+  **byte-identical** image (md5 `d045e9dab808f9331ad97bfc85e795dd`);
+  `work/oracle.py` traces original and rebuild identically. The earlier
+  two-pass C model is retained under `make cmodel`.
 
 ## Categories
 
