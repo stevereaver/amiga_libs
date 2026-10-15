@@ -42,12 +42,20 @@ point at a bare `rts` rather than the null stub.
 
 ## Status
 
-FULL — reconstructed (`source/`): C framework + codec
-(xpkCBR0.c), resident tables/strings (xpkCBR0_lib.s),
-two-pass word-offset functab (genfunctab.py).  Codec
-round-trip verified on a host model (20k random chunks,
-all pass); descriptor field writes verified field-for-field
-against the shipped LibInit.
+Byte-identical.  `make` assembles `source/xpkCBR0_h0.s`
+(verbatim asm incl. the raw-emitted `b0bc` longform cmp,
+`943c` sub.b, 0xfffc literals, and the leading 0xffff
+word-table marker); `fixup.py` rewrites the RELOC32 tail
+to the original descending order.  md5
+`ec38e854938b1e949b9d1f65d8d13a98`.  `make cmodel` builds
+the earlier C reconstruction.
+Runtime-verified: `work/oracle.py` (machine68k) logs
+identical for original vs rebuild across init, Open/Close,
+deferred+real expunge, all dead vectors, XpkInfo layout,
+pack/unpack round-trip, zero-length, too-long (-11),
+expansion (-17), out-of-slack (-10), 0x80 run token
+(129 emitted bytes), and the past-end run byte read.
+
 
 ## Contents
 

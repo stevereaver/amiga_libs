@@ -24,3 +24,10 @@ title: Reconstruction log
   guard (matches shipped semantics).
 - Phase 4: this OKF bundle; OOB-read defect noted in
   findings (same class as the xpkFRLE encoder defect).
+
+- 2026-10-15: byte-verbatim asm reconstruction
+  (`source/xpkCBR0_h0.s`) + descending-RELOC32 fixup.py;
+  `cmp` identical.  machine68k oracle identical across
+  every vector incl. codec edge cases, the +256 output
+  slack, the run-loop past-end read, and the real
+  deferred-expunge path.
