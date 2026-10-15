@@ -404,5 +404,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `powerpacker_35.254.library` | powerpacker 35.254 'pplib' (1991) — PP cruncher, CODE+BSS, 22 vectors, datatab-initialized. Byte-identical; oracle identical (AMIGALIBS-359) |
 | `catharsis_2.11.library` | catharsis 2.11 (2003) — 3-hunk AUTOINIT (CODE+DATA+BSS), 23 vectors, -30 reloc-lands-on-CODE+0 quirk, deferred expunge. Byte-identical; oracle identical (AMIGALIBS-360) |
 | `xpkLIN3_1.1_000_.library` | xpkLIN3 1.1 (2013) — XPK 'Lino3' codec (improved LIN1), 10 word vectors, 'minimal' mode. Byte-identical; sibling oracle identical (AMIGALIBS-361) |
+| `mathieeedoubbas_38.2_WB2.1__.library` | mdb 38.2 (WB2.1+, 1992) — IEEE double math, COLDSTART w/ attn+fpsp functab matrix, ffff-overrun + 3 empty hunks. Byte-identical; oracle identical (AMIGALIBS-362) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
