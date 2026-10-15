@@ -38,10 +38,14 @@ No official FD/header known; the name `Explode` is descriptive.
 
 ## Status
 
-FULL - reconstructed (`source/`), builds with m68k-amigaos-gcc -m68000
-to a valid hunk library.  Decoder algorithm fully ported to C
-(`explode.c`); ABI-critical glue (hook stubs, frame layout, tail-jump
-entry) in `explode_lib.s`.
+BYTE-IDENTICAL - verbatim asm reconstruction (`source/explode_h0.s`)
++ `source/fixup.py` (16-entry RELOC32 splice): `cmp`-equal to the
+shipped binary (md5 `7a9731be26727440731cc77ed97eed47`).
+machine68k oracle (`work/oracle.py`) identical over entry, init
+(OpenLibrary dos + SetFunction dos@-0x96 -> in-hunk hook), all 5
+vectors, and two calls through the installed hook (LoadSeg
+passthrough + Supervisor-walked seglist check).  The earlier
+semantic C model is preserved as the `cmodel` make target.
 
 ## Contents
 
