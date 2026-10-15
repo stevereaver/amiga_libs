@@ -7,6 +7,10 @@ timestamp: 2026-10-10T19:00:00Z
 
 # Rebuild deviations
 
+(Applies to the `make cmodel` C build only — the default `make`
+target, `version.s` + `fixup.py`, is byte-identical to the
+original.)
+
 * **Hunk count.** The original file carries a second, empty
   (zero-length) code hunk after hunk 0.  The m68k-amigaos-ld output
   has a single code hunk -- the toolchain does not emit empty hunks.

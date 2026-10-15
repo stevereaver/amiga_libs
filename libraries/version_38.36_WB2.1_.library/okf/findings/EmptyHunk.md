@@ -9,5 +9,6 @@ timestamp: 2026-10-10T19:00:00Z
 
 The hunk table declares 2 hunks; hunk 1 is a `HUNK_CODE` with length
 0 followed immediately by `HUNK_END`.  Harmless artifact of the
-original link; the reconstruction does not reproduce it (ld emits no
-empty sections).
+original link.  ld emits no empty sections, so `source/fixup.py`
+rewrites the header's hunk table and appends the empty hunk-1 record
+after link — the final file is byte-identical.

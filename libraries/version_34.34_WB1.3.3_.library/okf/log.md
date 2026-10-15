@@ -26,3 +26,17 @@ timestamp: 2026-10-10T19:00:00Z
   match the disassembly.
 - Phase 3: populated this okf bundle.
 - Status: FULL.
+
+## 2026-10-15 — byte-identical asm rebuild
+- Replaced the earlier functional C reconstruction with verbatim 68k
+  assembly (`source/version.s`): RomTag/strings/InitTable/functab/
+  datatab (raw-decoded InitStruct cmds incl. off16 c000/d000/e000
+  forms where present) + all 4 vectors.
+- `source/fixup.py` rebuilds the tail: declares the second empty CODE
+  hunk and rewrites RELOC32 in the original descending order.
+- Result: **byte-identical** (md5 `6fa3a150e3c71ecac06c46400b1d6ba3`).
+- `work/oracle.py` (machine68k): init, Open, Close, Expunge, null vec,
+  reopen, deferred+real expunge — **RUNTIME-IDENTICAL**
+  (orig.log == rebuild.log).
+- `version.c`/`version_lib.s`/`endmodule.s` kept as C semantic
+  reference (`make cmodel`).

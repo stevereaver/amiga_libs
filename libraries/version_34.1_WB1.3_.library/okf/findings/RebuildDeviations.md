@@ -1,22 +1,19 @@
 ---
 type: Finding
-title: Rebuild deviations
-description: What differs between the original binary and the C reconstruction.
-timestamp: 2026-10-10T19:00:00Z
+title: Rebuild deviations (historical)
+description: >-
+  Deviations of the earlier C reconstruction.  SUPERSEDED:
+  source/version.s + fixup.py now rebuilds the file byte-identically
+  (md5 09de0ebaf04f04a4b7f27b84a18a2db4).
+timestamp: 2026-10-15T00:00:00Z
 ---
 
-# Rebuild deviations
+# Rebuild deviations (C model — superseded)
 
-* **Hunk count.** The original file carries a second, empty
-  (zero-length) code hunk after hunk 0.  The m68k-amigaos-ld output
-  has a single code hunk -- the toolchain does not emit empty hunks.
-  Functionally irrelevant.
-* **Code generation.** GCC emits a6 save/restore around the vector
-  entry points (a6 is callee-saved in the C ABI but is the library
-  base register for LVO calls), so the compiled functions are a few
-  bytes longer than the originals.  Semantics verified instruction
-  by instruction against the IRA disassembly.
-* **Table regions byte-identical.** RomTag, name/id strings,
-  InitTable, function table contents and InitStruct bytes (including
-  the documented quirks) reproduce exactly; all 14 RELOC32 slots
-  match the original's relocation set by purpose.
+The canonical build is `source/version.s` + `source/fixup.py`,
+byte-identical to the shipped binary including the empty second CODE
+hunk record and descending RELOC32 order.  The notes below applied to
+the earlier C reconstruction (`make cmodel`): GCC wraps vectors in a6
+save/restore (longer code), and stock ld cannot emit the empty second
+hunk.  All table regions were already byte-identical.
+- **Revision mismatch**: idstr "versionlib 34.1" but datatab writes lib_Revision=28.

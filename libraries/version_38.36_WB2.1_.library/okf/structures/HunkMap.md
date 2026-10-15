@@ -10,7 +10,7 @@ timestamp: 2026-10-10T19:00:00Z
 ```
 HUNK_HEADER  2 hunks in table: [0x104, 0]
 HUNK_CODE    hunk 0, 0x104 bytes   | all code+data
-  +0x00      moveq #0/-1,d0; rts       | module entry
+  +0x00      moveq #0,d0; rts          | module entry (dead stub)
   +0x04      RomTag (0x4afc ...)       | ends +0x1e
   +0x1e      "version.library"\0
   +0x2e      id string + \r\n\0 (+pad)
