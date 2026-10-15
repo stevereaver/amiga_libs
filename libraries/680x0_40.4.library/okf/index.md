@@ -26,13 +26,14 @@ the matching CPU-specific driver `680N0.library` (version >=
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc): C for all logic plus a
-small hand-written `cpuprobe.s` for the supervisor-state CPU/PCR
-probe (VBR redirect + illegal-instruction trampoline - not
-expressible in C).  `make` produces a loadable `.library`; the data
-hunk (InitTable, function table layout, strings) is byte-identical
-to the original modulo the relocated vector pointers, and the code
-was verified function-by-function against the IRA disassembly.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — hand asm `source/680x0_h0.s`
+builds md5-identical to the shipped binary (single link pass; GNU ld
+emitted the same RELOC32 group layout natively, no fixup needed).
+`make cmodel` still builds the earlier C reconstruction.
+`work/oracle.py` (machine68k) exercises the CPU-detect ladder
+(68010/20/40/060-forced), driver-missing and exec<36 self-free
+paths, OpenLibrary/CloseLibrary/FreeMem/Supervisor tracing, and all
+public vectors — orig and rebuild logs identical.
 
 ## Contents
 

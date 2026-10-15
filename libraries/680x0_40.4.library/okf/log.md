@@ -21,3 +21,10 @@ description: Chronological journal of analysis sessions for this library. Newest
   `make` OK; data hunk byte-identical modulo vector relocs; code
   verified against disassembly.
 - Phase 3: okf bundle populated.
+
+- Phase 4 (2026-10-15): verbatim asm `680x0_h0.s` -> BYTE-IDENTICAL
+  (md5 15b5c19179d162c850fa5dfe7dcfa93d).  machine68k oracle verifies CPU
+  ladder (AttnFlags -> '1'/'2'/'4', forced-060 -> '6'), driver-open
+  name patching on the stack, self-free on driver-missing and
+  exec-v<36 paths, and CPUType/FPUType/MMUType/SetFPUExceptions
+  incl. the driver -222 forwarding.  orig vs rebuild logs identical.

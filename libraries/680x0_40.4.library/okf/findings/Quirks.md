@@ -31,9 +31,12 @@ timestamp: 2026-10-10T18:00:00Z
   (FPUControl) slot is called.
 - **'THOR' magic**: LibInit stores the longword 0x54484f52 ('THOR')
   at base+0x24 - the author signature, never read afterwards.
-- **Reconstruction deviations**: GCC code layout, register
-  allocation and instruction selection differ from the shipped
-  binary (compiled with a different toolchain).  Semantics match;
-  the .data hunk is byte-identical except for the relocated vector
-  pointers.  `movew` pairs replace the original single `movel` for
-  version/revision.
+- **rt_IdString points past the `$VER: ` cookie.**  DATA+0x4e
+  holds the cookie; the idstring reference is DATA+0x54, the bare
+  `"680x0.library 40.4 (25.11.2001) ..."` text (same layout as
+  xpkDLTA 0.1).
+- **Reconstruction deviations (C model only)**: GCC code layout,
+  register allocation and instruction selection differ from the
+  shipped binary; semantics match.  The verbatim asm rebuild
+  `680x0_h0.s` is byte-identical including the scrambled
+  cross-hunk relocation groups.
