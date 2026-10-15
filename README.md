@@ -368,4 +368,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `mathtrans_31.2_WB1.1_.library` | 'mathtrans 31.2' WB1.1 transcendental math — 19-hunk per-function build (incl. 3 empty hunks), AUTOINIT, 21 vectors, MC68343 FP firmware. Byte-identical raw asm + resplit fixup; oracle identical (AMIGALIBS-322) |
 | `mathtrans_33.8.library` | 'mathtrans 33.8' WB transcendental math — 17-hunk per-function build, AUTOINIT, 21 vectors. Byte-identical raw asm + resplit fixup; oracle identical (AMIGALIBS-323) |
 | `mathtrans_33.8_WB1.2__.library` | 'mathtrans 33.8(WB1.2+)' — md5-identical reshipment of 33.8; same reconstruction. Byte+runtime identical (AMIGALIBS-324) |
+| `mathtrans_37.1_WB2.04__.library` | 'mathtrans 37.1' WB2.04+ transcendental math — 18-hunk per-function build, AUTOINIT, 21 vectors. Byte-identical raw asm + resplit fixup; oracle identical (AMIGALIBS-325) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
