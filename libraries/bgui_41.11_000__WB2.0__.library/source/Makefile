@@ -1,0 +1,18 @@
+CC      = /opt/amiga/bin/m68k-amigaos-gcc
+ASFLAGS = -m68000
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
+ORIG    = ../binary/bgui_41.11(000+,WB2.0+).library
+OBJS    = bgui_41_11_000__WB2_0___h0.o
+
+all: bgui.library
+
+bgui.library: $(OBJS) fixup.py
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	python3 fixup.py $@ "$(ORIG)"
+	cmp -l $@ "$(ORIG)" && echo BYTE-IDENTICAL
+
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o bgui.library
