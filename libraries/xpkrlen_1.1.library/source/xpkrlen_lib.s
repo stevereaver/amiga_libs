@@ -1,179 +1,190 @@
-||||||
-||||||	xpkrlen_lib.s -- resident module + SAS/C-style init for
-||||||	xpkRLEN.library V1.0/1.1 "Run Length" (Nov 2 1992)
-||||||
-||||||	Two-hunk SAS/C build.  The DATA hunk carries a 276-byte
-||||||	template (InitTable + strings + XpkInfo/XpkMode) that
-||||||	INITFUNCTION copies into the library base at base+58,
-||||||	then relocates four descriptor pointer fields by adding
-||||||	base+58.  FUNCTABLE is the LONG-address format.
-||||||
-||||||	Hunk map (original):
-||||||	  CODE: entry stub, RomTag -> INIT (data hunk),
-||||||	        INITFUNCTION, OPEN/CLOSE/EXPUNGE, LIBFUNC_0..5,
-||||||	        FUNCTABLE (longs), name/idstr
-||||||	  DATA: template [0x00..0x113] + reloc list [0x100]
-||||||	        reloc: count=4, offsets {0xe2,0xb6,0xb2,0xae}
-||||||
+|||
+|||  xpkRLEN.library 1.1 (Nov 2 1992) -- resident shell
+|||
+|||  Aztec-style two-hunk build.  The RomTag is vestigial
+|||  (rt_EndSkip covers only the header, rt_Init points back at
+|||  the RomTag); the real InitTable lives at the head of the
+|||  DATA hunk.  InitFunction copies the 256-byte data template
+|||  to base+0x3a and applies the embedded pointer fixups.
+|||  Pack/unpack codecs are in xpkrlen.c.
+|||
 
 	.section .text
 
-_start:
-	moveq	#0,d0			| module entry + null vector
-	rts
 	.globl	_start
-
-_romtag:
-	.word	0x4afc			| RT_MATCHWORD
-	.long	_romtag			| RT_MATCHTAG
-	.long	_endmodule		| RT_ENDSKIP
-	.byte	0x80			| RTF_AUTOINIT
-	.byte	1			| RT_VERSION
-	.byte	9			| NT_LIBRARY
-	.byte	0			| RT_PRI
-	.long	_libname		| RT_NAME
-	.long	_idstr			| RT_IDSTRING
-	.long	_INIT			| RT_INIT -> DATA-hunk InitTable
-
-||||| ------------------------------------------------------------
-||||| INITFUNCTION -- SAS/C data-copy + fixup initialiser
-|||||   d0 = library base, a0 = seglist
-||||| ------------------------------------------------------------
-	.globl	_INITFUNCTION
-_INITFUNCTION:
-	movem.l	d6-d7/a2-a3,-(sp)
-	movea.l	d0,a3			| a3 = base
-	move.l	a0,34(a3)		| base+0x22 = seglist
-	move.b	#9,8(a3)		| ln_Type = NT_LIBRARY
-	move.l	#_libname,10(a3)	| ln_Name
-	move.b	#6,14(a3)		| lib_Flags = SUMUSED|CHANGED
-	move.w	#1,20(a3)		| lib_Version = 1
-	clr.w	22(a3)			| lib_Revision = 0
-	move.l	#_idstr,24(a3)		| lib_IdString
-
-	| copy the 256-byte template SECSTRT_1 -> base+58
-	lea	_SECSTRT_1,a0
-	movea.l	a3,a1
-	adda.w	#58,a1
-	move.l	#0x40,d0
-	lsl.l	#2,d0			| 0x100 bytes
-1:	move.b	(a0)+,(a1)+
-	subq.l	#1,d0
-	bcc.s	1b
-
-	| reloc pass: read count + offsets from SECSTRT_1+0x100,
-	| each field gets (base+58) added -> absolute pointer
-	lea	_SECSTRT_1+0x100,a0
-	move.l	(a0)+,d7
-2:	tst.l	d7
-	ble.s	3f
-	movea.l	a3,a1
-	adda.w	#58,a1			| a1 = base+58
-	adda.l	(a0)+,a1		| + field offset
-	move.l	a3,d0
-	addi.l	#58,d0			| d0 = base+58
-	add.l	d0,(a1)			| *target += base+58
-	subq.l	#1,d7
-	bra.s	2b
-3:	move.l	a3,d0			| return base
-	movem.l	(sp)+,d6-d7/a2-a3
+_start:	moveq	#0,d0			| entry stub returns 0
 	rts
 
-||||| ------------------------------------------------------------
-||||| FUNCTABLE -- LONG-address format (10 vectors + ffff guards)
-||||| ------------------------------------------------------------
+RomTag:	dc.w	0x4afc
+	dc.l	RomTag
+	dc.l	RomTag+0x1a		| EndSkip = 0x1e (header only)
+	dc.b	0x80			| RTF_AUTOINIT (flag set, unused)
+	dc.b	1			| version
+	dc.b	9			| NT_LIBRARY
+	dc.b	0
+	dc.l	_libname
+	dc.l	_idstr
+	dc.l	RomTag			| rt_Init -> RomTag (vestigial)
+
 	.even
-	.globl	_FUNCTABLE
-_FUNCTABLE:
-	.long	_LibOpen		| -6   Open
-	.long	_LibClose		| -12  Close
-	.long	_LibExpunge		| -18  Expunge
-	.long	_start			| -24  ExtFunc (null)
-	.long	_XpksPackerInfo		| -30  XpksPackerInfo
-	.long	_XpksPackChunk		| -36  XpksPackChunk
-	.long	_XpksPackFree		| -42  XpksPackFree (stub)
-	.long	_XpksPackReset		| -48  XpksPackReset (stub)
-	.long	_XpksUnpackChunk	| -54  XpksUnpackChunk
-	.long	_XpksUnpackFree		| -60  XpksUnpackFree (stub)
-	.word	0xffff
-	.word	0xffff
+
+||| ------ InitFunction: manual init + data copy + fixups ------
+||| in: d0 = lib base, a0 = seglist, a6 = SysBase
+	.globl	InitFunction
+InitFunction:
+	link	a5,#-20
+	movem.l	d7/a2/a4/a6,-(sp)
+	lea	0(a6),a4		| dead (kept for fidelity)
+	movea.l	a0,a2
+	move.l	d0,-20(a5)
+	movea.l	-20(a5),a0
+	move.l	a2,34(a0)		| seglist -> +0x22
+	move.b	#9,8(a0)		| ln_Type = NT_LIBRARY
+	move.l	#_libname,10(a0)	| ln_Name
+	move.b	#6,14(a0)		| lib_Flags = SUMUSED|CHANGED
+	move.w	#1,20(a0)		| version 1
+	clr.w	22(a0)			| revision 0
+	move.l	#_idstr,24(a0)		| lib_IdString
+	lea	58(a0),a1		| dest = base+0x3a
+	move.l	#_xpkdata,-8(a5)	| src  = data template
+	move.l	#0x40,d0		| 64 longs = 256 bytes
+	asl.l	#2,d0
+	move.l	a1,-12(a5)
+	movea.l	-8(a5),a0
+	bra.s	2f
+1:	move.b	(a0)+,(a1)+
+2:	subq.l	#1,d0
+	bcc.s	1b
+	lea	_xpkdata+0x100,a0	| fixup table: [count][offsets]
+	move.l	(a0)+,d7
+3:	tst.l	d7
+	ble.s	4f
+	move.l	-12(a5),d0		| base+58
+	move.l	d0,d1
+	add.l	(a0)+,d1		| +offset
+	movea.l	d1,a1
+	add.l	d0,(a1)			| *(base+58+off) += base+58
+	subq.l	#1,d7
+	bra.s	3b
+4:	movea.l	-20(a5),a6
+	bsr	5f			| dead jsr to rts (shipped)
+	move.l	-20(a5),d0
+	movem.l	(sp)+,d7/a2/a4/a6
+	unlk	a5
+	rts
+5:	rts
+
+||| ------ standard vectors ------
+LibOpen:
+	addq.w	#1,32(a6)		| lib_OpenCnt
+	bclr	#3,14(a6)		| clear LIBF_DELEXP
+	move.l	a6,d0
+	rts
+LibClose:
+	moveq	#0,d7
+	subq.w	#1,32(a6)
+	bne.s	6f
+	btst	#3,14(a6)
+	beq.s	6f
+	bsr	LibExpunge
+	move.l	d0,d7
+6:	move.l	d7,d0
+	rts
+LibExpunge:
+	moveq	#0,d7
+	bset	#3,14(a6)		| LIBF_DELEXP
+	tst.w	32(a6)
+	bne.s	8f			| busy -> deferred
+	movea.l	34(a6),a2		| seglist
+	move.l	a6,d1
+	movea.l	a6,a1
+	movea.l	4.w,a6
+	jsr	-252(a6)		| Remove
+	movea.l	d1,a1
+	move.l	a1,d7
+	moveq	#0,d0
+	move.w	16(a1),d0		| NegSize
+	move.l	d1,a0
+	sub.l	d0,a0			| base - negsize
+	movea.l	a2,a1
+	jsr	-210(a6)		| FreeMem(seglist)  (d0 already set?)
+	movea.l	d7,a1
+	move.w	16(a1),d0
+	move.l	d1,a0
+	sub.l	d0,a0
+	movea.l	a0,a1
+	move.w	18(a6),d0		| size = PosSize+NegSize
+	jsr	-210(a6)		| FreeMem(base-negsize, negsize+possize)
+	move.l	a2,d7			| return seglist
+8:	move.l	d7,d0
+	rts
+
+||| ------ xpk stubs ------
+LibEntry:				| -24: module entry -> start
+	bra	_start
+XpksPackFree:				| -42: returns d0 unchanged
+	rts				| (shipped: link/unlk frame only)
+XpksPackReset:				| -48
+	moveq	#0,d0
+	rts
+XpksUnpackFree:				| -60: returns d0 unchanged
+	rts
+
+	.even
+||| ------ function table (absolute longs) ------
+FuncTable:
+	dc.l	LibOpen
+	dc.l	LibClose
+	dc.l	LibExpunge
+	dc.l	LibEntry
+	dc.l	_XpksPackerInfo		| -30
+	dc.l	_XpksPackChunk		| -36
+	dc.l	XpksPackFree		| -42
+	dc.l	XpksPackReset		| -48
+	dc.l	_XpksUnpackChunk	| -54
+	dc.l	XpksUnpackFree		| -60
+	dc.w	0xffff,0xffff
 
 _libname:
 	.ascii	"xpkRLEN.library"
 	.byte	0
-	.globl	_libname
 _idstr:
-	.ascii	"$VER: RLEN 1.1 (Nov  2 1992)"
-	.byte	13,10,0
-	.globl	_idstr
+	.ascii	"Version 1.0"		| exact: no $VER here
+	.byte	0
 
-||||| ------------------------------------------------------------
-||||| DATA hunk: the 276-byte template copied to base+58 by
-||||| INITFUNCTION, then the reloc list it consumes.
-||||| Pointer fields hold template-relative offsets; the init
-||||| adds base+58 to turn them absolute.
-||||| ------------------------------------------------------------
-	.data
-	.globl	_SECSTRT_1
-_SECSTRT_1:
-	.long	0			| 0x00 copied marker
-_INIT:						| 0x04 InitTable
-	.long	0x13a			|   dataSize = 314
-	.long	_FUNCTABLE		|   funcTable
-	.long	0			|   dataTable
-	.long	_INITFUNCTION		|   initRoutine
-						| 0x14
-	.ascii	"$VER: RLEN 1.1 (Nov  2 1992)"
-	.byte	0			| 0x30 NUL
-	.byte	0			| 0x31 pad
-mode_node:				| 0x32 XpkMode node (42B)
-	.long	0			| next
-	.long	100			| upto
-	.long	1			| flags
-	.long	0			| packmem
-	.long	0			| unpackmem
-	.long	0x8c			| packspeed 140
-	.long	0x413			| unpackspeed 1043
-	.word	0x2d			| ratio 45
-	.word	0			| chunksize
-	.ascii	"normal"		| desc[10]
-	.byte	0,0,0,0			| pad desc to 10 -> 0x5c
-_s_name:					| 0x5c "RLEN"
-	.ascii	"RLEN"
-	.byte	0,0			| 0x60-0x61
-_s_lname:					| 0x62 "Run Length 1.0"
-	.ascii	"Run Length 1.0"
-	.byte	0,0			| 0x70-0x71
-_s_desc:					| 0x72 "Fast and simple..."
-	.ascii	"Fast and simple compression usable for simple data"
-	.byte	0			| string NUL ends 0xa4
-	.byte	0			| 0xa5 pad -> desc at 0xa6
-						| 0xa6 XpkInfo
-_xpkinfo:
-	.word	1,0,0,0			| ver words 1,0,0,0
-f_name:	.long	_s_name - _SECSTRT_1	| +8  xi_Name -> "RLEN"
-f_lname:.long	_s_lname - _SECSTRT_1	| +12 xi_LongName -> "Run Length 1.0"
-f_desc:	.long	_s_desc - _SECSTRT_1	| +16 xi_Description -> "Fast..."
-	.long	0x524c454e		| +20 xi_ID 'RLEN'
-	.long	9			| +24 xi_Flags
-	.long	0x7d00			| +28 xi_MaxPkInChunk 32000
-	.long	0			| +32 xi_MinPkInChunk
-	.long	0x7d00			| +36 xi_DefPkInChunk
-	.long	0			| +40 xi_PackMsg
-	.long	0			| +44 xi_UnpackMsg
-	.long	0			| +48 xi_PackedMsg
-	.long	0			| +52 xi_UnpackedMsg
-	.word	50			| +56 xi_DefMode
-	.word	0			| +58 pad
-f_mode:	.long	mode_node - _SECSTRT_1	| +60 xi_ModeDesc -> mode_node
-	.space	26,0			| +64 reserved -> 0x100
-						| 0x100 reloc list
-	.globl	_reloclist
-_reloclist:
-	.long	4			| count
-	.long	f_mode - _SECSTRT_1	| 0xe2
-	.long	f_desc - _SECSTRT_1	| 0xb6
-	.long	f_lname - _SECSTRT_1	| 0xb2
-	.long	f_name - _SECSTRT_1	| 0xae
+	.even
+_deadstub1:	rts
+_deadstub2:	rts			| two reserved rts stubs
 
-	.end
+||| =================  DATA hunk =================
+||| Emitted verbatim (the template fields are not longword-aligned;
+||| the embedded InitTable's two code refs are kept as .long symbols).
+	.section .data
+
+_xpkdata:
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x3a
+	dc.l	FuncTable
+	dc.b	0x00,0x00,0x00,0x00
+	dc.l	InitFunction
+	dc.b	0x24,0x56,0x45,0x52,0x3a,0x20,0x52,0x4c,0x45,0x4e,0x20,0x31
+	dc.b	0x2e,0x31,0x20,0x28,0x4e,0x6f,0x76,0x20,0x20,0x32,0x20,0x31
+	dc.b	0x39,0x39,0x32,0x29,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x64,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x8c,0x00,0x00,0x04,0x13,0x00,0x2d
+	dc.b	0x00,0x00,0x6e,0x6f,0x72,0x6d,0x61,0x6c,0x00,0x00,0x00,0x00
+	dc.b	0x52,0x4c,0x45,0x4e,0x00,0x00,0x52,0x75,0x6e,0x20,0x4c,0x65
+	dc.b	0x6e,0x67,0x74,0x68,0x20,0x31,0x2e,0x30,0x00,0x00,0x46,0x61
+	dc.b	0x73,0x74,0x20,0x61,0x6e,0x64,0x20,0x73,0x69,0x6d,0x70,0x6c
+	dc.b	0x65,0x20,0x63,0x6f,0x6d,0x70,0x72,0x65,0x73,0x73,0x69,0x6f
+	dc.b	0x6e,0x20,0x75,0x73,0x61,0x62,0x6c,0x65,0x20,0x66,0x6f,0x72
+	dc.b	0x20,0x73,0x69,0x6d,0x70,0x6c,0x65,0x20,0x64,0x61,0x74,0x61
+	dc.b	0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x5c,0x00,0x00,0x00,0x62,0x00,0x00,0x00,0x72,0x52,0x4c
+	dc.b	0x45,0x4e,0x00,0x00,0x00,0x09,0x00,0x00,0x7d,0x00,0x00,0x00
+	dc.b	0x00,0x00,0x00,0x00,0x7d,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x32
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x32,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+	dc.b	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x04
+	dc.b	0x00,0x00,0x00,0xe2,0x00,0x00,0x00,0xb6,0x00,0x00,0x00,0xb2
+	dc.b	0x00,0x00,0x00,0xae

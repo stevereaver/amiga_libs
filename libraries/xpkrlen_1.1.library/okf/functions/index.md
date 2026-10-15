@@ -1,13 +1,18 @@
----
-type: Index
-title: xpkRLEN functions
----
+# Functions
 
-# Functions — xpkRLEN.library V1.0/1.1
+| LVO | Symbol | Role |
+|-----|--------|------|
+| -6  | LibOpen | OpenCnt++, clear DELEXP |
+| -12 | LibClose | OpenCnt--, deferred expunge |
+| -18 | LibExpunge | Remove + FreeMem |
+| -24 | LibEntry | bra to module start |
+| -30 | XpksPackerInfo | returns base+0xe0 (copied XpkInfo) |
+| -36 | XpksPackChunk | PackBits encoder |
+| -42 | XpksPackFree | stub |
+| -48 | XpksPackReset | returns 0 |
+| -54 | XpksUnpackChunk | decoder |
+| -60 | XpksUnpackFree | stub |
 
-- [framework](framework.md) — LibOpen/Close/Expunge + init machinery
-- [XpksPackerInfo](XpksPackerInfo.md) — LVO -30
-- [XpksPackChunk](XpksPackChunk.md) — LVO -36 (RLE packer)
-- [XpksUnpackChunk](XpksUnpackChunk.md) — LVO -54 (RLE decoder)
-- stubs: XpksPackFree (-42), XpksPackReset (-48),
-  XpksUnpackFree (-60) — trivial, return d0-untouched / 0
+- [XpksPackChunk.md](XpksPackChunk.md)
+- [XpksUnpackChunk.md](XpksUnpackChunk.md)
+- [InitFunction.md](InitFunction.md)

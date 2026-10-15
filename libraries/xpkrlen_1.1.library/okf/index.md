@@ -1,63 +1,49 @@
 ---
 type: Library
-title: xpkRLEN.library V1.0/1.1 "Run Length"
+title: xpkRLEN.library 1.1 (Nov 2 1992)
 description: >-
-  xpkRLEN XPK sublibrary (Nov 2 1992) -- a byte-run RLE with
-  a signed count byte per token: positive=literal run,
-  negative=byte replicate, zero=terminator.  Two-hunk SAS/C
-  build: INITFUNCTION copies a 256-byte template (InitTable +
-  strings + XpkInfo/XpkMode) into base+58 and relocates four
-  descriptor pointer fields.  Codec has no output bound on
-  the run emit and the decoder has no bound at all.
-timestamp: 2026-10-28T00:00:00Z
+  XPK "Run Length" packer sublibrary - PackBits-style RLE codec.
+  Oldest RLEN build: Aztec-style two-hunk binary with a decorative
+  RomTag and a self-relocating data template.
+timestamp: 2026-10-15T08:10:00Z
 ---
 
-# xpkRLEN.library V1.0/1.1
+# xpkRLEN.library 1.1
 
-"Run Length" XPK sublibrary — the simplest codec in the set:
-`<signed count>` per token, `>0`=copy literals, `<0`=replicate
-the next byte, `0`=terminator.  Runs are found by a
-3-in-a-row lookahead and capped at 127, literals flush at
-127 or on a run boundary.
+XPK packer sublibrary (`RLEN` 4CC).  Six user vectors implementing
+the XpksSub API: PackerInfo, PackChunk (PackBits encoder),
+PackFree/PackReset (stubs), UnpackChunk, UnpackFree.
 
 ## Binary facts
 
-- 1384 bytes, TWO hunks (CODE + DATA), SAS/C build
-- sha256: `62c8e5a968b50ce256892b1c102d0ae2c0adbedf4be4f22796fa84e48e28cb5e`
-- RomTag (CODE hunk): RTF_AUTOINIT, ver 1, NT_LIBRARY,
-  RT_INIT -> InitTable in the DATA hunk
-- entry stub `moveq #0,d0; rts` (also the null vector)
-- InitTable: dataSize 0x13a, FUNCTABLE = LONG-address table
-  (10 vectors + ffff ffff), dataTable=0, init=INITFUNCTION
-- INITFUNCTION: fills base fields, copies 256B template
-  SECSTRT_1 -> base+58, adds base+58 to 4 descriptor ptrs
-  (reloc list {0xe2,0xb6,0xb2,0xae} at data+0x100)
-- XpkInfo lives at base+224 (inside the copied block)
+- 1384 bytes; TWO hunks: CODE 0x3a8 + DATA 0x114
+- RomTag is decorative: rt_EndSkip = +0x1e (covers only the header),
+  rt_Init points back at the RomTag itself.  The REAL InitTable sits
+  at the start of the DATA hunk (dataSize 0x13a) - the xpk master
+  finds it by convention, not via exec's InitResident.
+- InitFunction copies the 256-byte data template into base+0x3a and
+  applies 4 pointer fixups from an offset table at data+0x100.
+- `$VER: RLEN 1.1 (Nov  2 1992)` lives in the DATA hunk (the CODE
+  hunk's id string is just "Version 1.0").
+- Entry stub returns 0 (not -1 like xpkNONE 1.4).
 
-## Vectors
+## API
 
-| LVO | Function | Notes |
-|-----|----------|-------|
-| -6  | LibOpen | standard |
-| -12 | LibClose | DELEXP bit handled |
-| -18 | LibExpunge | Remove+FreeMem |
-| -24 | _start | null (ExtFunc) |
-| -30 | XpksPackerInfo | -> base+224 XpkInfo |
-| -36 | XpksPackChunk | RLE packer |
-| -42 | XpksPackFree | stub (d0-untouched) |
-| -48 | XpksPackReset | stub (returns 0) |
-| -54 | XpksUnpackChunk | RLE decoder |
-| -60 | XpksUnpackFree | stub (d0-untouched) |
+| LVO | Symbol | Notes |
+|-----|--------|-------|
+| -30 | XpksPackerInfo | returns relocated template ptr (base+0xe0) |
+| -36 | XpksPackChunk  | PackBits encoder |
+| -42 | XpksPackFree   | stub - returns d0 unchanged |
+| -48 | XpksPackReset  | returns 0 |
+| -54 | XpksUnpackChunk| byte-loop decoder |
+| -60 | XpksUnpackFree | stub - returns d0 unchanged |
 
-## External calls
+## Status
 
-exec.library: Remove (-252), FreeMem (-210) — expunge only.
-No AllocMem (workmem-free codec, packmem advertised as 0).
+FULL - reconstructed (source/), builds CODE+DATA two-hunk binary;
+data hunk is byte-identical to shipped; code is a semantic port.
 
-## Reconstruction
+## Contents
 
-- `source/xpkrlen.c` — framework + codec (C)
-- `source/xpkrlen_lib.s` — RomTag, INITFUNCTION (copy+fixup),
-  FUNCTABLE, DATA-hunk template + reloc list
-- long-address FUNCTABLE -- no genfunctab pass needed
-- Host test: 19701 round-trips, 0 errors, 299 `-17` rejects
+- [functions/](functions/index.md) - [structures/](structures/index.md)
+- [findings/](findings/index.md) - [algorithms/](algorithms/index.md) - [log.md](log.md)

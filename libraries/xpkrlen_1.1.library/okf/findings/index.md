@@ -1,9 +1,4 @@
----
-type: Index
-title: xpkRLEN findings
----
+# Findings
 
-# Findings — xpkRLEN.library V1.0/1.1
-
-- [Quirks](Quirks.md) — OOB lookahead, unchecked run emit,
-  boundless decoder, stub return values
+- [VestigialRomTag.md](VestigialRomTag.md)
+- [RebuildDelta.md](RebuildDelta.md)

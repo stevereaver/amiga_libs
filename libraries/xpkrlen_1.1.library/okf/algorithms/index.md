@@ -1,9 +1,4 @@
----
-type: Index
-title: xpkRLEN algorithms
----
+# Algorithms
 
-# Algorithms — xpkRLEN.library V1.0/1.1
-
-- [RLENFormat](RLENFormat.md) — signed-count RLE token
-  stream, run detection, literal/run splitting
+- PackBits RLE: literal token `+n` + n bytes, repeat token `-n` + 1
+  byte (n<=127), 0 terminator.  See xpkRLEN.c.
