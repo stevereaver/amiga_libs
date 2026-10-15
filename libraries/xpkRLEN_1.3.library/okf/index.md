@@ -25,11 +25,14 @@ XPK packer sublibrary implementing the XpksSub API (-30 XpksPackerInfo,
 
 ## Status
 
-FULL - reconstructed C source builds a valid two-hunk .library
-(m68k-amigaos-gcc -m68000).  Algorithm: PackBits RLE
-(literal code 1..127 / repeat code -1..-127 / 0 terminator).
-Host round-trip: 60k+ random cases pass; expanding inputs return
-XPKERR_EXPANSION (-17) as shipped.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — hand asm `source/xpkRLEN_h0.s`
+(+ fixup.py rewriting the RELOC32 groups to the shipped binary's
+scrambled order) builds md5 `91531faa9caaff395ba3b5bbdd7996c2`,
+matching the original exactly.  `make cmodel` still builds the
+earlier C reconstruction (larger hunk0).  machine68k oracle
+(`work/oracle.py`) exercises all 10 vectors, the cross-hunk
+XpkInfo/XpkMode descriptors, codec round-trip + edge cases, and
+the deferred-expunge defect — orig and rebuild logs identical.
 
 ## Contents
 
