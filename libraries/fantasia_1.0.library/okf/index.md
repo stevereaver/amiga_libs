@@ -23,7 +23,13 @@ Init stores ExecBase (+0x22), opens dos.library v1 (+0x26), stores
 the segment list (+0x2a); a private flag byte at +0x2e bit 3 carries
 the deferred-expunge request.
 
-Reconstructed in `source/`; `make` produces a valid HUNK `.library`.
+Reconstructed in `source/`; `make` produces a **byte-identical**
+`.library` (md5 `94eea1187a2d3fe15d2130c597f2897f`, 804B) via
+verbatim asm `source/fantasia_v.s`.  The earlier C model remains as
+`make cmodel`.  machine68k oracle (`work/oracle.py`) is
+trace-identical over init, open, all JOY1DAT/POTGOR/CIAA decode
+cases (9 directions + 5 button combos), the deferred+real expunge
+paths, and the a5-flag defect.
 
 ## Categories
 
