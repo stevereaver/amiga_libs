@@ -1,11 +1,19 @@
 ---
 type: Finding
-title: Rebuild deviations
-description: What differs between the original binary and the C reconstruction.
+title: Rebuild deviations (historical)
+description: >-
+  Deviations of the earlier C reconstruction.  SUPERSEDED:
+  source/version.s + fixup.py now rebuilds the file byte-identically
+  (md5 cd11aaabbbfd0cb23eae59edf16d321b).
 timestamp: 2026-10-10T19:00:00Z
 ---
 
-# Rebuild deviations
+# Rebuild deviations (C model — superseded)
+
+The current canonical build is `source/version.s` + `source/fixup.py`,
+byte-identical to the shipped binary including the empty second CODE
+hunk record and the descending RELOC32 order.  The notes below applied
+to the earlier C reconstruction (`make cmodel`):
 
 * **Hunk count.** The original file carries a second, empty
   (zero-length) code hunk after hunk 0.  The m68k-amigaos-ld output
@@ -17,6 +25,5 @@ timestamp: 2026-10-10T19:00:00Z
   bytes longer than the originals.  Semantics verified instruction
   by instruction against the IRA disassembly.
 * **Table regions byte-identical.** RomTag, name/id strings,
-  InitTable, function table contents and InitStruct bytes (including
-  the documented quirks) reproduce exactly; all 14 RELOC32 slots
-  match the original's relocation set by purpose.
+  InitTable, function table contents and InitStruct bytes reproduce
+  exactly; all 14 RELOC32 slots match the original's relocation set.
