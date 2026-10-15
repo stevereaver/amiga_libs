@@ -1,4 +1,6 @@
 # Makefile for mathieeedoubbas.library "MDB 10.881" reconstruction.
+# (UAE twin -- original binary name contains parentheses; keep ORIG
+#  single-quoted in the recipe so the shell leaves it alone.)
 #
 # `make`        -> byte-identical rebuild from mathieeedoubbas_h0.s
 #                  (fixup.py rewrites GNU ld's RELOC32 tail into the

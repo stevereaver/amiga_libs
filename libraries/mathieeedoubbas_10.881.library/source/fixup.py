@@ -2,10 +2,11 @@
 # Post-link fixup for mathieeedoubbas.library "MDB 10.881".
 # GNU ld emits a long-format HUNK_RELOC32 (0x3ec) tail; the shipped
 # binary carries the compact 16-bit form (0x3f7, RELOC32SHORT/DREL16)
-# with the 8 RomTag/InitTable refs in descending offset order —
-# including a relocation on the scalar InitTable dataSize field.
+# with the 8 RomTag/InitTable refs in descending offset order:
+# matchtag, endskip, name, idstring, init, functab, datatab, initfunc.
+# The scalar InitTable dataSize field (0x3c @ 0x1c) is NOT relocated.
 # Rebuild the file in the original layout and verify byte-identity
-# against binary/ mathieeedoubbas_10.881.library.
+# against the shipped binary passed as argv[2].
 import struct, sys, hashlib
 
 HUNK_HEADER  = 0x3f3

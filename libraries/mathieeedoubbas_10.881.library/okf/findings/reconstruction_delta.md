@@ -1,36 +1,27 @@
 ---
 type: Finding
 title: Reconstruction deltas
-description: Differences between the rebuilt library and the shipped binary.
+description: Rebuilt vs shipped library -- now byte-identical.
 ---
 
 # Reconstruction deltas
 
-None — `make` in `source/` now produces a **byte-identical** image
-(md5 `d045e9dab808f9331ad97bfc85e795dd`, sha256
-`398aa5cc85e5c7124d5f13861d83ede69f562136c77ba27f0381705775083df0`).
+**None.**  `source/mathieeedoubbas_h0.s` is a verbatim transcription of
+the 0x230-byte CODE hunk; `make` assembles+links it with
+m68k-amigaos-gcc `-m68000 -Wa,-m68881 -nostdlib -Wl,-s` and `fixup.py`
+rewrites GNU ld's HUNK_RELOC32 tail into the original compact 16-bit
+0x3f7 (RELOC32SHORT/DREL16) chunk.  Result: md5
+`d045e9dab808f9331ad97bfc85e795dd` = the shipped binary, all 624 bytes.
 
-The byte-exact build is `mathieeedoubbas_h0.s`, a verbatim assembly
-reconstruction of the single CODE hunk (0x230 bytes), linked by
-`fixup.py` which rewrites GNU ld's RELOC32 tail into the original
-compact 16-bit `0x3f7` RELOC32SHORT chunk with the 8 RomTag/InitTable
-refs in descending offset order. The earlier C model
-(`mathieeedoubbas.c`, `math.s`, `genfunctab.py` two-pass functab) is
-kept as a readable reference (`make cmodel`) but was never
-byte-identical.
+All 68881 F-line words assemble byte-identically under gas `-Wa,-m68881`
+(`fmovel d0,fpcr`, `fmoved (a7)+/(a7),fp0/fp1`, `fmoved fp0,-(a7)/(a7)`,
+`fmovel d0,fp0`, `fmovel fp0,d0`, `faddd/fsubd/fmuld/fdivd (a7),fp0`,
+`fintrzx fp1,fp0`, `fcmpx fp1,fp0`, `fbule/fbuge .w`, `fsubs/fadds
+#0e1,fp0`).
 
-Notes on the original image:
+## Earlier C+asm model
 
-- Entry stub is a bare `rts` (not `moveq #-1,d0;rts`).
-- Reserved LVO -24 is `moveq #0,d0;rts` at 0xb6, which is also the
-  shared return-zero tail of Close/Expunge.
-- lib name pointer targets mid-string inside
-  `"Libs:NoFPU/mathieeedoubbas.library"` -> `"mathieeedoubbas.library"`;
-  the IdString is `"MDB 10.881"`.
-- gas canonicalization traps avoided: `bras` (not `braw`) for the
-  no-FPU fallthrough, `subaw` (not `subal`) in the NegSize tail,
-  `fintrzx`/`fcmpx`/`fbule`/`fbuge` F-line mnemonics.
-- Runtime: `work/oracle.py` emulates the 68881 line-F subset (USPs
-  stack for `(a7)` EAs since the trap runs on ISP) and gives identical
-  traces for original and rebuild across no-FPU init, Open FPCR write,
-  all 12 math vectors (NaN/Inf/-0/div0), and deferred + real expunge.
+Kept as `make cmodel` (semantic documentation, larger binary).  Its
+LibInit no-FPU path was corrected: it used to FreeMem the *OpenLibrary*
+result; the shipped code frees the new library base instead (see
+`findings/nofpu_init.md`).

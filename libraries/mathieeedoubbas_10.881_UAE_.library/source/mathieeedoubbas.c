@@ -63,13 +63,17 @@ ULONG LibInit(ULONG base __asm("d0"), APTR seg __asm("a0"), struct ExecBase *eb 
     if (!(eb->AttnFlags & AFF_68881)) {
         /*
          * No coprocessor: as shipped -- open + immediately close the
-         * Libs:NoFPU/ fallback library, then run the free tail on the
-         * base OpenLibrary returned.  (The original pushed the new
-         * base and popped it into d1, unused -- dead restore.)
+         * Libs:NoFPU/ fallback library (the OpenLibrary result feeds
+         * CloseLibrary only), then run the free tail on the *new*
+         * base -- the original pushes d0, Open/CloseLibrary, and pops
+         * a1 = new base for the free tail.  The seglist cell was never
+         * written, so the tail's "return seglist" yields 0 and the
+         * resident init fails.  (Earlier notes claiming the tail frees
+         * the OpenLibrary result misread `movea.l (a7)+,a1`.)
          */
         struct Library *nofpu = XOpenLibrary(nofpuname, 36, eb);
         XCloseLibrary(nofpu, eb);
-        return FreeTail(nofpu);
+        return FreeTail(lib);
     }
 
     segcell[0] = (ULONG)seg;            /* stashed for expunge */

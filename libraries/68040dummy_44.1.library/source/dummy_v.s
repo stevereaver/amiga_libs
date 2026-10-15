@@ -142,7 +142,7 @@ _wloop:
 	movel	%a1,%d0
 	rts
 _wfail:
-	bras	_walkseg+2		/* lsl/retry? -> actually back to lsll */
+	bras	_walkseg+2		/* bra back to the lsl (next hunk link) */
 _walkout:
 	rts
 
