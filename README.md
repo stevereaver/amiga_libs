@@ -399,5 +399,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `hgrexxsupport__18.7.94_.library` | hgrexxsupport (Goebel 1994) — ARexx host lib, 3 hunks (CODE+DATA+BSS), extended 26B resident w/ extra pointer field, 5-entry functab. Byte-identical merged asm + resplit; oracle identical (AMIGALIBS-354) |
 | `virtualmem_1.2.library` | virtualmem 1.2 (1997) — vmem manager, 17 vectors, deps dos37+multiuser39, extended 26B resident (same stub family as hgrexxsupport). Byte-identical merged asm + resplit; oracle identical (AMIGALIBS-355) |
 | `xpkLIN1_1.1_000_.library` | xpkLIN1 1.1 (2013) — XPK 'Lino1' codec, 10 word vectors w/ 3 NULL holes, 'minimal' mode. Byte-identical; sibling oracle identical (AMIGALIBS-356) |
+| `regexp_38.1.library` | regexp 38.1 (1998) — regex lib, 2-hunk w/ resident+InitTable+functab in DATA, 8 vectors, dep dos37. Byte-identical; oracle identical (AMIGALIBS-357) |
+| `slre_37.0.library` | slre 37.0 — regex engine, 4 hunks w/ cross-hunk resident, char-class table copied to libbase, 5 vectors (-24 stub). Byte-identical; oracle regex probe identical (AMIGALIBS-358) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
