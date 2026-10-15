@@ -1,12 +1,15 @@
 ---
-file: log
+type: Log
+title: rexxidentify 1.16 work log
 ---
-# Work log
 
-- 2026-10-15: verbatim asm transcription of hunk0 + BSS tail;
-  fixup.py re-splits hunks and splices the original DREL16 tail.
-  BYTE-IDENTICAL.
-- machine68k oracle (adapted w/ DREL16 tail support): resident scan,
-  InitTable@h0+0x100 (dsz 0x2c), init opens 4 dep libs (identify
-  v41), all 5 vectors, close-underflow/deferred-expunge.
-  RUNTIME-IDENTICAL. Plane AMIGALIBS-293.
+- 2-hunk build; resident@h0+4; InitTable@h0+0x100; 5-entry
+  absolute-longword functab@h0+0x110 all ->h0.
+- DREL16 tails (word-sized groups); longword realign pad word
+  between DREL16 terminator and HUNK_END; BSS hunk has no body.
+- gen_source needed a pos-cursor fix vs the sibling version:
+  objdump tokens straddling DATA boundaries dropped bytes.
+- Verbatim .text + .bss; fixup splices header+DREL16 verbatim;
+  byte-identical first pass after the generator fix.
+- Oracle identical: init/5 vectors/RexxMsg dispatch/close-deferred
+  expunge/real expunge.
