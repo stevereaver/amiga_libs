@@ -1,20 +1,36 @@
 ---
 type: Finding
 title: FPCR write in Open
-description: Open programs the 68881 control register (0x10 (unconditional)).
+description: Open programs the 68881 control register to 0x10 (unconditional).
 ---
 
-# FPCR write in Open
+# FPCR write in Open (corrected)
 
-The shipped Open does `fmove.l fpcr,d0; beq write; cmpi.w #0x40,d0;
-bcs keep; cmpi.w #0x80,d0; bcc keep; write: fmove.l #0x80,fpcr`.
+The shipped Open does:
 
-Two observations:
+```
+moveq   #0x10,d0            ; 7010
+fmove.l d0,fpcr             ; f200 9000 -- unconditional
+addq.w  #1,0x20(a6)         ; OpenCnt++
+bclr    #3,0x0e(a6)         ; clear LIBF_DELEXP
+move.l  a6,d0
+rts
+```
 
-1. `fmove.l fpcr,d0` does NOT set CCR, so the shipped `beq` tests whatever
-   condition codes the caller left -- effectively random. The
-   reconstruction implements the evident *intent* (`(UWORD)fpcr == 0`) and
-   keeps the verbatim `0x40 <= fpcr < 0x80 -> rewrite` range check.
-2. 0x80 = extended-precision + round-toward-zero FPCR mode. Open forces
-   this when FPCR is 0 or already in the single-precision band 0x40..0x7f.
+FPCR := `0x10` on every Open — no test, no range check.  `0x10` =
+extended precision + round-toward-zero (bits 5:4 of the MODE byte).
 
+## Correction vs the earlier note
+
+An earlier version of this finding described a *conditional* scheme —
+`fmove.l fpcr,d0; beq; cmpi.w #0x40/#0x80 -> rewrite to 0x80`.  That
+describes the single-precision sibling `mathieeesingtrans.library`,
+not this binary.  The double-precision siblings (mathieeedoubbas and
+mathieeedoubtrans) both program FPCR unconditionally, to `0x10`.
+
+## Consequence
+
+Callers get their double results rounded toward zero from the FPU's
+control register — the value is stable across Open calls regardless
+of what FPCR the application had configured (verified by the oracle:
+fpcr 0x0000/0x0080/0x0010/0xdead all become 0x10).

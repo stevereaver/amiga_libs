@@ -13,7 +13,7 @@ Code hunk, offsets as shipped:
 | 0x00 | `rts` (bare executable entry -- no `moveq #-1,d0`) |
 | 0x02 | RomTag: matchword 0x4afc, matchtag->0x02, endskip->end of hunk |
 | 0x0a | flags 0x80 (RTF_AUTOINIT), version 45, type 9 (NT_LIBRARY), pri 0 |
-| 0x0e | rt_Name -> library name string |
+| 0x0e | rt_Name -> 0xf5, mid-string inside the NoFPU path (name carved out of the path tail) |
 | 0x12 | rt_IdString -> "MDT 10.881" |
 | 0x16 | rt_Init -> InitTable at 0x1c |
 | 0x1c | InitTable: dataSize=0x3c, funcTable=0x30, dataTable, initFunc |
