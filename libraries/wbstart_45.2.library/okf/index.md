@@ -6,7 +6,7 @@ description: >-
   same base layout and tag API, but the object start resolves
   "VOL:", "dev:dir/file" and bare names differently and walks the
   Workbench search path via WorkbenchControlA.
-timestamp: 2026-10-10T21:10:00Z
+timestamp: 2026-10-15T03:51:25Z
 ---
 
 # wbstart.library 45.2 (16.07.01) Emulation by Stephan Rupprecht
@@ -44,10 +44,16 @@ dos fault with `PrintFault()` when nothing matches.
 
 ## Status
 
-FULL — reconstructed in C + asm header (`source/wbstart.c`,
-`wbstart_lib.s`, `endmodule.s`; m68k-amigaos-gcc -m68000, single
-pass, absolute vectors).  `make` builds a valid
-`wbstart.library`.
+**Byte-identical.**  `source/wbstart_h0.s` is a verbatim gas
+reconstruction of both hunks; `source/fixup.py` rewrites the
+CODE-hunk RELOC32 group's offset order into the shipped
+non-sorted `{1dc, 1cc}` form — md5 `45964497863bb8fbb534faed27da44fa`,
+1760 bytes.  `work/oracle.py` (machine68k) runs both binaries
+through init/open/close/expunge, both reserved stubs and 14
+WBStart scenarios (all tag handlers, `.info` retry, `dev:`/
+`dev:dir/file` resolution, search-path walk hit and miss,
+PrintFault, AllocVec/OWO failure): logs are identical.
+The earlier C model is kept under `make cmodel`.
 
 ## Contents
 

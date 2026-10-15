@@ -40,3 +40,21 @@
     truncation (wrote +32 not +34), missing pad byte after
     "dos.library", obj AllocVec flags 0x10000 vs 0x10001,
     Classify unknown-code result is 0 via mid-instruction `moveq`.
+- Byte-verbatim reconstruction done: `source/mhimpegit_h0.s`
+  (whole module in one file: `.text` hunk0 + `.data` hunk1) +
+  `source/fixup.py` + reworked `source/Makefile` (default target =
+  verbatim build + cmp; `make cmodel` keeps the C model).
+  - Assembled clean with -m68000 (binary really is plain 68000 --
+    the "020" muls/divs are runtime 16-bit ops; the only gas
+    canonicalization mismatch was `lea a4@(0),a0`, which gas shrinks
+    to `lea a4@,a0` -- forced via `.short 0x41ec,0x0000`).
+  - Mid-instruction `cmpiw #0x7000/0x7001,d0` tricks reproduced as
+    `.short 0x0c40` + labelled `moveq`; both PC-indexed jump tables
+    (Dispatch @0x4b0, memcpy tail @0x55c) kept as .short word lists.
+  - Reloc tails: shipped file stores hunk0's 14 code->data relocs
+    descending and hunk1's 15 code + 4 self relocs descending;
+    GNU ld emits identical sets ascending -- fixup.py verifies the
+    (hunk,offset) multisets then splices the reference tails.
+  - `cmp`: BYTE-IDENTICAL, md5 8456ebb8b380fdb053bd5ed966530ac0.
+  - Oracle rerun on the rebuild: identical LibInit trace, identical
+    42-byte lib header, 65-entry exercise script 0 diffs.

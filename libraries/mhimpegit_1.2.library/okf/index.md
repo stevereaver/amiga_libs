@@ -1,5 +1,7 @@
 # mhimpegit.library 1.2
 
+- **Status**: BYTE-IDENTICAL + RUNTIME-IDENTICAL
+  (md5 `8456ebb8b380fdb053bd5ed966530ac0`)
 - **Binary**: `binary/mhimpegit_1.2.library` (2200 bytes)
 - **Version string**: `$VER: mhimpegit.library 1.2 (20.01.2017)`
 - **Author**: Thomas Wenzel (embedded string, -78 code 1002)
@@ -39,7 +41,10 @@ See `functions/vectors.md`, `structures/layout.md`,
 
 ## Rebuild
 
-`source/` contains `mhimpegit.c` + `mhimpegit_lib.s` + `Makefile`
-(m68k-amigaos-gcc -m68020, nostdlib). Behaviour verified
-instruction-for-instruction against the original under machine68k
-(`work/oracle.py` + `work/exercise.py`, not committed).
+`source/mhimpegit_h0.s` is a byte-verbatim asm reconstruction of both
+hunks (`make` → `cmp` → BYTE-IDENTICAL). `fixup.py` splices the
+shipped binary's descending-order RELOC32 tails over GNU ld's
+ascending ones. `make cmodel` builds the earlier C model
+(`mhimpegit.c` + `mhimpegit_lib.s`, -m68020, nostdlib). Runtime
+verified instruction-for-instruction under machine68k
+(`work/oracle.py` + `work/exercise.py`, 65-entry trace, 0 diffs).

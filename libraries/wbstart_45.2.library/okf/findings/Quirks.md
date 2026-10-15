@@ -16,10 +16,23 @@ timestamp: 2026-10-10T21:10:00Z
   `CloseLibrary` on all three support-base slots
   unconditionally, including NULL ones — a crash path preserved
   verbatim.
-- **68000-illegal opcode**: the WBStart tag loop tests the
-  `NextTagItem` result with `tst.l a0` (0x4a88) — not a valid
-  plain-68000 instruction (68020+).  The library is marked for
-  any CPU but will fault on a stock 68000.
+- **noncanonical `tst.l An` opcodes**: the WBStart tag loop tests
+  the `NextTagItem` result with `tst.l a0` (0x4a88) and the args
+  pointer with `tst.l a3` (0x4a8b) — encodings outside the
+  documented TST EA set that real 68k CPUs nevertheless execute
+  as a plain test (typical Aztec/SAS-era compiler output).
+- **`add.l a7,dN` forms**: 0xd68f/0xd48f/0xda8f use An as the
+  source `<ea>` of ADD.L (noncanonical vs ADDA) — again valid
+  silicon behaviour, just outside the canonical encoding.
+- **`lea 0.w,aN` for NULL**: pointers are cleared with
+  `lea 0x0,%aN` absolute-word instructions (0x4bf8/0x47f8/0x49f8/
+  0x41f8) instead of `suba`/`moveq` — compiled-C flavour.
+- **stray tail word**: the code hunk ends with four zero pad
+  words followed by `0x0002` (code+0x59a..0x5a3) — a leftover
+  constant shipped verbatim.
+- **non-sorted RELOC32 group**: the CODE hunk's first reloc
+  group stores offsets `{1dc, 1cc}` (the `strncat` call site
+  before `strncpy`); most linkers emit ascending order.
 - **Inverted result**: WBStart returns **0** on success and
   **20** (RETURN_ERROR) on any failure, including a missing name
   tag — matching 45.1's convention, inverting the workbench BOOL.
