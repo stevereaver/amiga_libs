@@ -7,7 +7,7 @@ description: >-
   stack-shuffle convention (d0:d1 double args pushed, fXXXd
   on the stack image, result popped back) plus a real
   IEEEDPPow and Tieee/Fieee float<->double converters.
-timestamp: 2026-10-11T02:10:00Z
+timestamp: 2026-10-15T14:30:00Z
 ---
 
 # mathieeedoubtrans.library 40.6 (FPU build)
@@ -34,17 +34,21 @@ same Martin Berndt framework:
 - idstr "mathieeedoubtrans 40.6 (7.4.95) for 68881/82
 "
   + "(c) 1995 by Martin Berndt" copyright
-- vectors at hunk+0x194..0x336 -- BYTE-EXACT reconstruction
+- vectors at hunk+0x194..0x337 -- BYTE-EXACT reconstruction
   (all FPU encodings verified identical)
 
 ## Status
 
-FULL — reconstructed (`source/`): framework in C
-(mathieeedoubtrans.c), resident/InitTable/functab in
-mathieeedoubtrans_lib.s + datatab.s, all 17 vector bodies in
-math.s (the whole 0x194..0x336 region byte-identical to the
-shipped code).  Framework is semantically equivalent
-(btst-pair gate compiles to andi/cmpi).
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — `make` assembles
+`source/mdt406_v.s` (verbatim asm, raw .short for all F-line
+words) and links `-nostdlib -Wl,-s` to the shipped 1000-byte
+module (md5 `8c1838e982391b3ffcf50302f79ae4e6`); the earlier
+C framework stays buildable as `make cmodel`.  machine68k
+oracle (`work/oracle.py`, python 68881 emulation through the
+line-F vector) runs identical logs on the original and the
+rebuild — init gate matrix, open/close/expunge lifecycle,
+all 17 vectors incl. Pow sign/FPCR paths and Sincos (a0)
+store.
 
 ## Contents
 

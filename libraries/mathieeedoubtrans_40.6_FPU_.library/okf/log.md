@@ -22,3 +22,22 @@ title: Reconstruction log
   macro.  Vector region 0x194..0x336 verified BYTE-EXACT
   (0 diffs); FPCR/FPU encodings all identical.
 - Phase 4: this OKF bundle.
+
+## 2026-10-15
+- Wrote `source/mdt406_v.s`: single-file verbatim asm of the
+  whole hunk (RomTag/InitTable/functab/datatab + all code),
+  raw `.short` for every F-line word, same style as the
+  sibling mdb406_v.s.  `make` (m68k-amigaos-gcc -m68000,
+  -nostdlib -nostartfiles -Wl,-s) produces a BYTE-IDENTICAL
+  module: md5 8c1838e982391b3ffcf50302f79ae4e6 both sides,
+  0 diffs, no reloc fixup needed (31 RELOC32 entries emitted
+  in source order).  C model kept under `make cmodel`.
+- Wrote `work/oracle.py` (adapted from the mathieeedoubbas
+  40.6 oracle): machine68k + python 68881 line-F emulator.
+  Added .s single<->double EA formats for Tieee/Fieee.
+  Drives init-gate matrix, open x2 (confirms Open does NOT
+  touch FPCR -- unlike doubbas), all 17 vectors over edge
+  inputs, Pow negative-x odd/even/non-integer paths and FPCR
+  save/restore, Sincos cos->(a0) store, deferred + real
+  expunge.  orig.log == rebuild.log (1269 lines): RUNTIME-
+  IDENTICAL.
