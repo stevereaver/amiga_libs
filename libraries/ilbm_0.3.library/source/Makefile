@@ -2,7 +2,7 @@ CC      = /opt/amiga/bin/m68k-amigaos-gcc
 ASFLAGS = -m68000
 LDFLAGS = -nostdlib -nostartfiles -Wl,-s
 ORIG    = ../binary/ilbm_0.3.library
-OBJS    = ilbm_0_3_h0.o ilbm_0_3_h2.o
+OBJS    = ilbm_0_3_h0.o
 
 all: ilbm.library
 

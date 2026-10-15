@@ -1,5 +1,9 @@
-/* verbatim hunk0 image (ilbm_0_3). generated - do not edit. */
-	.section seg0,"ax"
+/* ilbm_0_3 verbatim reassembly - generated, do not edit.
+   Hunks concatenated into .text; fixup.py re-splits them
+   against the original and splices reloc/symbol tails. */
+	.section .text
+
+	/* ==== hunk0 (ilbm_0_3) tag 0x03e9, 6536 bytes ==== */
 	.short	0x7200,0x7000,0x4e75,0x4a81,0x67f8,0x4a80,0x67f2,0x2041	/* 0000                 */
 	.short	0x2243,0x7200,0x761f,0xd080,0xd381,0xb288,0x6504,0x9288	/* 0010                 */
 	.short	0x5280,0x51cb,0xfff2,0x2609,0x4a80,0x4e75,0x4afc,0x0000	/* 0020               + */
@@ -409,3 +413,7 @@
 	.short	0x6272,0x6172,0x7900,0x4469,0x7373,0x6964,0x656e,0x7473	/* 1960                 */
 	.short	0x2049,0x4c42,0x4d20,0x6c69,0x622c,0x204a,0x756c,0x2032	/* 1970                 */
 	.short	0x3020,0x3839,0x0d0a,0x0000	/* 1980         */
+
+	/* hunk1 tag 0x400003ea (sz 0x3): non-content, spliced by fixup */
+
+	/* ==== hunk2 (ilbm_0_3) tag 0x03e9, 0 bytes ==== */
