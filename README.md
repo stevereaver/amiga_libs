@@ -361,4 +361,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xpkSHRI_2.6_000_.library` | 'xpkSHRI V2.6' — XPK Shrink compressor, plain-68000 sibling build; word-offset functab, 10 vectors, 7-mode table. Byte-identical asm + fixup; oracle identical (AMIGALIBS-315) |
 | `dsp3210_4.0.library` | 'dsp3210.library 4.0 (15.7.2021)' — DSP3210 d32 loader lib (Thomas Winischhofer); COLDSTART, word-offset functab, 14 vectors, d32 magic+reloc calls. Byte-identical asm + fixup; oracle identical (AMIGALIBS-316) |
 | `mmvx_7.0.library` | 'mmvx.library 7.0 (22.9.2021)' — MultiView extensions; COLDSTART, 41 vectors, lazy OpenLibrary forwarding stubs to mmv88.library v8+/mmv8.library v22+, audio.device paths, SDAT marker; 14 code relocs into BSS. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-317) |
+| `rtgextra_1.0.library` | 'rtgextra 1.0' (ver 38) — RTG helper lib; 3-hunk (CODE+CODE-tagged functab/strings+DATA InitTable), cross-hunk resident pointers, 15 vectors incl. 0-hole. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-318) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
