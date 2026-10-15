@@ -1,223 +1,247 @@
 /*
- * mathieeesingbas.library "MSB 10.881" -- byte-exact reconstruction.
- * Kickstart 1.x disk library for the MC68881/68882 FPU.
+ * mathieeesingbas.library 10.881 "(UAE)" -- byte-exact reconstruction.
  *
- * Single CODE hunk (0x72 longs = 0x1c8 bytes).  AUTOINIT RomTag with
- * rt_Version 45 (not the library version!), word-offset functab,
- * InitStruct datatab.  Relocations live in a compact 16-bit RELOC32SHORT
- * (0x3f7) chunk: 8 descending long refs in the RomTag/InitTable.
+ * Single CODE hunk, 0x72 longs (0x1c8 bytes).  RomTag RTF_AUTOINIT,
+ * rt_Version=45, NT_LIBRARY, pri 0.  Kickstart 1.x IEEE single-precision
+ * math library for machines with a 68881/68882 FPU.  The "(UAE)" badge
+ * is purely a collection label: this image is byte-for-byte identical
+ * to the plain mathieeesingbas_10.881.library disk image.
  *
- * Quirks:
- *  - hunk starts with a bare RTS before the RomTag.
- *  - dataSize 0x3c leaves 26 unused bytes past the exec Library node;
- *    the seglist cell sits in CODE at 0x2c instead of the lib base.
- *  - initfn tail at 0xca is shared with Expunge's unlink/free tail:
- *    on a missing AFF_68881 it FreeMem()s the fresh base and returns
- *    the (still zero) segcell -> init failure.
- *  - Open preserves FPCR unless it is 0 or in [0x40,0x80): then it is
- *    rewritten to 0x80.
- *  - Close falls through into Expunge; the moveq#0/rts at 0xb6 is both
- *    the Close null-return and the deferred-Expunge return.
+ * functab is a word-offset AUTOINIT table (leading/trailing -1);
+ * offsets are relative to _functab itself.
+ *
+ * GNU ld emits a standard HUNK_RELOC32 tail; the original was linked
+ * with the compact 0x3f7 (DREL) record holding 16-bit offsets in
+ * descending order -- fixup.py rewrites the tail after linking.
  */
 	.text
-	.globl	_romtag
-	.globl	_endskip
-	.globl	_inittab
 
-	rts					/* 0x00 executable entry: bare RTS */
+/*------------------------------ RomTag ------------------------------*/
+/* 0x00 */	rts					/* dead-stub / entry safety */
+_romtag:						/* 0x02 */
+	.short	0x4afc					/* RTC_MATCHWORD */
+	.long	_romtag					/* rt_MatchTag  */
+	.long	_endskip				/* rt_EndSkip   */
+	.byte	0x80, 45, 9, 0				/* RTF_AUTOINIT, v45, NT_LIBRARY, pri 0 */
+	.long	_libname				/* rt_Name      */
+	.long	_idstr					/* rt_IdString  */
+	.long	_inittab				/* rt_Init      */
 
-_romtag:					/* 0x02 */
-	.short	0x4afc				/* RT_MATCHWORD */
-	.long	_romtag				/* RT_MATCHTAG  (reloc @0x04) */
-	.long	_endskip			/* RT_ENDSKIP   (reloc @0x08) */
-	.byte	0x80,0x2d,0x09,0x00		/* AUTOINIT, ver 45, NT_LIBRARY, pri 0 */
-	.long	_name				/* (reloc @0x10) */
-	.long	_idstr				/* (reloc @0x14) */
-	.long	_inittab			/* (reloc @0x18) */
+/*---------------------------- AUTOINIT table ------------------------*/
+_inittab:						/* 0x1c */
+	.long	0x3c					/* lib data size            */
+	.long	_functab				/* function table           */
+	.long	_datatab				/* InitStruct table         */
+	.long	_initfn					/* init routine             */
 
-_inittab:					/* 0x1c */
-	.long	0x3c				/* dataSize */
-	.long	_functab			/* (reloc @0x20) */
-	.long	_datatab			/* (reloc @0x24) */
-	.long	_initfn				/* (reloc @0x28) */
-
-_segcell:					/* 0x2c seglist cell (in CODE!) */
+_segcell:						/* 0x2c -- seglist scratch  */
 	.long	0
 
-_functab:					/* 0x30 word offsets rel. to table */
+/*---------------------------- function table ------------------------*/
+/* word offsets relative to _functab, -1 flagged, -1 terminated */
+_functab:						/* 0x30 */
 	.short	0xffff
-	.short	_open-_functab			/* -6   LibOpen    0x44  */
-	.short	_close-_functab			/* -12  LibClose   0x6c  */
-	.short	_expunge-_functab		/* -18  LibExpunge 0x7a  */
-	.short	_libnull-_functab		/* -24  reserved   0x86  */
-	.short	_IEEESPFix-_functab		/* -30  0x104 */
-	.short	_IEEESPFlt-_functab		/* -36  0x114 */
-	.short	_IEEESPCmp-_functab		/* -42  0xdc  */
-	.short	_IEEESPTst-_functab		/* -48  0xd4  */
-	.short	_IEEESPAbs-_functab		/* -54  0xfe  */
-	.short	_IEEESPNeg-_functab		/* -60  0x10e */
-	.short	_IEEESPAdd-_functab		/* -66  0x158 */
-	.short	_IEEESPSub-_functab		/* -72  0x168 */
-	.short	_IEEESPMul-_functab		/* -78  0x178 */
-	.short	_IEEESPDiv-_functab		/* -84  0x188 */
-	.short	_IEEESPFloor-_functab		/* -90  0x120 */
-	.short	_IEEESPCeil-_functab		/* -96  0x13c */
+	.short	_open - _functab			/* -6  Open              */
+	.short	_close - _functab			/* -12 Close             */
+	.short	_expunge - _functab			/* -18 Expunge           */
+	.short	_nullvec - _functab			/* -24 reserved          */
+	.short	_fix - _functab				/* -30 IEEESPFix         */
+	.short	_flt - _functab				/* -36 IEEESPFlt         */
+	.short	_cmp - _functab				/* -42 IEEESPCmp         */
+	.short	_tst - _functab				/* -48 IEEESPTst         */
+	.short	_abs - _functab				/* -54 IEEESPAbs         */
+	.short	_neg - _functab				/* -60 IEEESPNeg         */
+	.short	_add - _functab				/* -66 IEEESPAdd         */
+	.short	_sub - _functab				/* -72 IEEESPSub         */
+	.short	_mul - _functab				/* -78 IEEESPMul         */
+	.short	_div - _functab				/* -84 IEEESPDiv         */
+	.short	_floor - _functab			/* -90 IEEESPFloor       */
+	.short	_ceil - _functab			/* -96 IEEESPCeil        */
 	.short	0xffff
 
-_datatab:					/* 0x54 InitStruct stream */
-	.byte	0xa0,0x0e,0x06,0x00		/* INITBYTE lib_Flags(14)   = 0x06 */
-	.byte	0x90,0x16,0x03,0x71		/* INITWORD lib_Revision(22) = 881 */
-	.byte	0,0
+/*---------------------------- InitStruct data ------------------------*/
+/* 0x54 */ _datatab:
+	.byte	0xa0, 0x0e, 0x06, 0x00			/* INITBYTE  lib_Flags(0x0e)  = 0x06 */
+	.byte	0x90, 0x16, 0x03, 0x71			/* INITWORD  lib_Revision(0x16)= 881  */
+	.byte	0x00, 0x00				/* end                         */
 
-/* initfn(d0=libBase, a0=segList, a6=execBase) -> d0=base or 0 */
-_initfn:					/* 0x5e */
-	tstl	d0
-	beqs	1f				/* no base -> return 0 */
-	moveal	d0,a1				/* a1 = base (free-tail arg) */
-	btst	#4,a6@(0x129)			/* AFF_68881 in AttnFlags */
-	beqs	_nofpu				/* -> shared free tail */
-	lea	_segcell(pc),a1			/* 0x6c */
-	movel	a0,a1@				/* segcell = seglist */
-1:	rts					/* 0x72 */
-
-_open:						/* 0x74 */
-	fmovel	%fpcr,d0			/* read FPCR */
-	beqs	2f				/* 0   -> force 0x80 */
-	cmpiw	#0x40,d0
-	bcss	1f				/* <0x40 -> keep */
-	cmpiw	#0x80,d0
-	bccs	1f				/* >=0x80 -> keep */
-2:	fmovel	#0x80,%fpcr			/* [0x40,0x80) or 0 -> 0x80 */
-1:	addqw	#1,a6@(32)			/* lib_OpenCnt++ */
-	bclr	#3,a6@(14)			/* clear LIBF_DELEXP */
-	movel	a6,d0
+/*---------------------------- init routine ---------------------------*/
+/* called by MakeLibrary: d0=libbase, a0=seglist, a6=SysBase */
+_initfn:						/* 0x5e */
+	tstl	%d0
+	beqs	_initret				/* no base: return 0        */
+	moveal	%d0,%a1
+	btst	#4,(297,%a6)				/* AttnFlags: AFF_68881     */
+	beqs	_initfail				/* no FPU: free mem, fail   */
+	lea	_segcell(%pc),%a1
+	movel	%a0,(%a1)				/* stash seglist            */
+_initret:
 	rts
 
-_close:						/* 0x9c */
-	subqw	#1,a6@(32)			/* lib_OpenCnt-- */
-	bnes	_libnull
-	btst	#3,a6@(14)			/* LIBF_DELEXP? */
-	beqs	_libnull
-	/* fall through */
-_expunge:					/* 0xaa */
-	tstw	a6@(32)				/* lib_OpenCnt */
-	beqs	3f
-	bset	#3,a6@(14)			/* defer: set LIBF_DELEXP */
-_libnull:					/* 0xb6 reserved vector lands here */
-	moveq	#0,d0
-	rts
-3:						/* 0xba unlink node by hand */
-	moveal	a6,a1
-	moveal	a6@+,a0				/* a0 = ln_Succ, a6 -> ln_Pred */
-	moveal	a6@,a6				/* a6 = ln_Pred */
-	movel	a0,a6@				/* pred->succ = succ */
-	movel	a6,a0@(4)			/* succ->pred = pred */
-	moveal	(4).w,a6			/* a6 = ExecBase */
-_nofpu:						/* 0xca shared free tail */
-	moveq	#0,d0
-	movew	a1@(16),d0			/* lib_NegSize */
-	subaw	d0,a1				/* a1 = mem block start */
-	addw	a1@(0x12,d0:w),d0		/* += lib_PosSize */
-	jsr	a6@(-210)			/* exec FreeMem */
-	movel	_segcell(pc),d0			/* return seglist (or 0) */
+/*---------------------------- Open (-6) ------------------------------*/
+_open:							/* 0x74 */
+	fmovel	%fpcr,%d0				/* read FPCR                */
+	beqs	_open_fpcr				/* unset -> force 0x80      */
+	cmpiw	#0x40,%d0
+	bcss	_open_ok				/* <0x40: leave alone       */
+	cmpiw	#0x80,%d0
+	bccs	_open_ok				/* >=0x80: leave alone      */
+_open_fpcr:
+	fmovel	#0x80,%fpcr				/* mode byte 0x80           */
+_open_ok:
+	addqw	#1,(32,%a6)				/* lib_OpenCnt++            */
+	bclr	#3,(14,%a6)				/* clr LIBF_DELEXP          */
+	movel	%a6,%d0
 	rts
 
-_name:						/* 0xe0 */
+/*---------------------------- Close (-12) ----------------------------*/
+_close:							/* 0x9c */
+	subqw	#1,(32,%a6)				/* lib_OpenCnt--            */
+	bnes	_ret0
+	btst	#3,(14,%a6)				/* LIBF_DELEXP set?         */
+	beqs	_ret0
+/*---------------------------- Expunge (-18) --------------------------*/
+_expunge:						/* 0xaa */
+	tstw	(32,%a6)				/* still open?              */
+	beqs	_doexpunge
+	bset	#3,(14,%a6)				/* set LIBF_DELEXP          */
+_ret0:							/* 0xb6 also reserved -24   */
+_nullvec:
+	moveq	#0,%d0
+	rts
+_doexpunge:						/* 0xba inline Remove()     */
+	moveal	%a6,%a1
+	moveal	(%a6)+,%a0				/* a0 = ln_Succ             */
+	moveal	(%a6),%a6				/* a6 = ln_Pred             */
+	movel	%a0,(%a6)				/* pred->succ = succ        */
+	movel	%a6,(4,%a0)				/* succ->pred = pred        */
+	moveal	4,%a6					/* a6 = SysBase             */
+_initfail:						/* 0xca shared free tail    */
+	moveq	#0,%d0
+	movew	(16,%a1),%d0				/* lib_NegSize              */
+	subaw	%d0,%a1					/* a1 = block start         */
+	addw	(18,%a1,%d0.w),%d0			/* d0 += lib_PosSize        */
+	jsr	-210(%a6)				/* exec FreeMem(a1,d0)      */
+	movel	_segcell(%pc),%d0			/* return seglist (or 0)    */
+	rts
+
+/*---------------------------- strings --------------------------------*/
+_libname:						/* 0xe0 */
 	.ascii	"mathieeesingbas.library"
 	.byte	0
-_idstr:						/* 0xf8 */
+_idstr:							/* 0xf8 */
 	.ascii	"MSB 10.881"
-	.byte	0,0				/* NUL + pad */
+	.byte	0, 0					/* nul + alignment pad */
 
-/* --- math vectors: regs d0[,d1], result d0; FPU stubs ------------- */
+/*---------------------------- IEEESPTst (-48) ------------------------*/
+/* integer-only: sign-extract via addl carry */
+_tst:							/* 0x104 */
+	addl	%d0,%d0					/* carry = sign bit         */
+	bcss	_tstneg					/* was negative             */
+	bnes	_retplus				/* was positive nonzero     */
+	rts						/* zero -> 0                */
 
-_IEEESPTst:					/* 0x104 sign-magnitude trick */
-	addl	d0,d0				/* sign->C, mag->Z */
-	bcss	8f				/* negative -> 0x128 */
-	bnes	5f				/* positive nonzero -> 0x118 */
-	rts					/* +0 -> 0 */
-_IEEESPCmp:					/* 0x10c */
-	tstl	d1
-	bmis	6f				/* right < 0 -> 0x11c */
-	beqs	_IEEESPTst			/* right == 0 -> Tst(left) */
-	subl	d1,d0
-	blts	7f				/* -> 0x12a */
-	beqs	9f				/* -> 0x11a */
-5:	moveq	#1,d0				/* 0x118 shared +1 tail */
-9:	rts						/* 0x11a shared rts */
-6:	tstl	d0				/* 0x11c */
-	bnes	10f				/* -> 0x124 */
-	bset	#31,d0				/* +0 vs neg -> -0 */
-10:	subl	d1,d0				/* 0x124 */
-	bcss	5b				/* -> 0x118 */
-8:	beqs	11f				/* 0x128 shared eq tail */
-7:	moveq	#-1,d0				/* 0x12a shared -1 tail */
-11:	rts						/* 0x12c */
-
-_IEEESPAbs:					/* 0x12e */
-	bclr	#31,d0
+/*---------------------------- IEEESPCmp (-42) ------------------------*/
+_cmp:							/* 0x10c */
+	tstl	%d1
+	bmis	_cmpd1neg				/* d1 < 0                   */
+	beqs	_tst					/* d1 == 0: shares Tst tail */
+	subl	%d1,%d0
+	blts	_retminus				/* d0 < d1 -> -1            */
+	beqs	_reteq					/* equal -> 0               */
+_retplus:						/* 0x118 */
+	moveq	#1,%d0
+_reteq:							/* 0x11a */
+	rts
+_cmpd1neg:						/* 0x11c */
+	tstl	%d0
+	bnes	_cmpsub
+	bset	#31,%d0					/* d0==+0 -> make -0x80000000 */
+_cmpsub:						/* 0x124 */
+	subl	%d1,%d0
+	bcss	_retplus				/* unsigned wrap -> +1      */
+_tstneg:						/* 0x128 */
+	beqs	_cmpdone
+_retminus:						/* 0x12a */
+	moveq	#-1,%d0
+_cmpdone:						/* 0x12c */
 	rts
 
-_IEEESPFix:					/* 0x134 single -> long */
-	fmoves	d0,%fp0
-	fmovel	%fp0,d0
+/*---------------------------- IEEESPAbs (-54) ------------------------*/
+_abs:							/* 0x12e */
+	bclr	#31,%d0
 	rts
 
-_IEEESPNeg:					/* 0x13e */
-	bchg	#31,d0
+/*---------------------------- IEEESPFix (-30) ------------------------*/
+_fix:							/* 0x134 */
+	fmoves	%d0,%fp0
+	fmovel	%fp0,%d0				/* round per FPCR mode      */
 	rts
 
-_IEEESPFlt:					/* 0x144 long -> single */
-	fmovel	d0,%fp0
-	fmoves	%fp0,d0
+/*---------------------------- IEEESPNeg (-60) ------------------------*/
+_neg:							/* 0x13e */
+	bchg	#31,%d0
 	rts
-	.short	0				/* pad 0x14e */
 
-_IEEESPFloor:					/* 0x150 */
-	fintrzs	d0,%fp0				/* fp0 = trunc(x) */
-	fcmps	d0,%fp0
-	fbule	1f				/* keep when fp0<=x or NaN */
-	fsubs	#0e1,%fp0			/* fp0 -= 1.0 */
-1:	fmoves	%fp0,d0
+/*---------------------------- IEEESPFlt (-36) ------------------------*/
+_flt:							/* 0x144 */
+	fmovel	%d0,%fp0
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x16a */
+	.short	0					/* align pad */
 
-_IEEESPCeil:					/* 0x16c mirror of Floor */
-	fintrzs	d0,%fp0
-	fcmps	d0,%fp0
-	fbuge	1f				/* keep when fp0>=x or NaN */
-	fadds	#0e1,%fp0			/* fp0 += 1.0 */
-1:	fmoves	%fp0,d0
+/*---------------------------- IEEESPFloor (-90) ----------------------*/
+_floor:							/* 0x150 */
+	fintrzs	%d0,%fp0				/* fp0 = trunc(x)           */
+	fcmps	%d0,%fp0				/* fp0 vs x                 */
+	fbule	_floorout				/* fp0 <= x (or unord): ok  */
+	fsubs	#0x3f800000,%fp0			/* fp0 -= 1.0               */
+_floorout:						/* 0x164 */
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x186 */
+	.short	0					/* align pad */
 
-_IEEESPAdd:					/* 0x188 */
-	fmoves	d0,%fp0
-	fadds	d1,%fp0
-	fmoves	%fp0,d0
+/*---------------------------- IEEESPCeil (-96) -----------------------*/
+_ceil:							/* 0x16c */
+	fintrzs	%d0,%fp0				/* fp0 = trunc(x)           */
+	fcmps	%d0,%fp0
+	fbuge	_ceilout				/* fp0 >= x (or unord): ok  */
+	fadds	#0x3f800000,%fp0			/* fp0 += 1.0               */
+_ceilout:						/* 0x180 */
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x196 */
+	.short	0					/* align pad */
 
-_IEEESPSub:					/* 0x198 */
-	fmoves	d0,%fp0
-	fsubs	d1,%fp0
-	fmoves	%fp0,d0
+/*---------------------------- IEEESPAdd (-66) ------------------------*/
+_add:							/* 0x188 */
+	fmoves	%d0,%fp0
+	fadds	%d1,%fp0
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x1a6 */
+	.short	0					/* align pad */
 
-_IEEESPMul:					/* 0x1a8 */
-	fmoves	d0,%fp0
-	fmuls	d1,%fp0
-	fmoves	%fp0,d0
+/*---------------------------- IEEESPSub (-72) ------------------------*/
+_sub:							/* 0x198 */
+	fmoves	%d0,%fp0
+	fsubs	%d1,%fp0
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x1b6 */
+	.short	0					/* align pad */
 
-_IEEESPDiv:					/* 0x1b8 */
-	fmoves	d0,%fp0
-	fdivs	d1,%fp0
-	fmoves	%fp0,d0
+/*---------------------------- IEEESPMul (-78) ------------------------*/
+_mul:							/* 0x1a8 */
+	fmoves	%d0,%fp0
+	fmuls	%d1,%fp0
+	fmoves	%fp0,%d0
 	rts
-	.short	0				/* pad 0x1c6 */
+	.short	0					/* align pad */
 
-_endskip:					/* 0x1c8 */
-	.end
+/*---------------------------- IEEESPDiv (-84) ------------------------*/
+_div:							/* 0x1b8 */
+	fmoves	%d0,%fp0
+	fdivs	%d1,%fp0
+	fmoves	%fp0,%d0
+	rts
+	.short	0					/* align pad */
+
+_endskip:						/* 0x1c8 */
