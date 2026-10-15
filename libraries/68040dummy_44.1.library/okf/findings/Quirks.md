@@ -5,12 +5,13 @@ title: Quirks and open questions
 
 # Quirks — 68040.library 44.1 (Phase5 dummy)
 
-- **"060.library" pointer quirk.** On the no-FPU40 (LC/EC040) branch
-  the init code `lea`s 7 bytes into `"LIBS:68060.library"`, so the
-  actual OpenLibrary name is `"060.library"`. Deliberate (060 lib
-  naming) or off-by-N bug is an open question; the newer 46.5 loader
-  opens `"68060.library"` properly (+5), and Lynxx 46.9 opens
-  `"060.library"` again (+2 into `"68060.library"`).
+- **Bare-name pointer trick.** All four name `lea`s point 5 bytes
+  into the `"LIBS:<name>"` strings, i.e. at the bare library names.
+  OpenLibrary("dos.library") / OpenLibrary("68060.library") get the
+  bare names; the LoadSeg helper passes `name-5` to reach the
+  `LIBS:`-prefixed path. (An earlier version of this note claimed
+  the 060 branch opened `"060.library"` at +7 — wrong; the oracle
+  log shows `OpenLibrary("68060.library")`.)
 - **68060 fast path.** `AFF_68060` short-circuits init to success —
   the stub installs itself on 060 systems but forwards nothing
   (pb_OpenLib stays NULL → LibOpen returns the stub itself, whose

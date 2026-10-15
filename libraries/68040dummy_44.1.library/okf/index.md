@@ -31,20 +31,24 @@ Implements only the four system vectors; no user LVOs.
    LoadSeg+InitResident of `LIBS:68040new.library`, else
    `LIBS:68040old.library`; result kept in pb_LoadLib; init returns
    NULL **either way** — preload-then-die.
-5. no FPU40 (LC/EC040): `pb_OpenLib = OpenLibrary("060.library",0)`
-   — pointer lands 7 bytes into `"LIBS:68060.library"` (quirk);
+5. no FPU40 (LC/EC040): `pb_OpenLib = OpenLibrary("68060.library",0)`
+   — all name `lea`s land +5 into `"LIBS:<name>"` (bare name);
    fail if NULL else return base.
 
 LibOpen returns pb_OpenLib if set (redirection), else self.
 
 ## Status
 
-FULL — reconstructed in C + asm helpers; `make` in `source/` builds
-a single-hunk `68040.library`.
+DONE — verbatim asm reconstruction `source/dummy_v.s` +
+`source/fixup.py`; `make` produces a **byte-identical**
+`68040.library` (md5 ad4ecfe10758fd8d54aa59fdc7e0edb5) and the
+machine68k oracle (`work/oracle.py`) is trace-identical across all
+seven init/vector scenarios. The older C model remains under
+`make cmodel` (not byte-identical).
 
 ## Categories
 
 - [functions/](functions/index.md) — the four system vectors
 - [structures/](structures/index.md) — RomTag/InitTable/hunk map, LibBase
-- [findings/](findings/index.md) — "060.library" quirk, ABI quirks
+- [findings/](findings/index.md) — LIBS: bare-name trick, ABI quirks
 - [log.md](log.md) — work journal

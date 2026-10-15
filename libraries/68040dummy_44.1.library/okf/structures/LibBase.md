@@ -11,7 +11,7 @@ description: Library base, dataSize 0x38 — struct Library + privates.
 0x22  UBYTE  private flag byte  — bclr #3 executed on every LibOpen
 0x23  UBYTE  pad
 0x24  APTR   pb_SysBase         — set by LibInit (a6)
-0x28  APTR   pb_OpenLib         — OpenLibrary("060.library") result,
+0x28  APTR   pb_OpenLib         — OpenLibrary("68060.library") result,
                                   returned by LibOpen when non-NULL;
                                   pre-zeroed by the InitStruct table
 0x2c  APTR   pb_LoadLib         — LoadSeg+InitResident result,

@@ -1,7 +1,7 @@
 ---
 type: Function
 title: LibInit
-description: Init routine — CPU-flag dispatch; preload 68040new/old or open "060.library".
+description: Init routine — CPU-flag dispatch; preload 68040new/old or open "68060.library".
 lvo: null (AUTOINIT init routine, entered with d0=base, a0=seglist, a6=SysBase)
 ---
 
@@ -25,7 +25,7 @@ if (SysBase->AttnFlags & AFF_FPU40) {               /* btst #6 */
     return NULL;                                   /* always: preload-then-die */
 }
 
-base->pb_OpenLib = OpenLibrary("060.library", 0);   /* str+7 quirk */
+base->pb_OpenLib = OpenLibrary("68060.library", 0); /* +5: skips "LIBS:" */
 if (!base->pb_OpenLib) return NULL;
 return base;
 ```
