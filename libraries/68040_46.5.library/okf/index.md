@@ -36,9 +36,14 @@ vectors; no user LVOs.
 
 ## Status
 
-FULL — reconstructed in C + asm helpers (the supervisor probe is
-hand-written .s, Supervisor() functions must terminate with RTE);
-`make` in `source/` builds a single-hunk `68040.library`.
+DONE — verbatim asm `source/68040_v.s` + `source/fixup.py`;
+`make` produces a **byte-identical** 748B library (md5
+`8333b7778869e23f481d32c03cf48f30`).  machine68k oracle
+(`work/oracle.py`) is trace-identical over 7 scenarios: the real
+`movec`/`rte` fault path runs under the harness (illegal-instruction
+→ vector-4 handler → skip), plus forced-060 OpenLibrary path,
+LoadSeg/InitResident new+old fallback, no-RomTag UnLoadSeg, and the
+proxied LibOpen.  Older C model kept under `make cmodel`.
 
 ## Categories
 

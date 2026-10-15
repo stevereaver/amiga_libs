@@ -1,8 +1,8 @@
 # Makefile for the Phase5 68040.library 46.5 loader stub
 #
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-# The AUTOINIT function table is absolute-long (.long entries in
-# loader_lib.s), so no two-pass functab generation is needed.
+# Default target builds the byte-identical verbatim assembly
+# reconstruction (68040_v.s + fixup.py rewrites the reloc tail).
+# `make cmodel` builds the older readable C model (NOT byte-identical).
 
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
@@ -11,26 +11,27 @@ CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
 ASFLAGS = -m68040
 LDFLAGS = -nostdlib -nostartfiles
 
+ORIG    = ../binary/68040_46.5.library
 TARGET  = 68040.library
 
 all: $(TARGET)
 
-$(TARGET): loader_lib.o loader.o helpers.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ loader_lib.o loader.o helpers.o endmodule.o
+$(TARGET): 68040_v.o
+	$(CC) $(LDFLAGS) -Wl,-s -o 68040_v.library 68040_v.o
+	python3 fixup.py 68040_v.library $(ORIG)
+	cp 68040_v.library $(TARGET)
 
-loader_lib.o: loader_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ loader_lib.s
+68040_v.o: 68040_v.s
+	$(CC) -m68000 -Wa,-m68020 -c -o $@ 68040_v.s
 
-loader.o: loader.c
-	$(CC) $(CFLAGS) -c -o $@ loader.c
-
-helpers.o: helpers.s
-	$(CC) $(ASFLAGS) -c -o $@ helpers.s
-
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
+cmodel:
+	$(CC) $(ASFLAGS) -c -o loader_lib.o loader_lib.s
+	$(CC) $(CFLAGS)  -c -o loader.o loader.c
+	$(CC) $(ASFLAGS) -c -o helpers.o helpers.s
+	$(CC) $(ASFLAGS) -c -o endmodule.o endmodule.s
+	$(CC) $(LDFLAGS) -o 68040_cmodel.library loader_lib.o loader.o helpers.o endmodule.o
 
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o $(TARGET) 68040_v.library 68040_cmodel.library
 
-.PHONY: all clean
+.PHONY: all clean cmodel

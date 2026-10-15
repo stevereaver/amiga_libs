@@ -14,8 +14,8 @@ title: Quirks and open questions
 - **060 path:** `OpenLibrary("68060.library")` — pointer is +5 into
   `"LIBS:68060.library"` (basename), stored at pb_OpenLib; LibOpen
   hands it out → callers of "68040.library" get the real 060 lib.
-  Note the older 44.1 dummy opens `"060.library"` (+7) instead —
-  behaviour change or bug fix, open question.
+  (The older 44.1 dummy uses the same +5 scheme — an earlier note
+  claiming it opened `"060.library"` at +7 was wrong; oracle-verified.)
 - **Real-040 path:** `LoadSeg("LIBS:68040new.library")` /
   `…old.library` + InitResident, then always NULL → the stub unloads
   itself leaving the real lib resident (preload-then-die). The
@@ -25,5 +25,8 @@ title: Quirks and open questions
   success path.
 - LibClose/Expunge/ExtFunc are all null stubs; OpenCnt is never
   decremented — permanent resident.
-- Rebuild differences: semantic parity; gcc codegen differs (offset,
-  regalloc), hunk layout and vector table format match.
+- Rebuild: `source/68040_v.s` verbatim asm + `fixup.py` (rewrites
+  RELOC32 → the original's 0x3f7 DREL16 tail with out-of-order
+  offsets a,12,16,1a,d8-ec,f0,110,fe,6) → byte-identical
+  (md5 8333b7778869e23f481d32c03cf48f30). Old C model kept as
+  `make cmodel`.
