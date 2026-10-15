@@ -1,33 +1,26 @@
----
-type: Library
-title: freeanim.library 40.9
-description: Functional AUTOINIT library with only the four system vectors — no public API.
-tags: [autoinit]
----
+# freeanim.library 40.9 (11.8.95) — OKF index
 
-# freeanim.library 40.9 — Knowledge Bundle
+Working (non-stub) AUTOINIT library. Single CODE hunk (76 longs,
+304 B); file 396 B, MD5 `03cd7bf7fd38450a49c3bc53d25f7dcf`.
 
-## Overview
+Reconstruction: `source/freeanim.s` + `Makefile` + `fixup.py`
+(reloc-group order only). Byte-identical to the original;
+runtime-oracle identical (`work/oracle.py`).
 
-Binary: `binary/freeanim_40.9.library`, 396 bytes,
-SHA256 `24feed8924d51816636b0d445558f12dfbd6eef5f88c77d31fb5e9e6ff729910`.
-ID string `freeanim.library 40.9 (11.8.95)` (no `$VER:` prefix).
+RomTag @ h0+4: AUTOINIT|0x01 (0x81), v40 r9, NT_LIBRARY pri 0,
+name/idstr at h0+0x1e/0x2f, InitTable at h0+0x54
+(dsize 0x26, functab->0x64, datatab->0x70, initfn->0x120).
+Functab is word-offset mode (0xffff markers): 4 vectors,
+entries relative to the functab address.
 
-Single code hunk, RomTag `RTF_AUTOINIT|RTF_COLDSTART`, version 40,
-NT_LIBRARY, priority 0.  AUTOINIT function table holds only the four
-mandatory system vectors; LVO -24 lands on a shared
-`moveq #0,rts` stub.  There is no public API in this build.
+Vectors: Open (+opencnt), Close (-opencnt, deferred expunge on
+LIBF_DELEXP), Expunge (exec.Remove + FreeMem of lib), reserved
+-24 -> `moveq #0; rts`. No public API beyond the standard four —
+the library is an empty skeleton, like the 40.29 sibling but with
+a real open/close/expunge lifecycle.
 
-Unlike the stub-only 40.29, this build has a working lifecycle:
-init stores the segment list at +0x22 (dataSize 0x26), Open bumps
-lib_OpenCnt, Close performs a guarded decrement and honours
-LIBF_DELEXP, Expunge removes/frees via exec.
+initfn @0x120 stores the seglist at lib+0x22 for expunge.
+Dead `moveq #-1,d0; rts` stub sits at h0+0 before the RomTag.
 
-Reconstructed in `source/`; `make` produces a valid HUNK `.library`.
-
-## Categories
-
-- [functions/](functions/index.md) — LVO entries
-- [structures/](structures/index.md) — hunk map, RomTag/InitTable, base layout
-- [findings/](findings/index.md) — quirks and version differences
-- [log.md](log.md) — work journal
+See `functions/vectors.md`, `structures/layout.md`,
+`findings/quirks.md`, `log.md`.

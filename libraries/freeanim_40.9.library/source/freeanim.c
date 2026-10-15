@@ -5,6 +5,11 @@
 **	"freeanim_40.9.library" (id: "freeanim.library 40.9
 **	(11.8.95)").
 **
+**	NOTE: semantic reference only — this C form does not
+**	reproduce the original byte-for-byte.  The canonical
+**	byte-identical build is freeanim.s (+ fixup.py for the
+**	scrambled RELOC32 group order); see Makefile.
+**
 **	Real AUTOINIT library, but with no public API: the function
 **	table holds only the four system vectors.  The -24 slot is a
 **	shared `moveq #0,rts` stub.  The base carries just the
