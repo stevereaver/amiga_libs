@@ -1,20 +1,13 @@
 ---
 file: vectors
 ---
-# Vectors (word-offset functab @h0+0x90)
+# Vectors
 
--6 Open | -12 Close | -18 Expunge | -24 stub->0 |
--30 XpkPackerInfo -> XPKPACKERINFO @h0+0xe02:
-  "Shrink"/"Shrink 020+ V3.0", sign 'SHR3', flags 0x28009,
-  7 mode descriptors (worst..best, upto 14..100);
--36 XpksPackChunk — SHR3 encoder; incompressible input
-  returns -17 (encoder margin bail); real pack produces
-  deterministic 16B stream for 32B 'ABCD'*8 input;
--42 XpksFreeChunk (ctx free) | -48 ctx (re)init |
--54 XpksUnpackChunk — two decoder flavours selected by
-  xsp+0x14 bit1: ring-buffer (flags 0) and literal (flags 2);
-  header >=2 rejected with -26 | -60 stub->0.
+10 LVOs (-6 .. -60), word-offset functab@h0+0x94:
+-6 open +0xc2, -12 close +0xd0, -18 expunge +0xe2,
+-24 0-hole -> +0 stub (backword offset 0xff6c), -30 XpkPackerInfo +0x120,
+-36 XpkPackChunk +0x19c, -42 ctx-free +0x128,
+-48 ctx re-init +0x140, -54 XpkUnpackChunk +0x732, -60 +0x128.
 
-Runtime: pack ctx allocations 3.4MB + 86KB + 2016B observed;
-deferred expunge while opencnt>0 (flags 0x0e), real expunge
-on final close.
+PackerInfo: 'SHR3'/'Shrink 020+ V3.0', flags 0x28009,
+max 0x7fffffff, 7-mode table (worst..best, upto 14..100).

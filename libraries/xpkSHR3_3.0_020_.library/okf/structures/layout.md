@@ -1,20 +1,23 @@
 ---
 file: layout
 ---
-# xpkSHR3 3.0 (020) layout
+# xpkSHR3 3.0(020) layout
 
-File 4232B. Single CODE hunk: declared 0x3fe longs @0x1c
-but the body physically extends to 0x1016 (2B overrun past
-the declared bound, then pad + RELOC32 tail: 23 slots all
-->h0, END).
+File 4232B. Single hunk0 CODE 0x3fe longs (4088B @0x20).
+Tail: RELOC32 — 23 ->h0 entries (resident/initdatatab/functab
+ptrs, packer-info string ptrs 0xe0a..0xe3e, mode-desc next ptrs
+0xe5a..0xf2a), END.
 
-Resident @h0+4 (file +0x24): packed RomTag, flags 0x80
-AUTOINIT, ver 3, type 9 library; name/id -> "xpkSHR3.library"
-/ "$VER: xpkSHR3 V3.0 (1 Oct 2013) by Matthias Meixner".
-InitTable @h0+0x64: dsize 0x94, functab->h0+0x90 (10 word
-offsets, 0xffff-terminated), datatab->h0+0xa0, initfn->h0+0x74.
+## hunk0
 
-Pack context (xpk sublib state, allocated lazily on first
-XpksPackChunk): hash table 3*hashsize + 36928 B hung off
-xsp+0x34; unpack allocs 2016 B (ring-buffer decoder) or
-67552 B (literal decoder) depending on xsp+0x14 bit 1.
+| off | contents |
+|-----|----------|
+| 0x00 | `moveq #0,d0 / rts` stub (also the functab 0-hole target) |
+| 0x04 | Resident: flags 0x80 AUTOINIT, ver 3; name->+0x1e id->+0x2e init->+0x64 |
+| 0x1e | 'xpkSHR3.library' |
+| 0x2e | '$VER: xpkSHR3 V3.0 (1 Oct 2013) by Matthias Meixner\r\n' |
+| 0x64 | InitTable: dsize 0x26, ftab->+0x94, dtab->+0x74, initfn->+0xac |
+| 0x74 | InitStruct byte-cmd datatab (ln_Type=9/ln_Name/flags=6/ver=3/rev=0/idstr) |
+| 0x94 | word-offset functab: ffff + 10 words + ffff |
+| 0xac | initfn: seglist store, AttnFlags bit-1 test — clear -> +0 stub |
+| 0xdc2 | tail data: 14-word match-offset class table, 9-long hash-size table @0xdde, XpkPackerInfo @0xe02, 7 mode descs @0xe5a..0xf54 (stride 0x2a), strings, ends 0xff8 |
