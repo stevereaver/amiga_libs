@@ -28,13 +28,14 @@ The shipped file is named "680x0_46.3(MMU).library" but its bytes are **identica
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc): C for all logic plus a
-small hand-written `cpuprobe.s` for the supervisor-state CPU/PCR
-probe (VBR redirect + illegal-instruction trampoline - not
-expressible in C).  `make` produces a loadable `.library`; the data
-hunk (InitTable, function table layout, strings) is byte-identical
-to the original modulo the relocated vector pointers, and the code
-was verified function-by-function against the IRA disassembly.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — the file shipped as
+`680x0_46.3(MMU).library` is a byte-for-byte duplicate of the 46.1
+build (md5 `edbf249db38de0b48641bbf9fb62ddf3`); its embedded
+idstring still reads `46.1 (04.07.2016)`, so it is a mislabeled
+duplicate shipment, not a distinct 46.3 build.  Rebuilt via the
+shared verbatim `source/680x0_h0.s`; `make cmodel` retains the C
+reconstruction.  machine68k oracle identical over the full scenario
+matrix.
 
 ## Contents
 

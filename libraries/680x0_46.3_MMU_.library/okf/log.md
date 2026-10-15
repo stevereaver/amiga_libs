@@ -21,3 +21,8 @@ description: Chronological journal of analysis sessions for this library. Newest
   `make` OK; data hunk byte-identical modulo vector relocs; code
   verified against disassembly.
 - Phase 3: okf bundle populated.
+
+- Phase 4 (2026-10-15): confirmed the shipped binary is identical
+  to 680x0.library 46.1 (edbf249db38de0b48641bbf9fb62ddf3);
+  mirrored verbatim asm + Makefile + oracle -> BYTE-IDENTICAL +
+  RUNTIME-IDENTICAL.  Duplicate shipment documented (AMIGALIBS-236).
