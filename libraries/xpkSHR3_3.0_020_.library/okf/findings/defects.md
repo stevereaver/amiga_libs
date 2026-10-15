@@ -21,3 +21,12 @@ file: defects
   not a real ctx makes it dereference the garbage pointer —
   -48 then fills ~8KB via ctx+0x7e4/ctx+0x7ec table pointers and
   can smash low memory.
+- The -24 functab hole is the only *backward* word offset
+  (0xff6c) — resolves to the +0 stub.
+- Pack ignores xsp+0xc (dstlen): the output margin is fixed at
+  dst+srcLen; exceeding it bails with -17 (encoder margin bail).
+  Pack ctx is lazily AllocMem'd into xsp+0x34, sized
+  3*hashsz[(mode+13)/14]+36928 (40 000 .. 233 536 B — matches the
+  mode-desc +0xc fields; unpack ctx is 67552 B with the
+  ring-buffer decoder / 2016 B with the literal one, matching
+  mode-desc +0x10=0x107e0).
