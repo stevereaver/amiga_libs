@@ -375,4 +375,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `containerkit_1.1.library` | 'containerkit 1.1' — container helper lib; AUTOINIT, resident+InitTable inside tiny DATA hunk (GCC-style), 29 vectors. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-329) |
 | `owndevunit_3.3.library` | 'OwnDevUnit 3.3' — device-unit arbitration (Attempt/Free/AvailDevUnit, timer.device); AUTOINIT, 11 vectors, h0 declared-vs-physical size anomaly + h1 alloc/body mismatch. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-330) |
 | `dsp3210_3.4.library` | 'dsp3210 3.4' — DSP d32 blob lib; COLDSTART, absolute-long functab (14 vectors), dsize 0x2c. Byte-identical raw asm + fixup; oracle identical incl. d32 valid/bad-magic paths (AMIGALIBS-331) |
+| `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
