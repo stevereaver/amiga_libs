@@ -414,5 +414,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `cyberintuition_40.30.library` | cyberintuition 40.30 (1995, Vision Factory) — CyberGraphX intuition patch, flat hunk, 4 vectors, opens 5 deps v39 + ENV vars. Byte-identical; oracle identical (AMIGALIBS-369) |
 | `muihelp_19.9.library` | muihelp 19.9 — MUI help-bubble lib, 3-hunk non-AUTOINIT, 6 vectors, MUIGfx render, lazy dep opens. Byte-identical; oracle identical (AMIGALIBS-370) |
 | `muirexx_19.9.library` | muirexx 19.9 (1997, Stuntz) — MUI ARexx host, 2-hunk non-AUTOINIT, 13 vectors, builtin cmd tables, rexxsyslib on demand. Byte-identical; oracle identical (AMIGALIBS-371) |
+| `redguy_0.5.library` | redguy 0.5 (2000, Oppeln-Bronikowski) — flat AUTOINIT, 16 vectors, negative-addr table walk. Byte-identical; oracle identical (AMIGALIBS-372) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
