@@ -4,9 +4,9 @@ Stub/placeholder library. Single CODE hunk (27 longs, 108 B);
 file 188 B, MD5 `d55fa1c912ce38fd8d480cadbcc6ac72`.
 
 Reconstruction: `source/freeanim.s` + `Makefile`, byte-identical.
-No runtime oracle needed — the library has no external calls; all
-four API vectors and the initfn are the same `moveq #0,d0; rts`
-stub at h0+0x66.
+Runtime-verified via machine68k oracle (`work/oracle.py`):
+AUTOINIT construction + initfn -> 0 + all four vectors -> 0
+identical between original and rebuild.
 
 RomTag @ h0+4: AUTOINIT (0x80), v40, NT_LIBRARY pri 0,
 name/idstr at h0+0x1e/0x2f, InitTable at h0+0x4a

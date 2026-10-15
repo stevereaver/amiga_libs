@@ -12,3 +12,7 @@
 - `make` -> byte-identical, md5 d55fa1c912ce38fd8d480cadbcc6ac72.
 - No oracle: library contains zero external calls; behavior is
   fully determined by byte-identity + return-0 stub semantics.
+
+- 2026-10-15: machine68k oracle added (AUTOINIT + all-vectors ret0
+  + initfn ret0 verified identical).  Reconstruction predates this
+  pass (already byte-identical).
