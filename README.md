@@ -377,5 +377,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `dsp3210_3.4.library` | 'dsp3210 3.4' — DSP d32 blob lib; COLDSTART, absolute-long functab (14 vectors), dsize 0x2c. Byte-identical raw asm + fixup; oracle identical incl. d32 valid/bad-magic paths (AMIGALIBS-331) |
 | `xpkSHR3_3.0_000_.library` | XPK 'SHR3' Shrink compressor sublib (68000 build); AUTOINIT, 10 word-offset vectors, identical wire format to 020 sibling. Byte-identical raw asm + fixup; oracle identical incl. real pack round-trip (AMIGALIBS-334) |
 | `xpkSHR3_3.0_020_.library` | XPK 'SHR3' Shrink compressor sublib (020 build); AUTOINIT, 10 word-offset vectors, 7-mode packer info, lazily-allocated hash ctx (3.4MB). Byte-identical raw asm + fixup; oracle identical incl. real pack round-trip (AMIGALIBS-333) |
+| `realtime_34.5.library` | 'realtime 34.5' — CIA timer scheduler lib; AUTOINIT, 19 installed vectors (functab entry0 NULL). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-335) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
