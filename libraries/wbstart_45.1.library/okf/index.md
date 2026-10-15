@@ -34,10 +34,15 @@ directory part of the object name.
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc -m68000, single pass,
-absolute vectors).  The rebuilt `.data` hunk is byte-layout
-identical (functab@0x00, name@0x1c, id@0x2c, init@0x4c,
-romtag@0x5c, endskip@0x76).
+**Byte-identical.**  `source/wbstart_h0.s` is a verbatim gas
+reconstruction of both hunks; `source/fixup.py` rewrites GNU
+ld's HUNK_RELOC32 tail into the shipped HUNK_DREL32 (0x3f7,
+word offsets) tail — md5 `ab05a79789225bdf074a6f808ed4ca57`,
+1008 bytes.  `work/oracle.py` (machine68k) runs both binaries
+through init/open/close/expunge, both reserved stubs and 11
+WBStart scenarios (all tag handlers, PathPart truncation,
+wbtags build, AllocVec/OWO failure): logs are identical.
+The earlier C model is kept under `make cmodel`.
 
 ## Contents
 
