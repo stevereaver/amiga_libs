@@ -1,26 +1,32 @@
 ---
 type: Finding
 title: Rebuild deviations
-description: Byte-level differences between the original and the C rebuild.
-timestamp: 2026-10-10T09:20:00Z
+description: Byte-level differences between the original and the rebuild.
+timestamp: 2026-10-15T00:00:00Z
 ---
 
 # Rebuild deviations
 
-Rebuild (`make` in `source/`): sha256
-`536263c9b9b95b725155516bace33f7780409ea98c7fdc7cb4b6e4af2fd13b8c`,
-.text 0x230 bytes vs. the original 0x20c.
+None — `make` in `source/` now produces a **byte-identical** image
+(md5 `2e211c29f976ac2b702beb812a9f3914`, sha256
+`c1aedc8eee7a5fa478adfdaf8a6d3240931f35f9f88e2c55305521741951f92e`).
 
-- Bytes 0x00–0x67 are identical: entry stub, RomTag, both strings,
-  dataSize and InitStruct data all match.
-- Object link order differs: the rebuild places the XpkInfo/XpkMode
-  block and strings (from `xpkNONE_lib.o`) ahead of the generated
-  functab and C code; the original has functab → code → descriptors →
-  strings. All block *contents* match field-for-field.
-- LibInit is byte-identical (`2240 23480022 4e75` — nice win).
-- The remaining functions implement identical semantics with gcc
-  codegen (a6 save/restore, btst→branch instead of fallthrough in
-  Close, or.b for flag clear in Open). Vector order in the table is
-  the same; reserved slots point at a distinct `_LibNull` rather than
-  the entry stub.
-- No data/bss hunks in either image.
+The byte-exact build is `xpkNONE_h0.s`, a verbatim assembly
+reconstruction of the single CODE hunk (0x20c bytes). The earlier C
+model (`xpkNONE.c` + `xpkNONE_lib.s` + `genfunctab.py`) is kept as a
+readable reference but was never byte-identical (.text 0x230, gcc
+codegen and object link order differed).
+
+Two original-image details required verbatim emission:
+
+- `rt_EndSkip` stores literal `0` with **no relocation** — the
+  resident's endskip field is just zero, not a relocated pointer to
+  the hunk base. Emitting `.long _stub0` produced a spurious 18th
+  RELOC32 entry.
+- `movea.l 0(a0),a0` in the -54 vector uses the 6-byte disp16 form
+  (`2068 0000`); gas canonicalizes `0(a0)` to the 2-byte `(a0)`
+  indirect, so it is emitted as raw `.short`s.
+
+Runtime: `work/oracle.py` gives identical traces for the original and
+the rebuild across init, Open x2, all four reserved stubs, XPKInfo,
+the -17 vector, the CopyMem vector, and deferred + real expunge.

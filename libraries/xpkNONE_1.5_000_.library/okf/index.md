@@ -19,14 +19,14 @@ bytes, one code hunk (0x20c bytes, 17 RELOC32 entries). IdString:
 
 ## Status
 
-Fully reconstructed in C + skeleton asm. `source/` builds with
-m68k-amigaos-gcc (two-pass link via `genfunctab.py` for the
-word-offset function table) into a single-hunk `.library`. The header
-region (entry stub, RomTag, name/id strings, InitTable dataSize,
-InitStruct data) is byte-identical; function-table order/count, XpkInfo
-and XpkMode contents match; code-hunk layout below the tables differs
-(gcc codegen and object link order). All six sublibrary LVOs resolved
-against `xpksub_lib.i` from the Aminet `xpk_Develop` archive.
+**Byte-identical rebuild + runtime-verified.** `source/xpkNONE_h0.s`
+is a verbatim assembly reconstruction of the single CODE hunk; `make`
+in `source/` produces md5 `2e211c29f976ac2b702beb812a9f3914` — identical
+to the original. The earlier C model (`xpkNONE.c`, `xpkNONE_lib.s`,
+`genfunctab.py`) is retained as a readable reference. `work/oracle.py`
+traces original and rebuilt binaries identically across all 10 vectors
+and both expunge paths. All six sublibrary LVOs resolved against
+`xpksub_lib.i` from the Aminet `xpk_Develop` archive.
 
 ## Contents
 
