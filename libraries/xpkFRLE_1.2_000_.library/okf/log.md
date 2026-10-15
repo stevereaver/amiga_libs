@@ -24,3 +24,10 @@ title: Reconstruction log
   literal-tail corruption reproduces byte-identically
   (0x9f header), inlen==0 -> -17.
 - Phase 4: this OKF bundle; defects filed in Plane.
+
+- Phase 4 (2026-10-15): verbatim asm `xpkFRLE_h0.s` -> BYTE-IDENTICAL
+  (md5 0f04897f92c3b8ebbdde6f666991cd90).  machine68k oracle adapted
+  from the V1.1 harness; logs identical.  Confirmed live: pack bounds
+  by OutBuf+InLen (pure-literal input always returns -17), unpack
+  never stores xsp_OutLen, ret0 stub at hunk+0 doubles as the
+  return-0 trampoline.

@@ -13,7 +13,24 @@ NM      = /opt/amiga/bin/m68k-amigaos-nm
 
 TARGET  = xpkFRLE.library
 
-all: $(TARGET)
+all: xpkFRLE.library
+
+# ---- byte-verbatim rebuild (hand asm) ----
+
+$(TARGET): xpkFRLE_h0.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ xpkFRLE_h0.o
+	@cmp -s $(TARGET) '../binary/xpkFRLE_1.2(000).library' && echo BYTE-IDENTICAL \
+	  || echo DIFFERS
+
+xpkFRLE_h0.o: xpkFRLE_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ xpkFRLE_h0.s
+
+# ---- C reconstruction model (older, functional not verbatim) ----
+
+cmodel: cmodel.library
+
+cmodel.library: xpkFRLE_lib.o functab.o xpkFRLE.o endmodule.o
+	$(CC) $(LDFLAGS) -o $@ xpkFRLE_lib.o functab.o xpkFRLE.o endmodule.o
 
 dummy.library: xpkFRLE_lib.o functab_stub.o xpkFRLE.o endmodule.o
 	$(CC) $(LDFLAGS) -o $@ xpkFRLE_lib.o functab_stub.o xpkFRLE.o endmodule.o
@@ -25,8 +42,6 @@ functab.s: dummy.library genfunctab.py
 functab.o: functab.s
 	$(CC) $(ASFLAGS) -c -o $@ functab.s
 
-$(TARGET): xpkFRLE_lib.o functab.o xpkFRLE.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ xpkFRLE_lib.o functab.o xpkFRLE.o endmodule.o
 
 xpkFRLE_lib.o: xpkFRLE_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ xpkFRLE_lib.s

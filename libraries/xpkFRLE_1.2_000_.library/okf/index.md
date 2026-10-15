@@ -44,12 +44,13 @@ incremental patch of V1.1:
 
 ## Status
 
-FULL — reconstructed (`source/`): C framework + codecs
-(xpkFRLE.c), resident tables/descriptors/strings
-(xpkFRLE_lib.s), two-pass word-offset functab.  Host-verified:
-30k random round-trips (expansion rejects and the shipped
->128-byte literal-tail corruption both reproduced), inlen==0
-and n==1 edges checked.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — `source/xpkFRLE_h0.s` builds
+md5 `0f04897f92c3b8ebbdde6f666991cd90`, matching the shipped binary
+(single 0x370B code hunk; ascending 13-entry RELOC32 -- no fixup).
+`make cmodel` retains the C reconstruction.  machine68k oracle
+identical over all paths (open/close/deferred+real expunge, ret0
+stubs, XpkInfo island, pack/unpack round-trips, -17 overflow, the
+OutBuf+InLen bound quirk, zero-length OOB reads).
 
 ## Contents
 
