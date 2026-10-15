@@ -373,4 +373,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `sage_36.2.library` | 'SAGE 36.2 (1 May 1992)' — HiSoft SAGE lib; AUTOINIT w/ InitTable in DATA hunk + functab in CODE (inverted), 10 vectors, graphics v33 dep. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-327) |
 | `dsp3210_6.0.library` | 'dsp3210 6.0 (20.8.2021)' — DSP d32 blob lib; COLDSTART, 15 vectors (new -90 array-free op, reworked -66 guarded free), word-offset functab. Byte-identical asm + fixup; oracle identical (AMIGALIBS-328) |
 | `containerkit_1.1.library` | 'containerkit 1.1' — container helper lib; AUTOINIT, resident+InitTable inside tiny DATA hunk (GCC-style), 29 vectors. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-329) |
+| `owndevunit_3.3.library` | 'OwnDevUnit 3.3' — device-unit arbitration (Attempt/Free/AvailDevUnit, timer.device); AUTOINIT, 11 vectors, h0 declared-vs-physical size anomaly + h1 alloc/body mismatch. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-330) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
