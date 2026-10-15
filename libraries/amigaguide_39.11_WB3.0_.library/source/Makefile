@@ -1,0 +1,18 @@
+CC      = /opt/amiga/bin/m68k-amigaos-gcc
+ASFLAGS = -m68000
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
+ORIG    = ../binary/amigaguide_39.11(WB3.0).library
+OBJS    = amigaguide_39_11_WB3_0__h0.o amigaguide_39_11_WB3_0__h2.o
+
+all: amigaguide.library
+
+amigaguide.library: $(OBJS) fixup.py
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	python3 fixup.py $@ "$(ORIG)"
+	cmp -l $@ "$(ORIG)" && echo BYTE-IDENTICAL
+
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o amigaguide.library
