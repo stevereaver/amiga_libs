@@ -23,3 +23,8 @@ Code hunk, offsets as shipped:
 Word-offset format: the leading -1 marks word offsets; each word is the
 function's offset from the table base; -1 terminates. Relocations only on
 the RomTag/InitTable pointer fields.
+
+File tail after the code hunk: a compact 16-bit relocation chunk
+(id 0x3f7, `[count:w][hunk:w][off:w]*`) listing the 8 pointer fields
+above in descending order 0x28..0x04 — see
+[findings/hunk_tail.md](../findings/hunk_tail.md).

@@ -8,7 +8,9 @@ description: IEEE single routine at LVO -96.
 
 `float IEEESPCeil(d0 parm)`
 
-ceil; fp1=x; fp0=fintrz(x); fcmp fp0 vs x; if fp0<x add 1.0.
+ceil; `fintrz.s d0,fp0` (fp0 = trunc(x)); `fcmp.s d0,fp0`; `fbuge`
+keeps fp0 when trunc(x) >= x (or unordered/NaN), else `fadd.s #1.0,fp0`;
+result `fmove.s fp0,d0`.  Mirror of IEEESPFloor.
 
 LVO definitions verified against the canonical NDK fd file
 `/opt/amiga/m68k-amigaos/ndk/lib/fd13/`.

@@ -29,3 +29,10 @@ INITWORD lib_Revision(0x16)=0x0371, terminator.
 
 A longword inside the code hunk at text+0x2c holds the seglist passed to
 the init routine (a0); returned by expunge/close-expunge.
+
+## Dead allocation
+
+dataSize 0x3c reserves 26 private bytes (lib+0x22..0x3b) past the
+standard `struct Library`, but no instruction ever reads or writes them —
+the seglist lives in the code hunk instead.  Dead allocation in the
+shipped binary.

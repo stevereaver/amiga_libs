@@ -13,3 +13,11 @@ The init routine runs with a6 = ExecBase, d0 = new base, a0 = seglist.
 Singbas has no `Libs:NoFPU` string at all: without a coprocessor the init
 routine simply runs the shared free tail on its *own* freshly allocated
 base (a1 = d0) and returns 0, so the resident init fails cleanly.
+
+Mechanics: `btst #4,0x129(a6)` tests AFF_68881 (bit 4 of the low
+AttnFlags byte at ExecBase+0x128).  On failure it branches to code+0xca
+— the middle of Expunge's free tail — which computes
+`FreeMem(base - NegSize, NegSize + PosSize)` and returns the longword at
+code+0x2c (the seglist cell, still 0 because the `move.l a0,(a1)` store
+was skipped).  Verified by the oracle: `freemem` logged with the right
+block start/size and init returns 0.

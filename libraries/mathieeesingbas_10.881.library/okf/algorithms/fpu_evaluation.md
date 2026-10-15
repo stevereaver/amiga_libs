@@ -6,18 +6,32 @@ description: How mathieeesingbas.library maps the public API onto 68881 instruct
 
 # FPU evaluation schemes
 
-All routines are thin 68881 wrappers -- no polynomial/rational
-approximations; the FPU microcode does the work.
+mathieeesingbas (the "bas" = basics) exports only the 12 arithmetic /
+conversion primitives — no transcendentals, no Pow (those live in
+mathieeesingtrans.library).  Every routine is a thin 68881 wrapper;
+the FPU microcode does the work.  fp0 is the only FP register used.
 
-- Unary ops: load operand (fmove.s / fmove.d), single F-line op,
-  store result. Ops used: fatan, fsin, fcos, ftan, fsincos, fsinh,
-  fcosh, ftanh, fetox, flogn, flog10, fsqrt, fasin, facos, fadd,
-  fsub, fmul, fdiv (subset per library).
-- Pow: `2^(exp * log2(arg))` via flog2/fmul/ftwotox; negative-arg path
-  adds fintrz + fcmp (integrality test) and fmod-2 for the sign.
-- Floor/Ceil: `fintrz(x)` then fcmp against x; adjust by -1/+1
-  (constant `fsub.s #1` / `fadd.s #1`) when trunc is on the wrong side.
-- Compare/Test: pure integer sign-magnitude compares on the IEEE bit
-  patterns -- no FPU ops at all.
-- Fix/Flt: fmove.l/fmove.s/fmove.d register transfers (rounding per
-  FPCR as programmed by Open: 0x80 (conditional)).
+- Add/Sub/Mul/Div: `fmove.s d0,fp0; f<op>.s d1,fp0; fmove.s fp0,d0; rts`
+  — ops used: fadd.s 0x22, fsub.s 0x28, fmul.s 0x23, fdiv.s 0x20.
+  Each is followed by a `0000` pad word so bodies sit on 0x10 stride.
+- Fix: `fmove.s d0,fp0; fmove.l fp0,d0` (integer rounding per FPCR
+  mode; Open leaves it at double-precision + round-nearest).
+- Flt: `fmove.l d0,fp0; fmove.s fp0,d0`.
+- Floor/Ceil: `fintrz.s d0,fp0; fcmp.s d0,fp0` then `fbule`/`fbuge`
+  over a `fsub.s #1.0,fp0` / `fadd.s #1.0,fp0` adjust; result via
+  `fmove.s fp0,d0`.  fbule/fbuge keep the trunc result when it is
+  already <= / >= x — or when the compare was unordered (NaN in
+  gives NaN out).
+- Tst/Cmp: no FPU ops at all — sign-magnitude compares on the IEEE
+  bit patterns (`add.l d0,d0` puts sign in C and magnitude in Z;
+  positive IEEE singles compare like integers; the negative side
+  subtracts the bit patterns which flips the order correctly,
+  with a `bset #31,d0` fixup for +0 vs negative).
+- Abs/Neg: pure integer `bclr`/`bchg #31,d0`.
+- Open: `fmove.l fpcr,d0` + conditional `fmove.l #0x80,fpcr`
+  (see findings/fpcr_open.md).
+
+## FBcc displacement base
+
+The `fbule`/`fbuge` word displacements are relative to the displacement
+word itself (0x0a -> skips the 4-word `f*.s #imm,fp0` sequence).
