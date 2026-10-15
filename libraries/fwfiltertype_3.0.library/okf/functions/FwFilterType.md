@@ -1,10 +1,10 @@
 ---
 type: Function
 title: FwFilterType
-description: Compares 4 type bytes at field+0x0c against "alph"; returns 3 and a "fwpha" string pointer on match.
+description: Compares 5 type bytes at field+0x0c against "alpha"; returns 3 and a "fwpenpal.library" pointer on match.
 lvo: -30
 tags: [user-function, filter]
-timestamp: 2026-10-10T19:15:00Z
+timestamp: 2026-10-15T02:00:00Z
 ---
 
 # Signature
@@ -16,23 +16,26 @@ ULONG FwFilterType(UBYTE *field, STRPTR *out, ULONG unused);
 
 # Semantics
 
-- Compares exactly 4 bytes at `field + 0x0c` against `"alph"` (the stored
-  constant is `"alpha\0"` but only 4 bytes are tested).
-- On match: `result = 3`; if `out != NULL`, `*out = "fwpha"`.
-- On mismatch: returns 0, `*out` untouched.
-- The `d0` argument is pushed onto the stack in the original but never
-  read — effectively `unused`.
+- Compares **5 bytes** at `field + 0x0c` against `"alpha"` — the `dbne`
+  loop is seeded `d0=4`, so it iterates 5 times (offsets 0..4) testing
+  the full `"alpha"`.  (An earlier doc revision claimed only `"alph"`;
+  oracle-verified that `alphx` fails and `alpha` matches.)
+- On match: `d7 = 3`; if `out != NULL`, `*out = "fwpenpal.library"`.
+- On mismatch: `d7 = 0`; if `out != NULL`, `*out = NULL` — the miss
+  path enters the store block mid-instruction (see DeadCompare) and
+  executes `clr.l (a4)`.
+- If `out == NULL` (`a1=0`), the store block is skipped entirely.
+- Return value: `move.w d7,d0` writes only the low word — the upper 16
+  bits of d0 carry whatever the preceding `ext.l`/`subq.l` left, so
+  callers must mask to a word (oracle observed `0xffff0000` on the miss
+  path, `3` on match).
+- The `d0` argument is pushed into the reserved stack slot at entry and
+  never read — a genuinely unused third parameter.
 
 # Notes
 
-- This is the library's sole user function — the binary is essentially a
-  type-name translation service: a field naming `alph*` maps to the
-  `"fwpha"` filter/type string. Callers and the structure containing the
-  +0x0c type field are unknown (no header/docs ship with the binary).
-- The original emits a dead `cmpi.w #$4294,d0` after the store — flags
-  are never consumed before the function returns; likely leftover code
-  or a compiler quirk. Reproduced as a note only, not in C.
-- Register prologue is unusual: `subq.w #4,a7` then `movem` — the extra
-  4-byte frame slot holds the unused d0.
-- `"alph"`/`"fwpha"` are 4-byte type tokens; "fw" prefix matches the
-  library name (SoftWood family naming, cf. fwpha filter names).
+- Sole user function — the binary is essentially a type-name
+  translation service: field `+0x0c == "alpha"` maps to the
+  `"fwpenpal.library"` string (SoftWood's PenPal family naming).
+- Prologue is unusual: `subq.w #4,a7` + `movem.l d7/a4-a5,-(a7)` — the
+  extra 4-byte frame slot holds the unused d0 store.

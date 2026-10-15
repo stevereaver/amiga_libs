@@ -1,20 +1,15 @@
 ---
 type: Finding
 title: Rebuild deviations
-timestamp: 2026-10-10T19:15:00Z
+timestamp: 2026-10-15T02:00:00Z
 ---
 
-# Rebuild deviations
+# Rebuild status
 
-The rebuilt `source/fwfiltertype.library` is not byte-identical to the
-original (expected — different compiler):
+**Superseded.** As of 2026-10-15 `make` assembles `fwfiltertype.s` into
+a **byte-identical** image (md5 `e6e1ad2915d73de079e659eeabf4ac58`);
+`fixup.py` rewrites the RELOC32 tail to the original's descending
+offset order.  The earlier gcc C build is kept as `make cmodel`.
 
-- Code hunk 0x194 bytes vs original 0x1b4 (gcc codegen).
-- The dead `cmpi.w #$4294,d0` is absent (documented in DeadCompare.md).
-- LibOpen keeps a6 on the stack briefly (gcc prologue) where the
-  original used a6 directly; semantics identical.
-
-Byte-identical: RomTag fields, module-entry opcode, name string,
-$VER/copyright strings, InitTable field layout (dataSize 0x28), all
-InitStruct command bytes, function-table entry count/order including
-the shared LibNull address for -24/-36, and -1L terminator.
+Historical note (C model): code hunk 0x194 bytes vs original 0x1b4,
+dead `cmpi.w` absent, gcc prologue differences — all moot now.

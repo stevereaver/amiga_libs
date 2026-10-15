@@ -19,11 +19,12 @@ string: "Copyright © 1993 SoftWood, Inc."
 
 ## Status
 
-Fully reconstructed in C. `source/` builds with m68k-amigaos-gcc 16.2 into
-a single-hunk `.library` whose RomTag, name/id strings, InitTable
-(dataSize 0x28), InitStruct bytes and six-entry absolute-long vector
-table match the original layout field-for-field. Code differs only in
-gcc codegen.
+**Byte-identical** asm rebuild: `make` assembles `source/fwfiltertype.s`
+(+ `fixup.py` for the descending RELOC32 order) into md5
+`e6e1ad2915d73de079e659eeabf4ac58`.  The earlier C model is kept as
+`make cmodel`.  `work/oracle.py` (machine68k) verifies identical
+behaviour — lifecycle, stubs, FwFilterType match/miss/NULL-out paths,
+deferred + real expunge.
 
 ## Contents
 

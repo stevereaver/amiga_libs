@@ -1,16 +1,24 @@
 ---
 type: Finding
-title: Dead compare in FwFilterType
-timestamp: 2026-10-10T19:15:00Z
+title: Dual-use `cmpi.w` / `clr.l (a4)` in FwFilterType
+timestamp: 2026-10-15T02:00:00Z
 ---
 
-# Dead `cmpi.w #$4294,d0`
+# `0c40 4294` is not (only) a dead compare
 
-FwFilterType ends the store path with `cmpi.w #$4294,d0` — the condition
-flags are never consumed before `rts`. d0 at that point is the result of
-`ext.l(d7)-3` (0 on the store path), so the compare is constant. Leftover
-code or compiler artefact; no functional effect. Not reproduced in C
-(documented here only).
+FwFilterType's store block ends:
 
-Also of note: the d0 argument is moved into the stack frame at entry and
-never read — a genuinely unused third parameter.
+```asm
+    lea   _fwpen(pc),a0        ; *out = "fwpenpal.library"
+    move.l a0,(a4)
+    cmpi.w #$4294,d0           ; 0x1a4: dead compare on THIS path
+; --- 0x1a6: mid-instruction entry from the miss path ---
+    clr.l (a4)                 ; 0x4294 -> *out = NULL
+```
+
+The miss path `bne.b` at 0x19c targets 0x1a6 — inside the `cmpi.w`
+operand — where the extension word `0x4294` executes as `clr.l (a4)`.
+So the word serves two masters: a dead `cmpi.w` (flags unused) on the
+store path and the `*out = 0` clear on the miss path.  Compiler
+code-sharing trick; reproduced verbatim in `source/fwfiltertype.s`
+with raw `.short` emits and a label at +2.
