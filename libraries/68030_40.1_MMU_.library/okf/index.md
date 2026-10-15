@@ -43,6 +43,22 @@ oracle):
 - 37 functab entries: four standard vectors, ~29 dead stubs
   raising Alert(0x3f000001), FPUControl at -222.
 
+## Status
+
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — `source/68030_h0.s`
+(hunk0 .text + hunk1 .data, single file) assembles and links to
+md5 `0f616819707961d57780a65b11d1815a`, matching
+`binary/68030_40.1(MMU).library` byte-for-byte.  `source/fixup.py`
+splices the original RELOC32 tails (the shipped reloc order is the
+multi-object link order, not GNU ld's ascending order); hunk bodies
+were already byte-identical pre-splice.  `make` builds + verifies;
+`make cmodel` retains the C reconstruction.  `work/oracle.py`
+(machine68k M68030 harness) reports identical orig/rebuild logs over
+the full matrix: init at attn 0x04/0x14 x mmu 0/1, all patched-vector
+calls (GetMsg 0/1/2-elt, BeginIO cmd gating, CacheClearU trampolines,
+ColdReboot supervisor path running pmove tc/tt0/tt1 + reset), and the
+eight fail cases.
+
 ## Contents
 
 - `functions/vectors.md` — LVO map, init flow, patch tables,
