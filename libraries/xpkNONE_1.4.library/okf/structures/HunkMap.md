@@ -1,13 +1,13 @@
 ---
 type: Structure
 title: HunkMap
-description: Single code hunk, 0x288 bytes, 23 RELOC32 entries.
+description: Single code hunk, 0x288 bytes, 28 RELOC32 entries.
 timestamp: 2026-10-10T19:45:00Z
 ---
 
 # Hunk map
 
-One code hunk (HUNK_CODE 0xa2 longs = 0x288 bytes) + HUNK_RELOC32 +
+One code hunk (HUNK_CODE 0xa2 longs = 0x288 bytes) + HUNK_RELOC32 (28 entries, scrambled descending order) +
 HUNK_END. No data/bss hunks.
 
 | .text off | content |

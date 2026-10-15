@@ -22,3 +22,20 @@ title: Work journal
 - Documented findings: missing $VER cookie, functab-before-romtag
   layout, unconditional DELEXP, dead init hook, XpkInfoVersion=0,
   -1 entry stub.
+
+## 2026-10-12
+
+- Rewrote the reconstruction as verbatim assembly
+  (`source/xpkNONE_v.s`), preserving gcc-canonicalisation traps as raw
+  emits where needed; `fixup.py` rebuilds the original's scrambled
+  28-entry RELOC32 tail (GNU ld emits ascending).
+- `make` output is **byte-identical** to `binary/xpkNONE_1.4.library`
+  (md5 `2e98fd5760fb158d697c3c183eb16827`).
+- `work/oracle.py` (machine68k, adapted from xpkNONE_1.2): identical
+  traces original vs rebuild — init (dead bsr-to-null path), open x2,
+  reserved stubs, XpkInfo island fields, -36 -> -17
+  (XPKERR_EXPANSION), CopyMem passthrough, deferred + real expunge
+  (flag correctly set on the lib base, unlike 1.2's exec-base bug).
+- Corrected an earlier theory: reloc entries at 0x1b6/0x1ba/0x1be are
+  the XpkInfo name/packer/desc pointers — they do NOT land inside the
+  idstring; no load-time string corruption exists.

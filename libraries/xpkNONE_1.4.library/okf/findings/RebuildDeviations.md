@@ -6,15 +6,16 @@ timestamp: 2026-10-10T19:45:00Z
 
 # Rebuild deviations
 
-The rebuilt `source/xpkNONE.library` is not byte-identical (expected):
+**None** — the verbatim assembly rebuild (`xpkNONE_v.s`) is
+byte-identical to the shipped binary, including:
 
-- Code hunk 0x260 bytes vs original 0x288 (gcc codegen).
-- Function code order differs; function-table *order* matches.
-- The dead `bsr` to the null stub in LibInit is folded away by gcc
-  (documented in InitStubCall.md).
-- XpksUnpackChunk avoids the original's redundant InLen reload.
+- the scrambled, non-monotonic 28-entry RELOC32 tail (island pointers
+  0x1ea..0x1b6 first, then functab/RomTag/InitTable/datatab entries
+  interleaved) — `fixup.py` rewrites GNU ld's ascending list verbatim;
+- rt_EndSkip = +0x9e pointing at the name string, mid-resident;
+- the dead `bsr` to the null stub in LibInit (InitStubCall.md);
+- the missing `$VER:` cookie and `\r\n` line ending.
 
-Byte-identical through the whole header region (entry opcode, 10-entry
-function-table shape, padding, all InitStruct bytes, InitTable fields,
-RomTag fields, name and id strings including the missing `$VER:`
-cookie and the `\r\n` line ending).
+Historical note: the earlier C model (`make cmodel`) was identical
+only through the header region (0x260-byte hunk, gcc codegen order,
+folded dead call).

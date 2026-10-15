@@ -14,18 +14,21 @@ timestamp: 2026-10-10T19:45:00Z
 
 `binary/xpkNONE_1.4.library` — sha256
 `732b07e66d11cf507b4c5884ad93057fabdb936666117e69bb59233747ad1392`, 812
-bytes, one code hunk (0x288 bytes, 23 RELOC32 entries). IdString:
+bytes, one code hunk (0x288 bytes, 28 RELOC32 entries). IdString:
 `xpkNONE 1.4 (19.07.1998)\r\n` — **no `$VER:` cookie**.
 
 ## Status
 
-Fully reconstructed in C. `source/` builds with m68k-amigaos-gcc into a
-single-hunk `.library` whose entry opcode, function-table order/count,
-padding, InitStruct bytes, InitTable, RomTag fields and name/id strings
-are byte-identical to the original through the whole header region
-(code-hunk offsets differ). All six sublibrary LVOs resolved against
-the authoritative `xpksub_lib.i` from the Aminet `xpk_Develop`
-archive.
+**Byte-identical and runtime-identical.** `source/xpkNONE_v.s` is a
+verbatim 68k assembly reconstruction; `make` (m68k-amigaos-gcc +
+`fixup.py`, which rewrites the scrambled 28-entry RELOC32 tail in the
+original's descending order) produces a `cmp`-clean copy of the shipped
+binary (md5 `2e98fd5760fb158d697c3c183eb16827`). `work/oracle.py`
+(machine68k) gives identical traces for init/open/close, all stub
+vectors, XpksPackerInfo layout, -36 -> -17, the CopyMem passthrough,
+and deferred + real expunge. The earlier C reconstruction is retained
+and still builds via `make cmodel`. All six sublibrary LVOs resolved
+against `xpksub_lib.i` from the Aminet `xpk_Develop` archive.
 
 ## Contents
 
