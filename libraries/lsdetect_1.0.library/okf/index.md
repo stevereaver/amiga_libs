@@ -32,7 +32,11 @@ plus colour 0 while the game owns the display.
 
 ## Status
 
-Reconstructed in C (`source/`), absolute vectors, single pass.
+BYTE-IDENTICAL - verbatim asm `source/lsdetect_h0.s` + `fixup.py`
+(17-entry RELOC32 splice): `cmp`-equal to the shipped binary (md5
+`84bba53e40d3b7dce80ca5772cab3aa3`).  Semantic
+C model kept as `cmodel` target.  machine68k oracle identical over
+entry/init (4 support libraries opened)/all 7 vectors/expunge.
 `make` produces `lsdetect.library`.
 
 ## Contents
