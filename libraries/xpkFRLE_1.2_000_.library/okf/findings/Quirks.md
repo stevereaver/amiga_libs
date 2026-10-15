@@ -14,8 +14,11 @@ description: Defects and oddities of the shipped V1.2 binary.
    is clamped to the real end (a2), so output is correct;
    but the CAPACITY CHECK uses the inflated scanned length,
    so a tail literal almost always returns -17 even though
-   a valid encoding exists.  Reconstruction models the OOB
-   scan deterministically as running to the cap.
+   a valid encoding exists (oracle: a pure-literal input
+   always returns -17).  The C model (`make cmodel`) models
+   the OOB scan deterministically as running to the cap; the
+   byte-verbatim asm rebuild reproduces the OOB reads for
+   real.
 
 2. **>128-byte literal tail -> corrupt stream.**  If a tail
    literal longer than 128 slips past the (borderline)
@@ -35,9 +38,10 @@ description: Defects and oddities of the shipped V1.2 binary.
    touch the first three arg-block longs (`moveml a0@`).
 
 5. **InLen==0 -> -17 after OOB reads.**  Deterministic -17
-   in the reconstruction; the shipped scan reads ~2-125
-   bytes OOB first (and on a garbage-equal byte can emit a
-   corrupt stream instead -- nondeterministic).
+   in the C model and under the (zeroed-memory) oracle; the
+   shipped scan reads ~2-125 bytes OOB first (and on a
+   garbage-equal byte can emit a corrupt stream instead --
+   nondeterministic).
 
 6. **Entry stub returns 0 and is triple-purpose** (module
    entry, null vector via negative functab offsets, and the
