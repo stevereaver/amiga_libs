@@ -383,5 +383,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `Garshnelib_39.1.library` | 'Garshnelib 39.1' — game-support lib; degenerate AUTOINIT resident (rt_Init->RomTag), manual initfn + forward functab, 16 entries. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-338) |
 | `xpkSHR3_3.0_060_.library` | XPK 'SHR3' Shrink compressor sublib (060 build); 060 mulu.l ops expanded to mulu.w pairs, same wire format + vectors as siblings. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-339) |
 | `dsp3210_7.0.library` | 'dsp3210 7.0' — DSP coprocessor lib; COLDSTART, 15 word-offset vectors, new container cookie 0x00fc2011 + keyed-node list semantics. Byte-identical asm + fixup; oracle identical (AMIGALIBS-340) |
+| `calculus_37.3.library` | 'calculus 37.3' — math helper lib; COLDSTART SAS/C a4-frame, 5-vector abs functab. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-341) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
