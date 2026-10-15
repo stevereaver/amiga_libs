@@ -1,18 +1,31 @@
 ---
 type: Finding
 title: Reconstruction deltas
-description: Differences between the rebuilt library and the shipped binary.
+description: Rebuilt library vs shipped binary -- now byte-identical.
 ---
 
 # Reconstruction deltas
 
-- Shipped `.text` hunk: 0x1c8 bytes; rebuilt hunk is larger
-  (GCC 68000 codegen is more verbose than the original compiler: extra
-  register saves, `movea.l 4.w,a6` reloads, duplicated code tails).
-- Function order inside the hunk differs; the vector table maps LVOs
-  correctly and all FPU instruction sequences are byte-identical to the
-  shipped sequences (verified via objdump of both binaries).
-- Original code shares tails: e.g. `IEEESPCmp`/`IEEESPTst` share the
-  -1/0/+1 epilogues, and `IEEESPPow` branches into the reserved
-  moveq#0/rts vector. The reconstruction duplicates equivalent tails.
-- Strings/InitStruct bytes/RomTag fields are identical.
+None at the byte level: `source/mathieeesingbas.s` + `fixup.py` produce a
+file identical to the shipped binary (md5 3e7f4b125c23ac45849af05ebcd587ce).
+
+- Single `.text` hunk of 0x1c8 bytes transcribed verbatim: RomTag,
+  AUTOINIT table, word-offset functab, InitStruct stream, init/Open/
+  Close/Expunge stubs, strings, and all 12 IEEE-single entry points.
+- The only post-processing is the reloc tail: GNU ld emits a standard
+  HUNK_RELOC32 (0x3ec) record for the 8 absolute pointer fields, while
+  the original was linked with the compact 0x3f7 record with 16-bit
+  offsets in descending order (see [drel_tail.md](drel_tail.md)).
+- The old multi-object C reconstruction is kept as `make cmodel`
+  (functionally equivalent, not byte-identical).
+
+Observed runtime semantics (machine68k oracle, `work/oracle.py`):
+
+- `IEEESPCmp`/`IEEESPTst` share tails; `Cmp(d0,0)` branches into the Tst
+  body; `Cmp` uses integer sign-magnitude tricks (incl. a `bset #31,d0`
+  that turns +0 into 0x80000000 before the unsigned compare).
+- `IEEESPAbs`/`IEEESPNeg` are pure integer ops (`bclr`/`bchg #31,d0`).
+- `IEEESPFloor`/`IEEESPCeil` = `fintrz.s` + `fcmp.s` + FBcc +
+  conditional `fsub/fadd #1.0`.
+- Expunge unlinks the node inline (no exec.Remove call) and jumps into
+  the shared free tail also used by the no-FPU init path.

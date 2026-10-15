@@ -15,9 +15,9 @@ Standard `struct Library`, dataSize = 0x3c (InitTable longword 0).
 | 0x0e | lib_Flags | InitStruct sets 0x06; bit 3 = LIBF_DELEXP |
 | 0x10 | lib_NegSize | bytes of jump-vector region before base |
 | 0x12 | lib_PosSize | bytes of base itself |
-| 0x14 | lib_Version | 45 |
+| 0x14 | lib_Version | never written by datatab -> stays 0 (RomTag rt_Version=45 only) |
 | 0x16 | lib_Revision | 881 (0x0371) via InitStruct word |
-| 0x18 | lib_IdString | "MSB 10.881" |
+| 0x18 | lib_IdString | never written by datatab -> stays 0 (rt_IdString is only in the RomTag) |
 | 0x20 | lib_OpenCnt | word, inc/dec in Open/Close |
 
 ## InitStruct byte stream (datatab)

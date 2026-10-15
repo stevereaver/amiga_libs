@@ -1,16 +1,19 @@
 ---
 type: Finding
 title: Edge-case encoding notes
-description: Pow / conversion / shared-tail edge cases in mathieeesingbas.library.
+description: Conversion / shared-tail edge cases in mathieeesingbas.library.
 ---
 
 # Edge cases
 
-- Pow NaN encoding: `moveq #-1,d0; bchg d0,d0` yields 0x7fffffff
-  (a quiet NaN bit pattern), then (double lib) `moveq #-1,d1` for the
-  low word. Not IEEE-canonical NaN handling but deterministic.
-- Pow with arg<0 only supports integral exponents; it computes
-  |arg|^exp via log2/2^x and applies the sign when trunc(exp) is odd
-  (tested with `fmod exp,2`).
-- The reserved LVO (-24) body `moveq #0,d0; rts` doubles as a
-  return-zero branch target inside Pow's arg==0,exp>0 path.
+- There is NO Pow in this library (that is mathieeesingtrans); an
+  earlier draft of this note imported trans-library detail.  The
+  reserved LVO -24 body `moveq #0,d0; rts` doubles as the common
+  "return 0" tail for Close and the deferred-Expunge path.
+- IEEESPCmp quirk: when d1 < 0 and d0 == +0, it first `bset #31,d0`
+  turning +0 into the bit pattern 0x80000000 so the following unsigned
+  `sub.l d1,d0` compare orders -0/-small values correctly.
+- IEEESPTst distinguishes -0.0 (0x80000000 -> 0) from negatives via the
+  `add.l d0,d0` carry + zero check.
+- IEEESPFloor/Ceil on NaN take the unordered FBcc branch and return the
+  NaN unchanged (verified by oracle: 0x7fc00001 in -> 0x7fc00001 out).

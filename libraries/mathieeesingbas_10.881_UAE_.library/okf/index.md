@@ -18,19 +18,18 @@ RomTag version 45 (0x2d), NT_LIBRARY, RTF_AUTOINIT; single code hunk.
 - UAE twin: `../mathieeesingbas_10.881.library` is **byte-for-byte identical** to this binary (same SHA256/MD5)
 - Original MD5: `3e7f4b125c23ac45849af05ebcd587ce`
 - Reconstruction: `make` builds `source/mathieeesingbas.s` (verbatim
-  transcription shared with the non-UAE twin) + `fixup.py` DREL16
-  rewrite — byte-identical. `make cmodel` keeps the C+asm model.
-- Oracle: `work/oracle.py` (line-F 68881 shim); traces identical
+  transcription) + `fixup.py` which rewrites the compact 0x3f7 DREL
+  reloc tail GNU ld cannot emit — BYTE-IDENTICAL to the shipped binary
+  (md5 `3e7f4b125c23ac45849af05ebcd587ce`). `make cmodel` keeps the old
+  C+asm model as documentation.
+- Oracle: `work/oracle.py` (line-F 68881 soft-FPU shim); traces identical
   original vs rebuild.
 - No-FPU path: none -- on missing AFF_68881 the init routine frees the freshly allocated base and fails the resident init (returns 0)
 - FPCR written by Open: 0x80 (conditional)
-- Reconstruction: `source/` builds a valid HUNK `.library` via the two-pass
-  word-offset AUTOINIT table (`genfunctab.py`). Semantics verified against
-  the disassembly; layout/size differ from the shipped binary (see findings).
 
 ## Categories
 
-- [functions/](functions/index.md) — all LVO entries (-6 .. -52)
+- [functions/](functions/index.md) — all LVO entries (-6 .. -96)
 - [structures/](structures/index.md) — library base, AUTOINIT tables, jump vectors
 - [algorithms/](algorithms/index.md) — FPU evaluation schemes (Pow, Floor/Ceil)
 - [findings/](findings/index.md) — quirks, open questions, reconstruction deltas

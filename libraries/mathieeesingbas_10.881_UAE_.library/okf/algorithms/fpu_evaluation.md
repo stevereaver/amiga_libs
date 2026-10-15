@@ -6,18 +6,17 @@ description: How mathieeesingbas.library maps the public API onto 68881 instruct
 
 # FPU evaluation schemes
 
-All routines are thin 68881 wrappers -- no polynomial/rational
-approximations; the FPU microcode does the work.
+This library only implements the 12 entry points of the singbas FD
+(Fix/Flt/Cmp/Tst/Abs/Neg/Add/Sub/Mul/Div/Floor/Ceil) -- there is no Pow
+or transcendentals here (those live in mathieeesingtrans.library).
 
-- Unary ops: load operand (fmove.s / fmove.d), single F-line op,
-  store result. Ops used: fatan, fsin, fcos, ftan, fsincos, fsinh,
-  fcosh, ftanh, fetox, flogn, flog10, fsqrt, fasin, facos, fadd,
-  fsub, fmul, fdiv (subset per library).
-- Pow: `2^(exp * log2(arg))` via flog2/fmul/ftwotox; negative-arg path
-  adds fintrz + fcmp (integrality test) and fmod-2 for the sign.
-- Floor/Ceil: `fintrz(x)` then fcmp against x; adjust by -1/+1
-  (constant `fsub.s #1` / `fadd.s #1`) when trunc is on the wrong side.
-- Compare/Test: pure integer sign-magnitude compares on the IEEE bit
-  patterns -- no FPU ops at all.
-- Fix/Flt: fmove.l/fmove.s/fmove.d register transfers (rounding per
-  FPCR as programmed by Open: 0x80 (conditional)).
+- Add/Sub/Mul/Div: `fmove.s d0,fp0`; `f<op>.s d1,fp0`;
+  `fmove.s fp0,d0` -- pure 68881 three-instruction wrappers.
+- Floor/Ceil: `fintrz.s d0,fp0`; `fcmp.s d0,fp0`; FBcc skips or takes
+  `fsub.s #1.0` / `fadd.s #1.0` so trunc(x) becomes floor/ceil.
+- Fix/Flt: `fmove.s`/`fmove.l` register transfers; Fix's output rounding
+  follows the FPCR mode byte (Open conditionally writes 0x80 =
+  double-precision + round-to-nearest).
+- Tst/Cmp/Abs/Neg: NO FPU ops at all -- integer sign/magnitude tricks
+  on the IEEE bit patterns (add.l carry for sign, bclr/bchg bit 31).
+  `Cmp(d0,0)` branches into the Tst body (shared tail).

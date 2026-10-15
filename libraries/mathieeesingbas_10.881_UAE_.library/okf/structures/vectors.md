@@ -7,8 +7,8 @@ description: NegSize vector region built by AUTOINIT for mathieeesingbas.library
 # Jump vectors (mathieeesingbas.library)
 
 AUTOINIT expands the word-offset table into the standard negative-offset
-jump region below the base: `jmp abs.l` (or PC-relative jump) at -6, -12,
--18, -24, then -30..-52 for the 12 public functions.
+jump region below the base: `jmp abs.l` at -6, -12,
+-18, -24, then -30..-96 for the 12 public functions.
 
 Resolved LVOs (canonical NDK fd13 file):
 
