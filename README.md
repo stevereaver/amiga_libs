@@ -365,4 +365,5 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `wbstart_2.0.library` | 'wbstart 2.0 (13.3.96)' — Workbench launcher; COLDSTART, DATA-hunk alloc/body quirk, WBStart handler via CreateNewProc; same vector skeleton as 2.2. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-319) |
 | `muilowlevel_19.9.library` | 'muilowlevel 19.9' (MUI/Stuntz) — COLDSTART, MakeLibrary(dsize 0x54)+AddLibrary, 33 vectors incl. 0-hole, BSS globals. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-320) |
 | `dsp3210_5.0.library` | 'dsp3210 5.0 (4.8.2021)' — DSP d32 blob lib; COLDSTART, word-offset functab, 14 vectors; odd-renumbered error codes vs 4.0, -60 returns 0 on invalid. Byte-identical asm + fixup; oracle identical (AMIGALIBS-321) |
+| `mathtrans_31.2_WB1.1_.library` | 'mathtrans 31.2' WB1.1 transcendental math — 19-hunk per-function build (incl. 3 empty hunks), AUTOINIT, 21 vectors, MC68343 FP firmware. Byte-identical raw asm + resplit fixup; oracle identical (AMIGALIBS-322) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
