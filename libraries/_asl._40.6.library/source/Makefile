@@ -1,10 +1,8 @@
-# Makefile for _asl.library 40.6 C reconstruction
+# Makefile for _asl.library 40.6 reconstruction.
 #
-# Two-pass link: pass 1 uses a size-correct dummy function table so
-# nm gives the final .text addresses; genfunctab.py then emits
-# functab.s with word offsets relative to _functab, and pass 2 links
-# the real table.
-
+# `make`        -> byte-identical rebuild from _asl.s
+# `make cmodel` -> earlier multi-file model (functionally equivalent,
+#                  not byte-identical; kept as semantic documentation)
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
@@ -17,38 +15,32 @@ TARGET  = _asl.library
 
 all: $(TARGET)
 
+$(TARGET): _asl.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $(TARGET) _asl.o
+
+_asl.o: _asl.s
+	$(CC) $(ASFLAGS) -c -o $@ _asl.s
+
+# --- earlier C model ---
+cmodel: asl_lib.o functab.o datatab.o asl.o asl_relay.o endmodule.o
+	$(CC) $(LDFLAGS) -o _asl-c.library asl_lib.o functab.o datatab.o \
+		asl.o asl_relay.o endmodule.o
+
 dummy.library: asl_lib.o functab_stub.o datatab.o asl.o asl_relay.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ asl_lib.o functab_stub.o datatab.o asl.o asl_relay.o endmodule.o
+	$(CC) $(LDFLAGS) -o $@ asl_lib.o functab_stub.o datatab.o \
+		asl.o asl_relay.o endmodule.o
 
 functab.s: dummy.library genfunctab.py
 	$(NM) dummy.library > dummy.nm
 	python3 genfunctab.py dummy.nm > $@
 
-functab.o: functab.s
-	$(CC) $(ASFLAGS) -c -o $@ functab.s
-
-$(TARGET): asl_lib.o functab.o datatab.o asl.o asl_relay.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ asl_lib.o functab.o datatab.o asl.o asl_relay.o endmodule.o
-
-asl_lib.o: asl_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ asl_lib.s
-
-functab_stub.o: functab_stub.s
-	$(CC) $(ASFLAGS) -c -o $@ functab_stub.s
-
-datatab.o: datatab.s
-	$(CC) $(ASFLAGS) -c -o $@ datatab.s
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
 
 asl.o: asl.c
 	$(CC) $(CFLAGS) -c -o $@ asl.c
 
-asl_relay.o: asl_relay.s
-	$(CC) $(ASFLAGS) -c -o $@ asl_relay.s
-
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
-
 clean:
-	rm -f *.o *.nm functab.s dummy.library $(TARGET)
+	rm -f *.o *.nm functab.s dummy.library _asl-c.library $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean

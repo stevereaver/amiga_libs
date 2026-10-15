@@ -24,7 +24,12 @@ FreeFileRequest, RequestFile, AllocAslRequest, FreeAslRequest,
 AslRequest).  The directory name uses `_asl.`/`_asl.` rather than
 the conventional `asl_` prefix.
 
-Reconstructed in `source/`; `make` produces a valid HUNK `.library`.
+Reconstructed byte-identically in `source/_asl.s` (asm; MD5
+`7aac04fa4d5acb542565cf8f60faa68c`); the earlier multi-file model
+(`asl.c`, `asl_lib.s`, `asl_relay.s`, `datatab.s`, two-pass
+`functab`) is kept as semantic documentation via `make cmodel`.
+Runtime oracle `work/oracle.py` verifies identical behaviour under
+machine68k.
 
 ## Categories
 

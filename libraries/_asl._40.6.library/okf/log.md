@@ -20,3 +20,16 @@ description: Chronological journal of analysis sessions for this library. Newest
   C lifecycle, asl_relay.s relay stubs, two-pass functab.
   `make` → valid HUNK library; table layout lands on identical
   offsets.
+
+## 2026-10-13
+
+- Replaced the multi-file model with `source/_asl.s` — verbatim asm
+  (word-mode functab inline, InitStruct datatab, relay tail with
+  raw `jsr (a6,d1.w)` emit).  `make` → byte-identical:
+  MD5 `7aac04fa4d5acb542565cf8f60faa68c`.
+- `work/oracle.py` (machine68k): InitStruct + word-functab decode,
+  opener stub at lib+0x22, fake asl.library base with trapped LVO
+  slots -30..-60, exec Remove/FreeMem/CloseLibrary stubs.
+  Exercises stub, Open x2, -24 reserved, all six relays + opener
+  fail path (confirms CloseLibrary(SysBase) bug), deferred + real
+  expunge.  orig vs rebuild: RUNTIME-IDENTICAL.
