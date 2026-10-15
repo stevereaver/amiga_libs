@@ -1,7 +1,7 @@
 ---
 type: Library
 title: mathieeesingbas_10.881.library
-description: Kickstart 1.x IEEE single math library (68881/68882 FPU), reconstructed in C+asm.
+description: Kickstart 1.x IEEE single math library (68881/68882 FPU), byte-identical asm reconstruction.
 tags: [math, ieee, 68881, kickstart-1.x]
 ---
 
@@ -15,7 +15,13 @@ RomTag version 45 (0x2d), NT_LIBRARY, RTF_AUTOINIT; single code hunk.
 
 - Original SHA256: `2efea2bb5f27557e846bb0101b00a013f4b66370002f8bfd449247ff5e287c10`
 - Original size: 520 bytes, single `.text` hunk of 0x1c8 bytes
-- UAE twin: `../mathieeesingbas_10.881.library` is **byte-for-byte identical** to this binary (same SHA256)
+- UAE twin: `../mathieeesingbas_10.881.library` is **byte-for-byte identical** to this binary (same SHA256/MD5)
+- Original MD5: `3e7f4b125c23ac45849af05ebcd587ce`
+- Reconstruction: `make` builds `source/mathieeesingbas.s` (verbatim
+  transcription shared with the non-UAE twin) + `fixup.py` DREL16
+  rewrite — byte-identical. `make cmodel` keeps the C+asm model.
+- Oracle: `work/oracle.py` (line-F 68881 shim); traces identical
+  original vs rebuild.
 - No-FPU path: none -- on missing AFF_68881 the init routine frees the freshly allocated base and fails the resident init (returns 0)
 - FPCR written by Open: 0x80 (conditional)
 - Reconstruction: `source/` builds a valid HUNK `.library` via the two-pass

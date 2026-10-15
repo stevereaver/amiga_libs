@@ -22,3 +22,12 @@ description: Chronological journal of analysis sessions for this library. Newest
 - `make` produces a valid HUNK .library; FPU instruction streams verified
   byte-identical against the shipped disassembly; framework code is
   semantically equivalent but larger (see findings).
+
+## 2026-11-20
+
+- Binary is byte-for-byte identical to the non-UAE twin (same md5
+  `3e7f4b125c23ac45849af05ebcd587ce`), so the verbatim asm source
+  and fixup.py were shared across. `make` now produces the
+  byte-identical rebuild; `make cmodel` keeps the C model.
+- Oracle run: traces identical original vs rebuild (184-line log).
+- Status: DONE.
