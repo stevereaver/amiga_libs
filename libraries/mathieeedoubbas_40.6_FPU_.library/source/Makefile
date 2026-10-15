@@ -1,23 +1,27 @@
 # Makefile for mathieeedoubbas.library 40.6 (68881/82) reconstruction.
 #
-# Single link pass: the AUTOINIT function table is absolute
-# longwords.
+# `make`        -> byte-identical rebuild from mdb406_v.s (verbatim asm).
+# `make cmodel` -> earlier C model (kept for reference, NOT identical).
 
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68020 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
           -Wall -Wno-unused-parameter
-ASFLAGS = -m68020 -m68881
+ASFLAGS = -m68020
 LDFLAGS = -nostdlib -nostartfiles
 
 TARGET  = mathieeedoubbas.library
 
 all: $(TARGET)
 
-OBJS = mathieeedoubbas_lib.o datatab.o mathieeedoubbas.o math.o endmodule.o
+$(TARGET): mdb406_v.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ mdb406_v.o
 
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+mdb406_v.o: mdb406_v.s
+	$(CC) $(ASFLAGS) -c -o $@ mdb406_v.s
+
+cmodel: mathieeedoubbas_lib.o datatab.o mathieeedoubbas.o math.o endmodule.o
+	$(CC) $(LDFLAGS) -o mathieeedoubbas_c.library mathieeedoubbas_lib.o datatab.o mathieeedoubbas.o math.o endmodule.o
 
 mathieeedoubbas_lib.o: mathieeedoubbas_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ $<
@@ -37,4 +41,4 @@ mathieeedoubbas.o: mathieeedoubbas.c mdbbase.h
 clean:
 	rm -f *.o $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean

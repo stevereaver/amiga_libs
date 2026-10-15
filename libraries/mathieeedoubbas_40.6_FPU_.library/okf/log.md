@@ -6,6 +6,30 @@ description: Chronological journal of analysis sessions. Newest first.
 
 # Log
 
+## 2026-10-15
+- Rewrote the reconstruction as a single verbatim asm file,
+  `source/mdb406_v.s` (same approach as the singtrans
+  mst406_v.s): RomTag/InitTable/functab/datatab emitted in
+  module order, every F-line word as raw `.short`, literal-0
+  functab slot left for RELOC32.  `make` now links
+  `-nostdlib -Wl,-s` to a **byte-identical** copy of the
+  shipped binary (md5 0b7251cd2ae0bdfe0719761b54a6eb0b);
+  the old C model survives as `make cmodel`.
+- New `work/oracle.py` (machine68k + python 68881 emulator,
+  double-precision stack EAs `(sp)+/-(sp)/(sp)` resolved via
+  USP): init gate matrix, open x2 (FPCR becomes 0x90 — Open
+  writes `moveq #72; add.l d0,d0; fmove.l d0,fpcr`), all 12
+  math vectors over edge inputs incl. NaN/inf/-0 and the
+  four FPCR rounding modes for Fix, deferred + real expunge.
+  Original vs rebuild logs diff clean -> runtime-identical.
+- Correction: Open is NOT the plain open stub — it programs
+  the FPCR to double-precision/round-toward-zero, so
+  `IEEEDPFix` truncates for any caller that went through
+  Open (see FixRounding).
+- RT_ENDSKIP = RT_INIT = hunk+0x7e, pointing at the
+  InitTable itself — mid-module quirk shared with the
+  sibling 40.6 builds.
+
 ## 2026-10-10
 - Parsed 896-byte single-CODE-hunk module: entry `moveq #0,d0/
   rts`, RomTag (AUTOINIT, ver 40), InitTable (dataSize 0x2c,

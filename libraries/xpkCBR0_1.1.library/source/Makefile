@@ -28,11 +28,13 @@ xpkCBR0_h0.o: xpkCBR0_h0.s
 	$(CC) $(ASFLAGS) -c -o $@ $<
 
 # --- reference C model (not byte-identical) ----------------------
-cmodel: xpkCBR0_lib.o functab.o xpkCBR0.o
-	$(CC) -nostdlib -nostartfiles -o xpkCBR0-c.library xpkCBR0_lib.o functab.o xpkCBR0.o
+cmodel: xpkCBR0_lib.o functab.o xpkCBR0.o endmodule.o
+	$(CC) -nostdlib -nostartfiles -o xpkCBR0-c.library \
+		xpkCBR0_lib.o functab.o xpkCBR0.o endmodule.o
 
-dummy.library: xpkCBR0_lib.o functab_stub.o xpkCBR0.o
-	$(CC) -nostdlib -nostartfiles -o $@ xpkCBR0_lib.o functab_stub.o xpkCBR0.o
+dummy.library: xpkCBR0_lib.o functab_stub.o xpkCBR0.o endmodule.o
+	$(CC) -nostdlib -nostartfiles -o $@ \
+		xpkCBR0_lib.o functab_stub.o xpkCBR0.o endmodule.o
 
 functab.s: dummy.library genfunctab.py
 	$(NM) dummy.library > dummy.nm

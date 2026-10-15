@@ -27,6 +27,7 @@ IEEE->FFP output conversion (the public SPFieee routine).
 ## Binary facts
 
 - sha256 `37cc1054478cd30556d5f49b3dc082469368ee94fc46ede2ba2acb84a525767b`, 912 bytes
+- md5 `b4eb6ee26278f6c81f0e26d71365f258`
 - single CODE hunk 0x2e0 bytes
 - RomTag: RTF_AUTOINIT, RT_VERSION 40, NT_LIBRARY, pri 0
 - RT_ENDSKIP points at the InitTable (hunk+0x72), not module end
@@ -42,11 +43,16 @@ IEEE->FFP output conversion (the public SPFieee routine).
 
 ## Status
 
-FULL — reconstructed (`source/`): C framework + verbatim
-68881 vectors and FFP<->IEEE converters in math.s;
-m68k-amigaos-gcc -m68020 -m68881, single-pass link.  All FPU
-encodings and branch structures verified against the original
-disassembly; converters round-trip-verified on a host model.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — `make` assembles
+`source/mt406_v.s` (verbatim asm, raw .short for all F-line
+words) and links `-nostdlib -Wl,-s` to the shipped 912-byte
+module (md5 `b4eb6ee26278f6c81f0e26d71365f258`); the earlier
+C framework stays buildable as `make cmodel`.  machine68k
+oracle (`work/oracle.py`, python 68881 emulation through the
+line-F vector) runs identical logs on the original and the
+rebuild — init gate matrix, open/close/expunge lifecycle,
+all 21 vectors incl. FFP edge inputs, Pow sign/parity paths
+and the SPFieee error conventions.
 
 ## Contents
 

@@ -1,23 +1,27 @@
 # Makefile for mathtrans.library 40.6 (68881/82) reconstruction.
 #
-# Single link pass: the AUTOINIT function table is absolute
-# longwords.
+# `make`        -> byte-identical rebuild from mt406_v.s (verbatim asm).
+# `make cmodel` -> earlier C model (kept for reference, NOT identical).
 
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68020 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
           -Wall -Wno-unused-parameter
-ASFLAGS = -m68020 -m68881
+ASFLAGS = -m68020
 LDFLAGS = -nostdlib -nostartfiles
 
 TARGET  = mathtrans.library
 
 all: $(TARGET)
 
-OBJS = mathtrans_lib.o datatab.o mathtrans.o math.o endmodule.o
+$(TARGET): mt406_v.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ mt406_v.o
 
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+mt406_v.o: mt406_v.s
+	$(CC) $(ASFLAGS) -c -o $@ mt406_v.s
+
+cmodel: mathtrans_lib.o datatab.o mathtrans.o math.o endmodule.o
+	$(CC) $(LDFLAGS) -o mathtrans_c.library mathtrans_lib.o datatab.o mathtrans.o math.o endmodule.o
 
 mathtrans_lib.o: mathtrans_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ $<
@@ -37,4 +41,4 @@ mathtrans.o: mathtrans.c mtbase.h
 clean:
 	rm -f *.o $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean

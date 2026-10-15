@@ -31,10 +31,17 @@ ExtFunc all point at a `moveq #0,d0` stub).
 
 ## Status
 
-FULL — reconstructed C source builds a valid hunk library
-(m68k-amigaos-gcc -m68000, two-pass generated functab).
-Codec round-trip verified on 20,000 randomized inputs.
-Two latent encoder defects documented and filed in Plane.
+Byte-identical.  `make` assembles `source/xpkFRLE_h0.s`
+(verbatim asm incl. the raw-emitted noncanonical `c23c`/`923c`
+AND.B/SUB.B-with-immediate encodings and the word `6000 0098`
+bra), `fixup.py` rewrites the RELOC32 tail to the original
+descending order.  md5 `45381000923f1a67ca73aad8526201ff`.
+`make cmodel` builds the earlier C reconstruction.
+Runtime-verified: `work/oracle.py` (machine68k) logs identical
+for original vs rebuild across init, Open/Close, deferred+real
+expunge, all dead vectors, XpkInfo island, pack/unpack
+round-trips, repeat segmentation (129+129+40), the 128-literal
+cap edge, zero-length inputs, and the OutBufLen (-17) overflow.
 
 ## Contents
 

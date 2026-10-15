@@ -18,6 +18,13 @@ timestamp: 2026-10-10T23:00:00Z
   bit patterns with +0==-0 handling and no NaN semantics; Tst is
   `add.l d0,d0` carry/magnitude; Abs `bclr #31`, Neg `bchg #31`
   (produces -0.0).
+- **Open programs the FPCR**: `moveq #72/add.l d0,d0` ->
+  `fmove.l d0,fpcr` sets 0x90 (double precision,
+  round-to-zero) on every Open — the only sibling that does.
+- **RT_ENDSKIP mid-module**: RomTag's rt_EndSkip == rt_Init ==
+  hunk+0x7e, pointing at the InitTable itself rather than the
+  end of the resident copy (same family trait as
+  singtrans/mathtrans 40.6).
 - **68020+68881 gate**: init fails without both — the code is
   68000-clean except this check (same quirk as singtrans 40.6).
 - **ExtFunc → loader entry**: LVO -24 points at the module

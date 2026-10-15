@@ -12,3 +12,7 @@ timestamp: 2026-10-10T22:45:00Z
   invalid n=1 emit at input tail, 1-byte headroom check.
 - [Quirks](Quirks.md) — entry returns -1, no $VER: cookie, no
   stream terminator, 2% ratio claim.
+- [RebuildDelta](RebuildDelta.md) — byte-identical rebuild
+  notes: descending RELOC32 tail, noncanonical AND/SUB-with-
+  immediate encodings, asymmetric decoder biases, OutLen
+  store tricks.

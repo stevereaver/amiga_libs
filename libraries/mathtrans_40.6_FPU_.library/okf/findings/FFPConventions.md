@@ -22,5 +22,7 @@ IEEE +-inf / huge      -> 0xFFFFFFFF (V set)
 ```
 
 Every math vector is `SPTieee(arg) -> one 68881 single op ->
-fmoves + SPFieee(result)`.  SPSincos converts the cosine
-first (stored through d1) and returns the sine in d0.
+fmoves + SPFieee(result)`.  SPSincos takes the cosine result
+pointer in **d1** (`movea.l d1,a0`, fd `(cosResult,parm)(d1,d0)`
+convention): it converts fp0 (cosine) first and stores it at
+`*a0`, then returns the fp1 sine converted in d0.

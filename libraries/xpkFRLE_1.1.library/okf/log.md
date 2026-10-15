@@ -26,3 +26,19 @@ description: Chronological journal of analysis sessions. Newest first.
 - Reconstructed in C (bounded reads, 128-byte literal cap — same
   decoded output on all inputs), built, 20k round-trip test pass.
 - Filed inconsistency card AMIGALIBS-23.
+
+## 2026-10-15
+- Byte-verbatim asm reconstruction (`source/xpkFRLE_h0.s`) +
+  descending-RELOC32 fixup.py; `cmp` byte-identical
+  (md5 45381000923f1a67ca73aad8526201ff).
+- machine68k oracle (work/oracle.py): identical logs orig vs
+  rebuild across init, all vectors, codec edge cases and the
+  real deferred-expunge path.
+- New quirks found while transcribing: `eor.b d2,d5` corrupts
+  the literal key in the tail-literal emit (dead register);
+  decoder uses +0x20 bias for repeats vs +0x1f for literals;
+  pack stores outlen via `suba.l -8(a0),a3; move.l a3,(a0)`
+  vs unpack's `suba.l -(a0),a3; move.l a3,8(a0)`; pack bounds
+  output by OutBuf+OutBufLen (-17) while unpack is unbounded;
+  functab physically precedes datatab; RELOC32 tail is
+  descending (18 sites).
