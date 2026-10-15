@@ -1,0 +1,4 @@
+/* verbatim hunk1 image (octaplayer_2_1). generated - do not edit. */
+	.section seg1,"aw"
+	.short	0x0000,0x0000,0x0000,0x0046,0x0000,0x23b8,0x0000,0x0000	/* 0000                 */
+	.short	0x0000,0x0020,0x0000,0x0000	/* 0010         */

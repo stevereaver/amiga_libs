@@ -1,0 +1,4 @@
+/* verbatim hunk1 image (cpublit_2_0). generated - do not edit. */
+	.section seg1,"aw"
+	.short	0x0000,0x0000,0x0000,0x0054,0x0000,0x2738,0x0000,0x0000	/* 0000                 */
+	.short	0x0000,0x0020,0x0000,0x0000	/* 0010         */

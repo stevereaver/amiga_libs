@@ -1,0 +1,18 @@
+CC      = /opt/amiga/bin/m68k-amigaos-gcc
+ASFLAGS = -m68000
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
+ORIG    = ../binary/arexxport_36.15.library
+OBJS    = arexxport_36_15_h0.o arexxport_36_15_h1.o
+
+all: arexxport.library
+
+arexxport.library: $(OBJS) fixup.py
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	python3 fixup.py $@ "$(ORIG)"
+	cmp -l $@ "$(ORIG)" && echo BYTE-IDENTICAL
+
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o arexxport.library
