@@ -9,20 +9,21 @@ has been learned about it.
 
 ```
 libraries/
-├── template.library/          # layout template — copy when adding a library
-│   ├── binary/                # original binary (gitignored, not committed)
-│   ├── source/                # reconstructed/decompiled source
-│   └── okf/                   # knowledge bundle for THIS library
-└── <name>_<ver>.library/      # e.g. zlib_3.2.library, 68040_46.5.library
-    ├── binary/
-    ├── source/
-    ├── okf/
-    └── work/                  # scratch space (gitignored)
+├── x/                         # first-character bucket (a-z, 0-9, _)
+│   └── <name>_<ver>.library/  # e.g. x/xpkNONE_1.2.library
+│       ├── binary/            # original binary (gitignored, not committed)
+│       ├── source/            # reconstructed/decompiled source
+│       ├── okf/               # knowledge bundle for THIS library
+│       └── work/              # scratch space (gitignored)
+└── z/zlib_3.2.library/ ...
 ```
 
+- Library dirs are bucketed by their first character
+  (`libraries/i/iffparse_40.1_WB3.1_.library`,
+  `libraries/6/68040_44.2_WB3.5_.library`) — keeps every directory under
+  GitHub's 1,000-entry listing limit.
 - Directory names are the library name and version with non-filesystem-safe
   characters (spaces, parentheses, `.` in version strings) replaced by `_`.
-  Examples: `68040_44.2_WB3.5_.library`, `xpkmaster_4.33.library`.
 - ~1,480 library versions covering ~650 distinct libraries are collected here
   (system libs, xpk/XPK sublibraries, xpr transfer protocols, datatype
   support libs, CPU support libs, third-party libs, ...).
@@ -44,7 +45,7 @@ okf/
 └── findings/         # quirks, version differences, open questions
 ```
 
-Seed a new bundle by copying `libraries/template.library/okf/`. See
+Seed a new bundle by copying `libraries/t/template.library/okf/`. See
 `.devin/skills/okf/SKILL.md` for the full format and workflow rules: read the
 bundle before working on a library, and update it with findings afterward.
 
