@@ -1,12 +1,14 @@
-# Log
+---
+file: log
+---
+# Work log
 
-- Parsed single-hunk AUTOINIT + extended 26B resident; decoded
-  InitTable @h0+0x7c and 31-vector absolute-longword functab @h0+0x8c.
-- Verbatim .byte emission of the hunk body + fixup splicing the
-  original RELOC32/END tail.
-- Build: BYTE-IDENTICAL (5432B).
-- Oracle: generic loader + initstruct + full 31-vector probe.
-  RUNTIME-IDENTICAL, incl. ~1.34e9 deterministic invalid accesses.
-- Oracle upgraded post-commit with full dep stubs
-  (commodities/intuition/graphics/misc.resource); re-verified
-  RUNTIME-IDENTICAL with the richer trace (39.8M invalids).
+- 2026-10-15: multifunction 38.1 — single-hunk AUTOINIT,
+  resident+InitTable+code+data all in h0, RELOC32 53->h0.
+  Raw .byte x1 + tail splice fixup; BYTE-IDENTICAL (5432B).
+  Oracle traces all 31 vecs + open/close/expunge under exec +
+  commodities/intuition/graphics/dos/misc.resource/timer stubs;
+  RUNTIME-IDENTICAL (39,799,144 deterministic invalids — v-42
+  smashes the lib's own jump table, so late close/expunge run
+  wild through unmapped space until the insn budget expires).
+  Plane AMIGALIBS.

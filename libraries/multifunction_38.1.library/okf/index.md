@@ -1,13 +1,15 @@
-# multifunction_38.1.library
+---
+bundle: multifunction_38.1.library
+status: complete
+updated: 2026-10-15
+---
+# multifunction.library 38.1 (Michael Boese & Matthias Bethke, 1997-1998)
 
-"multifunction.library by Michael Boese & Matthias Bethke (c) 1997-1998"
-— RTG/bitmap utility library, v38 r1. 5432B, m68000.
+Utility library (commodity objects, misc.resource port bits,
+ring buffers, timer.device wrappers, gfx screen context, debug
+output via MFLIB_DEBUG). 1 hunk: h0 CODE 0x50c longs holding
+resident+InitTable+code+data. AUTOINIT ver 38. 31 abs-long
+vectors (-6..-186). RELOC32 tail, 53 slots ->h0.
 
-- Flat single-hunk (CODE 0x50c longs) AUTOINIT library.
-- Extended 26-byte resident @h0+4 (extra pointer @+0xa -> h0+0x142e,
-  same stub family as hgrexxsupport/virtualmem); body+0 is a
-  `moveq #-1,d0;rts` stub (relocated-zero vector target).
-- InitTable @h0+0x7c: dsize 0x62, functab->h0+0x8c, dtab->h0+0x10c,
-  initfn->h0+0x140.
-- 31 absolute-longword vectors + 0xffffffff terminator.
-- 53 RELOC32 slots, all ->h0.
+- structures/layout.md, functions/vectors.md,
+  findings/defects.md
