@@ -25,7 +25,13 @@ The public vector calls expname.library's own LVO -30 and returns
 the bitwise complement of its result — semantics of that function
 are inferred (no FD/LVO file for boards.library was found).
 
-Reconstructed in `source/`; `make` produces a valid HUNK `.library`.
+Reconstructed as verbatim asm `source/boards.s`; `make` produces a
+**byte-identical** rebuild (md5 `0558cf1c769b7717ea4f5009441b66ad`) —
+fixup.py rewrites GNU ld's RELOC32 into the original descending
+DREL16 (0x3f7) chunk. `make cmodel` keeps the earlier C model.
+Runtime-verified with machine68k (`work/oracle.py`): identical
+traces original vs rebuild over init ok/fail, open/close, deferred
+and real expunge (Remove+CloseLibrary+FreeMem), and the -30 proxy.
 
 ## Categories
 

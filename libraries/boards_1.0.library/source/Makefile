@@ -1,43 +1,37 @@
-# Makefile for boards.library 1.0 C reconstruction
-#
-# This binary uses an ABSOLUTE-LONG AUTOINIT function table (unlike
-# the word-offset scheme of iffparse/freeanim/_asl), so the table is
-# a hand-written .long list in functab.s and no two-pass link is
-# needed -- REL32 relocations do the work.
-
+# Makefile for boards.library 1.0 reconstruction.
+# `make`        -> byte-identical rebuild from boards.s (fixup.py
+#                  rewrites GNU ld's RELOC32 tail into the original's
+#                  DREL16 0x3f7 records with the original ordering)
+# `make cmodel` -> earlier C model (documentation, not byte-identical)
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
-          -Wall -Wno-unused-parameter -Wno-array-bounds
+          -Wall -Wno-unused-parameter
 ASFLAGS = -m68000
-LDFLAGS = -nostdlib -nostartfiles
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
 
 TARGET  = boards.library
+ORIG    = ../binary/boards_1.0.library
 
 all: $(TARGET)
 
-$(TARGET): boards_lib.o functab.o datatab.o boards.o boards_func.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ boards_lib.o functab.o datatab.o boards.o boards_func.o endmodule.o
+$(TARGET): boards_h0.o fixup.py
+	$(CC) $(LDFLAGS) -o $(TARGET) boards_h0.o
+	python3 fixup.py $(TARGET) $(ORIG)
 
-boards_lib.o: boards_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ boards_lib.s
+boards_h0.o: boards.s
+	$(CC) $(ASFLAGS) -c -o $@ boards.s
 
-functab.o: functab.s
-	$(CC) $(ASFLAGS) -c -o $@ functab.s
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
 
-datatab.o: datatab.s
-	$(CC) $(ASFLAGS) -c -o $@ datatab.s
+cmodel: boards_lib.o boards_c.o boards_func.o datatab.o endmodule.o
+	$(CC) $(LDFLAGS) -o boards-c.library boards_lib.o boards_c.o boards_func.o datatab.o endmodule.o
 
-boards.o: boards.c
+boards_c.o: boards.c
 	$(CC) $(CFLAGS) -c -o $@ boards.c
 
-boards_func.o: boards_func.s
-	$(CC) $(ASFLAGS) -c -o $@ boards_func.s
-
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
-
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o boards-c.library $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean

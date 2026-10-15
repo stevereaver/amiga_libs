@@ -19,3 +19,14 @@ description: Chronological journal of analysis sessions for this library. Newest
 - Reconstruction: header .s, functab.s (.long), datatab.s,
   boards.c lifecycle, boards_func.s (cells + relay), endmodule.s.
   `make` → valid HUNK library.
+
+## 2026-11-20
+
+- Byte-identical pure-asm rebuild `source/boards.s` (md5
+  `0558cf1c769b7717ea4f5009441b66ad`); fixup.py emits the DREL16
+  0x3f7 tail (17 word offsets, descending) + bare HUNK_END with no
+  terminator pad.
+- machine68k oracle: identical traces incl. expname.-30 proxy with
+  `not.l` inversion, deferred-expunge flag at lib+0x23, seglist
+  return 0x5a0000 on real expunge, freemem(lib-negsize, neg+pos).
+- Status: DONE.
