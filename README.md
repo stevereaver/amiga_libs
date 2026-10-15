@@ -411,5 +411,8 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `newicon_39.1.library` | newicon 39.1 (1996) — NewIcons helper, 2-hunk w/ InitTable in DATA, 12 vectors, deps dos37/gfx39/icon37. Byte-identical; oracle identical (AMIGALIBS-366) |
 | `ire_3.17.library` | ire 3.17 (2008, J. van de Loo) — intuition ext, 4-hunk w/ DREL16 tail, 9 vectors, dep dos36. Byte-identical; oracle identical (AMIGALIBS-367) |
 | `quickdos_1.01.library` | quickdos 1.01 (1994, A. Wilke) — DOS accel helper, flat hunk, 22 word vectors. Byte-identical; oracle identical (AMIGALIBS-368) |
+| `cyberintuition_40.30.library` | cyberintuition 40.30 (1995, Vision Factory) — CyberGraphX intuition patch, flat hunk, 4 vectors, opens 5 deps v39 + ENV vars. Byte-identical; oracle identical (AMIGALIBS-369) |
+| `muihelp_19.9.library` | muihelp 19.9 — MUI help-bubble lib, 3-hunk non-AUTOINIT, 6 vectors, MUIGfx render, lazy dep opens. Byte-identical; oracle identical (AMIGALIBS-370) |
+| `muirexx_19.9.library` | muirexx 19.9 (1997, Stuntz) — MUI ARexx host, 2-hunk non-AUTOINIT, 13 vectors, builtin cmd tables, rexxsyslib on demand. Byte-identical; oracle identical (AMIGALIBS-371) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
