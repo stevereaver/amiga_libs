@@ -394,5 +394,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `notifyintuition_2.40.library` | notifyintuition 2.40 (MorphOS-era) — AUTOINIT, 7 vectors (NotIStartNotify/EndNotify/FindUniqueTask), spawns notify subtask, SetFunction-patches 12 intuition vectors. Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-349) |
 | `dgsmus_2.1.library` | dgsmus 2.1 (Optonica 1993) — 3-hunk MOD-player engine (CODE + DATA + MEMF_CHIP sample hunk), 21 vectors, task-based sequencer, 6 sublib deps. Byte-identical merged asm + resplit fixup; oracle identical (AMIGALIBS-350) |
 | `quicklayers_0.55_020__.library` | quicklayers 0.55 (Nocciolino 2005) — layers patcher: init copies a resident module + rewrites its jmp table into h1 via a 12-record patch table; 4-vec shim, stub expunge. Byte-identical merged asm + resplit; oracle identical (AMIGALIBS-351) |
+| `cwrite_1.31.library` | CWrite 1.31 console-writer lib (1992); AUTOINIT, 12 abs-long vectors (NULL hole at -24). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-352) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
