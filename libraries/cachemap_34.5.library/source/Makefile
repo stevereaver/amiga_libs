@@ -1,26 +1,41 @@
-# Makefile for cachemap.library 34.5 C reconstruction
+# Makefile for cachemap.library 34.5
 #
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-#
-# The AUTOINIT function table is a list of word offsets relative to
-# the table start (marker -1W ... -1W).  gas cannot express
-# "extern_sym - local_sym" in a .word across objects, so the table is
-# generated in a second link pass (same scheme as iffparse).
+# Default: byte-verbatim assembly reconstruction (cachemap_h0.s).
+# GNU ld emits the single ascending RELOC32 group exactly like the
+# shipped binary -- no fixup pass needed.  `make` verifies with cmp.
+# `make cmodel` builds the earlier C reconstruction (two-pass
+# genfunctab for the word-offset table).
 
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
           -Wall -Wno-unused-parameter
 ASFLAGS = -m68000
-LDFLAGS = -nostdlib -nostartfiles
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
 NM      = /opt/amiga/bin/m68k-amigaos-nm
 
 TARGET  = cachemap.library
 
-all: $(TARGET)
+all: $(TARGET) verify
+
+$(TARGET): cachemap_h0.o
+	$(CC) $(LDFLAGS) -o $@ $<
+
+cachemap_h0.o: cachemap_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+verify:
+	@cmp -s $(TARGET) ../binary/cachemap_34.5.library && echo BYTE-IDENTICAL \
+	  || echo "DIFFERS (see work/)"
+
+# ---- earlier C reconstruction (larger codegen, semantics only) --
+cmodel: cachemap_lib.o functab.o cachemap.o endmodule.o
+	$(CC) -nostdlib -nostartfiles -o $(TARGET) \
+	  cachemap_lib.o functab.o cachemap.o endmodule.o
 
 dummy.library: cachemap_lib.o functab_stub.o cachemap.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ cachemap_lib.o functab_stub.o cachemap.o endmodule.o
+	$(CC) -nostdlib -nostartfiles -o $@ \
+	  cachemap_lib.o functab_stub.o cachemap.o endmodule.o
 
 functab.s: dummy.library genfunctab.py
 	$(NM) dummy.library > dummy.nm
@@ -28,9 +43,6 @@ functab.s: dummy.library genfunctab.py
 
 functab.o: functab.s
 	$(CC) $(ASFLAGS) -c -o $@ functab.s
-
-$(TARGET): cachemap_lib.o functab.o cachemap.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ cachemap_lib.o functab.o cachemap.o endmodule.o
 
 cachemap_lib.o: cachemap_lib.s
 	$(CC) $(ASFLAGS) -c -o $@ cachemap_lib.s
@@ -47,4 +59,4 @@ endmodule.o: endmodule.s
 clean:
 	rm -f *.o *.nm functab.s dummy.library $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel verify clean

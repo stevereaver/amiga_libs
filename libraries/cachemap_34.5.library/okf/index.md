@@ -30,10 +30,18 @@ is opened at init purely for `InitBitMap`.
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc -m68000, two-pass
-genfunctab for the word-offset table).  `make` produces a loadable
-`cachemap.library`.  Function names are reconstructed — the binary
-ships no fd and no exported names.
+**BYTE-IDENTICAL** — `source/cachemap_h0.s` (GNU as, verbatim
+m68k) rebuilds the 1004-byte file exactly
+(md5 `1a9165093434b519704ce0940ec2b912`); GNU ld emits the single
+ascending RELOC32 group `6,a,12,16,1a,22,2a` on its own, so no
+fixup pass is needed.  `make` verifies with `cmp`; the earlier C
+model survives under `make cmodel`.  Runtime-identical under the
+machine68k oracle (`work/oracle.py`): all 12 vectors exercised
+incl. misaligned/failed CreateMap, LockMap NULL-plane quirk,
+FillMapPlanes patterns + NULL-plane skip, six ScaleBits ratios,
+plane-leak expunge and real teardown — original and rebuild logs
+diff clean.  Function names are reconstructed — the binary ships
+no fd and no exported names.
 
 ## Contents
 
