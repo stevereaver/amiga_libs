@@ -49,10 +49,8 @@ title: Reconstruction log
   eorb d0,d3 (V1.1: eorb d2,d5); unpack writes NO OutLen and
   decodes via jmp pc@(2,d1:w) into 32-store blocks;
   noncanonical AND.B/SUB.B immediates gone (and.w d0,d1 now).
-
-- Phase 4 (2026-10-15): verbatim asm `xpkFRLE_h0.s` -> BYTE-IDENTICAL
-  (md5 0f04897f92c3b8ebbdde6f666991cd90).  machine68k oracle adapted
-  from the V1.1 harness; logs identical.  Confirmed live: pack bounds
-  by OutBuf+InLen (pure-literal input always returns -17), unpack
-  never stores xsp_OutLen, ret0 stub at hunk+0 doubles as the
-  return-0 trampoline.
+- Confirmed live under the oracle: pack bounds by
+  OutBuf+InLen so a pure-literal tail input ALWAYS returns
+  -17 (the inflated capacity check), unpack never stores
+  xsp_OutLen, and the hunk+0 moveq#0;rts doubles as the
+  return-0 trampoline for Close/Expunge.
