@@ -12,19 +12,23 @@ timestamp: 2026-10-10T09:40:00Z
 # xpkRLEN.library 1.4 — Knowledge Bundle
 
 `binary/xpkRLEN_1.4.library` — sha256
-`1aff620aec8b2de4ed74d28da6c788d5aeffbdf42569de58b8bab6d8c57ccacf`, 740
-bytes, one code hunk (0x278 bytes, 14 RELOC32 entries). IdString:
+`1aff620aec8b2de4ed74d28da6c788d5aeffbdf42569de58b8bab6d8c57ccacf`,
+md5 `63d5fd7d33d88c97157f13a5540b865b`, 740 bytes, one code hunk
+(0x278 bytes, 14 RELOC32 entries stored **descending**). IdString:
 `xpkRLEN 1.4 (1.12.2010)\r\n` — **no `$VER:` cookie**.
 
 ## Status
 
-Fully reconstructed in C + skeleton asm. `source/` builds with
-m68k-amigaos-gcc (two-pass link via `genfunctab.py`) into a
-single-hunk `.library`. Entry stub, RomTag fields and
-InitStruct/InitTable contents match; the RLEN encoder and decoder are
-instruction-faithful to the original; code-hunk layout and offsets
-differ (gcc codegen). All six sublibrary LVOs resolved against
-`xpksub_lib.i`.
+DONE — byte-identical + runtime-identical. `make` in `source/`
+assembles the verbatim transcription `xpkRLEN_h0.s` (gas
+`-m68000 -c`, link `-nostdlib -nostartfiles -Wl,-s`) and `fixup.py`
+rewrites the RELOC32 tail to the original's descending order;
+`cmp` + md5sum verify identity (md5
+`63d5fd7d33d88c97157f13a5540b865b`). The earlier C model remains
+buildable as `make cmodel` (NOT byte-identical). `work/oracle.py`
+(machine68k) exercises init, all ten vectors, Pack/Unpack with live
+param blocks, zero-length and error edges and deferred+real expunge;
+orig-vs-rebuild logs are identical.
 
 ## Contents
 

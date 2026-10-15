@@ -13,7 +13,7 @@ timestamp: 2026-10-10T09:40:00Z
 |----------:|---------|
 | 0x01..0x7f | literal run: copy the next `code` input bytes verbatim |
 | 0x81..0xff | repeat run: emit the next byte `-code` times (2..127) |
-| 0x80 | degenerate: decodes to nothing (see [Decoder80](../findings/Decoder80.md)) |
+| 0x80 | degenerate: emits the byte once via a `neg.b`/`bgt` overflow (see [Decoder80](../findings/Decoder80.md)) |
 | 0x00 | end of stream |
 
 Runs are limited to 127 in both directions; a repeat run needs at

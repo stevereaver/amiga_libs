@@ -13,6 +13,6 @@ description: Quirks, deviations, open questions.
 - [LiteralReserve4](LiteralReserve4.md) — bounds check reserves 4 bytes for a 1-byte token
 - [ReadPastEnd](ReadPastEnd.md) — encoder samples src[1]/src[2] past the input end
 - [NoOutputBounds](NoOutputBounds.md) — decoder never checks OutBufLen
-- [Decoder80](Decoder80.md) — code 0x80 emits nothing
+- [Decoder80](Decoder80.md) — code 0x80 emits the byte exactly once
 - [UnusedBaseField](UnusedBaseField.md) — dataSize 0x2a, only SegList used
 - [RebuildDeviations](RebuildDeviations.md) — what differs in the rebuilt binary
