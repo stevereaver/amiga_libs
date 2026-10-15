@@ -1,8 +1,10 @@
 # Structures
 
-- XpkInfo / XpkMode / XpkSubParams: public XPK sublibrary ABI, from
-  xpk_Develop `xpk/xpksub.h`.  The library embeds one XpkInfo block
-  (flags, name, ID, description, mode strings) plus its XpkMode table.
-- XpkSubBase: private library base (node + open count).
-- InitTable / function-table layout: non-AUTOINIT, absolute-longword
-  vectors placed before the RomTag in some versions.
+- [XpkSubBase](XpkSubBase.md) — private library base (dataSize 0x26)
+- [XpkInfo](XpkInfo.md) — packer descriptor island at code+0x15a
+- [XpkMode](XpkMode.md) — mode descriptor island at code+0x1b2 ("bytemode")
+- [InitTable](InitTable.md) — AUTOINIT table, InitStruct data,
+  word-offset functab
+- XpkSubParams: public XPK chunk I/O block (xpk_Develop `xpksub.h`);
+  this version only touches `xsp_InBuf`, `xsp_InLen`, `xsp_OutBuf`
+  and (pack only) `xsp_OutLen`.
