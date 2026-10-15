@@ -14,8 +14,9 @@
 **
 **	Init logic recovered from the disassembly:
 **	  - requires AFB_68040 set in ExecBase->AttnFlags, else fail
-**	  - fails when AttnFlags == 0x80ff (all low-byte flag bits +
-**	    AFB_PRIVATE -- an unusual, probably emulated, config)
+**	  - when AttnFlags == 0x80ff (all low-byte flag bits +
+**	    AFB_PRIVATE -- the marker the real support lib installs)
+**	    skip the load and return the base immediately
 **	  - with AFF_FPU40 set:   OpenLibrary("68o4o.library",0)
 **	  - without AFF_FPU40:    OpenLibrary("68060.library",0)
 **	  - fails when the open fails, returns the base otherwise
@@ -65,7 +66,7 @@ struct Library *LibInit(struct Library *base __asm("d0"),
     if (!(sysbase->AttnFlags & AFF_68040))
         return NULL;
     if (sysbase->AttnFlags == 0x80ff)
-        return NULL;
+        return base; /* "already loaded" marker: skip the open */
 
     if (sysbase->AttnFlags & AFF_FPU40)
         res = OpenLibrary((CONST_STRPTR)str_68o4o, 0);

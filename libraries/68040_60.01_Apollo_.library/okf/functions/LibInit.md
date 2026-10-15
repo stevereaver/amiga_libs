@@ -13,7 +13,7 @@ Semantics (from disassembly @ INITFUNCTION):
 
 ```c
 if (!(SysBase->AttnFlags & AFF_68040)) return NULL;   /* btst #3,(297,a6) */
-if (SysBase->AttnFlags == 0x80ff) return NULL;        /* cmpi.w #$80ff,(296,a6) */
+if (SysBase->AttnFlags == 0x80ff) return base;        /* cmpi.w #$80ff,(296,a6) */
 lib = OpenLibrary((AttnFlags & AFF_FPU40)
                   ? "68o4o.library" : "68060.library", 0);
 if (!lib) return NULL;
@@ -24,6 +24,10 @@ return base;
   is no room for private fields; the seglist is ignored entirely.
 - The opened library's base is **not** kept; the open exists only for
   its side effect (the real library becomes resident and stays open).
-- The 0x80ff compare checks the whole AttnFlags word; bit 15 is
-  exec's "private use" flag, 0xff all low bits. Probably meant to
-  reject emulation/ill-defined configs. See findings.
+- The 0x80ff compare checks the whole AttnFlags word and *succeeds
+  early* (`move.l d7,d0` runs before the `beq`): when the real
+  support library has already installed its $80ff marker the stub
+  returns its base without loading it a second time. Bit 15 is
+  exec's "private use" flag, 0xff all low bits. Verified by the
+  machine68k oracle (work/oracle.py): AttnFlags=$80ff produces
+  init → base with zero OpenLibrary calls.

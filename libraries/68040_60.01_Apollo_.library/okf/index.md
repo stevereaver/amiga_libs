@@ -29,7 +29,8 @@ side effect of resident initialization.
 `LibInit` (d0=base, a0=seglist, a6=SysBase):
 
 1. `if (!(AttnFlags & AFF_68040)) return NULL`
-2. `if (AttnFlags == 0x80ff) return NULL` (all flag bits + AFB_PRIVATE)
+2. `if (AttnFlags == 0x80ff) return base` — the support lib's
+   "already installed" marker: succeed without loading again
 3. `AFF_FPU40` set → `OpenLibrary("68o4o.library", 0)` (letter 'o'!)
    else → `OpenLibrary("68060.library", 0)`
 4. fail if that open failed, else return the base.
@@ -38,8 +39,13 @@ The opened library is never closed (deliberate leak → stays resident).
 
 ## Status
 
-FULL — reconstructed in C + a small asm header; `make` in `source/`
-produces a loadable `68040.library`.
+FULL — **byte-identical rebuild**: `make` in `source/` assembles
+68040.s into md5 `a87e68a0e398d03466cc5443f524fbe7`, matching the
+original exactly. The earlier C reconstruction is kept as
+`make cmodel` (semantic reference, not byte-identical).
+work/oracle.py (machine68k) produces identical traces for the
+original and the rebuild across the init scenario matrix and all
+four vectors.
 
 ## Categories
 
