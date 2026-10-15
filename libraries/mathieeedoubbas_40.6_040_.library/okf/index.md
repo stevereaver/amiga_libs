@@ -11,12 +11,14 @@ timestamp: 2026-10-10T23:10:00Z
 
 # mathieeedoubbas.library 40.6 (7.4.95) for 68040
 
-Sibling of `mathieeedoubbas_40.6_FPU_` — **the vector code is
-byte-identical** to the 68881/82 build: this "68040" library
-still executes `faddd`/`fsubd`/`fmuld`/`fdivd` natively but relies
-on the 68040 FPSP for the unimplemented `fintrz`/`fint` used by
-IEEEDPFloor and by IEEEDPFix's `fmove.l`.  Only the idstring,
-the init gate, and internal table layout differ.
+Sibling of `mathieeedoubbas_40.6_FPU_` — semantically the same
+Berndt framework with the SAME math vector bodies (still executes
+`faddd`/`fsubd`/`fmuld`/`fdivd` natively and relies on the 68040
+FPSP for the unimplemented `fintrz`/`fint` used by IEEEDPFloor and
+IEEEDPFix's `fmove.l`), but **NOT byte-identical**: the idstring
+is 4 bytes longer, shifting every functab target +4, and the init
+gate is extended.  CORRECTION to the earlier note: the whole
+functab/vector region differs at the byte level.
 
 ## Binary facts
 
@@ -28,13 +30,21 @@ the init gate, and internal table layout differ.
 - InitTable: dataSize 0x2c, absolute-longword functab (16 + -1L)
 - init gate: `btst #3` AFF_68040 required; under exec
   `lib_Version >= 39` additionally `btst #6` AFF_FPU40
+  (oracle-verified: attn=0x08 passes alone only on exec<39)
 - private DELEXP flag: bit3 of base+0x2a (not lib_Flags)
 
 ## Status
 
-FULL — reconstructed (`source/`): same C framework + math.s
-vectors as the FPU build, adapted init gate; builds with
-m68k-amigaos-gcc -m68020 -m68881.
+**BYTE-IDENTICAL** — verbatim asm `source/mdb040_v.s` +
+`source/fixup.py` (splices the original 26-entry ascending
+RELOC32 tail; the verbatim source is all-literal so gas emits
+no relocs). md5 `d57f6a32940f2862519712f0376aa9b7`.
+machine68k oracle `work/oracle.py` (adapted from the FPU
+sibling's: line-F emulates the 68881/82 subset the 040 FPSP
+would supply) — RUNTIME-IDENTICAL over the 8-case init-gate
+matrix (attn x exec version), open x2, all 16 vectors with
+edge inputs, reserved -24 (points at code+0 stub), and
+deferred + real expunge.  C model kept as `make cmodel`.
 
 ## Contents
 
