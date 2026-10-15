@@ -28,13 +28,13 @@ Binary is byte-identical to the official Mu680x0Libs 47.2 release (Aminet `util/
 
 ## Status
 
-Reconstructed (`source/`, m68k-amigaos-gcc): C for all logic plus a
-small hand-written `cpuprobe.s` for the supervisor-state CPU/PCR
-probe (VBR redirect + illegal-instruction trampoline - not
-expressible in C).  `make` produces a loadable `.library`; the data
-hunk (InitTable, function table layout, strings) is byte-identical
-to the original modulo the relocated vector pointers, and the code
-was verified function-by-function against the IRA disassembly.
+BYTE-IDENTICAL + RUNTIME-IDENTICAL — `source/680x0_h0.s` builds
+md5 `6c98b316d624d1e087c019c8100df4a5`, matching the shipped binary
+(916B, CODE 0x230 + DATA 0xb8).  `make cmodel` retains the C
+reconstruction.  machine68k oracle identical over the full matrix
+(cpu ladder 010/020/040, forced probe results incl. the NEW 'A'
+Apollo path, driver-missing/exec-v33 self-free, mmu absent,
+SetFPUExceptions forwarding).
 
 ## Contents
 

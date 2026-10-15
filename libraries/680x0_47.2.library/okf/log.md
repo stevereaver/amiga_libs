@@ -21,3 +21,11 @@ description: Chronological journal of analysis sessions for this library. Newest
   `make` OK; data hunk byte-identical modulo vector relocs; code
   verified against disassembly.
 - Phase 3: okf bundle populated.
+
+- Phase 4 (2026-10-15): verbatim asm `680x0_h0.s` -> BYTE-IDENTICAL
+  (md5 6c98b316d624d1e087c019c8100df4a5).  47.2 deltas vs the 40.4
+  build: PCR signature check (0x043x -> '6', other -> 'A' Apollo),
+  driver OpenLibrary arg 46, 'A' makes _open680x0 return 0 (init
+  self-frees on Apollo), dead unreferenced "apollo.library" string
+  at data+0x42, Close still never expunges, rt_EndSkip=0,
+  idstr points past the $VER: cookie.  machine68k oracle identical.

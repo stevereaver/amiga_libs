@@ -22,7 +22,21 @@ TARGET  = 680x0.library
 
 all: $(TARGET)
 
-$(TARGET): 680x0_lib.o cpuprobe.o 680x0.o
+# ---- byte-verbatim rebuild (hand asm) ----
+
+$(TARGET): 680x0_h0.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ 680x0_h0.o
+	@cmp -s $(TARGET) ../binary/680x0_47.2.library && echo BYTE-IDENTICAL \
+	  || echo DIFFERS
+
+680x0_h0.o: 680x0_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ 680x0_h0.s
+
+# ---- C reconstruction model (functional, NOT byte-identical) ----
+
+cmodel: cmodel.library
+
+cmodel.library: 680x0_lib.o cpuprobe.o 680x0.o
 	$(CC) $(LDFLAGS) -o $@ 680x0_lib.o cpuprobe.o 680x0.o
 
 680x0_lib.o: 680x0_lib.s
@@ -37,4 +51,4 @@ cpuprobe.o: cpuprobe.s
 clean:
 	rm -f *.o *.nm $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean
