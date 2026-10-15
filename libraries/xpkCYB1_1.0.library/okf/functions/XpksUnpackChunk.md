@@ -1,4 +1,5 @@
 # XpksUnpackChunk (-54)
 
-Unpacks one chunk produced by XpksPackChunk (inverse transform).
-Parameters via `struct XpkSubParams` (a0).
+Stub.  Shares the single `movel #-1,d0; rts` at hunk+0x15c with all
+other packer slots — always returns -1.  There is no decoder in this
+library.

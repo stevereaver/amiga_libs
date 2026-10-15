@@ -1,5 +1,6 @@
 # XpksPackChunk (-36)
 
-Packs one chunk per the algorithm documented in okf/index.md.
-Parameters via `struct XpkSubParams` (a0), library base a6.
-See source/xpkCYB1.c and the shipped work/ disassembly.
+Stub.  Hunk+0x15c: `movel #-1,d0; rts` — always returns -1.
+The same stub also serves XpksPackFree (-42), XpksPackReset (-48),
+XpksUnpackChunk (-54) and XpksUnpackFree (-60).  xpkCYB1 ships only
+the XpkInfo/XpkMode descriptors (oracle-verified).
