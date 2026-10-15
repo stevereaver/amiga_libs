@@ -1,0 +1,4 @@
+/* verbatim hunk4 image (rtgEGS_42_0). generated - do not edit. */
+	.section seg4,"aw"
+	.short	0x0000,0x0000,0x0000,0x0000,0x0000,0x02b0,0x0000,0x0058	/* 0000                 */
+	.short	0x0000,0x0060,0x0000,0x0000	/* 0010         */
