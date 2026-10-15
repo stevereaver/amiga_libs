@@ -1,0 +1,18 @@
+CC      = /opt/amiga/bin/m68k-amigaos-gcc
+ASFLAGS = -m68000
+LDFLAGS = -nostdlib -nostartfiles -Wl,-s
+ORIG    = ../binary/reqtools_38.390(WB1.3).library
+OBJS    = reqtools_38_390_WB1_3__h0.o
+
+all: reqtools.library
+
+reqtools.library: $(OBJS) fixup.py
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
+	python3 fixup.py $@ "$(ORIG)"
+	cmp -l $@ "$(ORIG)" && echo BYTE-IDENTICAL
+
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.o reqtools.library
