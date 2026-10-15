@@ -1,10 +1,10 @@
 ---
 type: Library
-title: launcher.library 41.9
+title: launcher.library 41.9 (5.2.96, Commodore)
 description: >-
-  'launcher.library 41.9 (5.2.96)' — OS 3.x program-launcher
-  service library; 2 hunks; InitTable+functab in the DATA hunk;
-  5 vectors.
+  Commodore launcher.library 41.9 — launches programs from icons /
+  tooltypes via a resident server process; CODE+DATA hunks, 5 vectors,
+  InitTable lives in the DATA hunk (cross-hunk rt_Init).
 files:
   - source/launcher_h0.s
   - source/fixup.py
@@ -14,27 +14,35 @@ files:
 
 # launcher.library 41.9
 
-Two hunks: CODE ~3136B + DATA 72B.
+Two hunks: CODE 3148B (hunk0), DATA 72B (hunk1).  `moveq #0; rts`
+stub at h0+0, Resident@h0+4 (AUTOINIT, v41, NT_LIBRARY, pri 0,
+EndSkip->h0+0xc4c).  rt_Init->h1+0x38: InitTable datasize 0x64,
+functab->h1+0x1e (5 absolute longs + ffffffff), datatab=0,
+initfn->h0+0x9f2.
 
-- Resident@h0+4: AUTOINIT fl=0x80 v41, name->h0+0x1e
-  'launcher.library', id->h0+0x2f 'launcher.library 41.9
-  (5.2.96)\r\n', init->h1+0x38 InitTable
-- InitTable@h1+0x38: dsz 0x64, functab->h1+0x1e, dtab=0,
-  initfn->h0+0x9f2
-- functab@h1+0x1e: 5 absolute longs -> h0 + ffffffff
-- h1 strings: 'CON:0/25/640/150/' output-window spec and
-  '/AUTO/WAIT' option template
-- h0 deps: icon.library, dos.library, 'TOOLPRI' env var
-- initfn creates a handler task (FindTask/FindName/WaitPort/
-  GetMsg/Signal loop visible in the trace)
+- name 'launcher.library'@h0+0x1e, idstring
+  'launcher.library 41.9 (5.2.96)' CRLF-terminated @h0+0x2f
+- h1 strings: 'CON:0/25/640/150/' and '/AUTO/WAIT' (console spec)
+- h0 embedded data block 0x2f0-0x31d: 'C:' struct, 'icon.library',
+  'CLI', '"', 'TOOLPRI', 'dos.library'
+- initfn opens dos.library 37 via exec TaggedOpenLibrary (-552),
+  inits a semaphore at lib+0x22, clears lib+0x5c (server proc)
+- first Open() from a CLI process spawns a resident server task
+  (entry h0+0x50, NP_Entry) that signals the library list node
+- the single API function (LVO -30) resolves a tool icon via
+  icon.library, builds a command line and launches it through the
+  server process
 
 ## Build
 
-`launcher_h0.s` verbatim .text + raw hunk1 .data; `fixup.py`
-splices the original RELOC32 tails.  Byte-identical.
+`launcher_h0.s` verbatim; resident+strings emitted raw (h0+4..0x50),
+embedded data block raw (0x2f0..0x31e), hunk1 emitted raw as .data.
+`fixup.py` splices the original header + RELOC32 tails (hunk0:
+9->h0 + 3->h1; hunk1: 6->h0 + 1->h1).  Byte-identical
+(md5 a8294a8da41334dbea47503c44567fe2).
 
 ## Runtime
 
-`work/oracle.py`: init (TaggedOpenLibrary dos v37, task
-creation + message handshake), all 5 vectors, open x2, close
-x2, expunge.  Identical original vs rebuild.
+`work/oracle.py`: init, open x2 (spawn branch), deferred+real
+expunge, extfunc, launch fn x2 (Lock-fail path then success path),
+spawned-task entry — identical original vs rebuild.
