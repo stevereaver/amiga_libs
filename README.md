@@ -58,6 +58,8 @@ libraries need `-fbaserel -msmall-code -mcrt=library -ramiga-lib`.
 
 ## Status
 
+**404 libraries reconstructed, documented (okf/) and committed so far.**
+
 Bulk reverse-engineering campaign in progress (tracked as AMIGALIBS-9 in
 Plane): every library is being disassembled, its LVOs resolved, C source
 reconstructed in `source/`, documented in `okf/`, and committed per library
@@ -461,6 +463,7 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `xprjmodem_0.1.library` | XPR JModem protocol module — CODE+DATA+BSS, resident@h0+0xc, InitTable+functab inside the DATA hunk, 8 vectors (one NULL slot), WB1.x dep convention, close underflow. Byte-identical; oracle identical (AMIGALIBS-426) |
 | `midi_2.0.library` | "MIDI Library v2.0 (21 Oct 1988)" — early MIDI lib; CODE+empty-DATA+BSS, 32 vectors, dos33 dep + MsgPort/signal init, close underflow. Byte-identical; oracle identical (AMIGALIBS-425) |
 | `stc_3.322.library` | "StoneCrackerLibrary 3.322 (17 Apr 1994)" — older STC cruncher; CODE+BSS, 20 vectors, OldOpenLibrary deps; Close works here (cnt=0, expunge->0x2b0f) unlike 3.41. Byte-identical; oracle identical (AMIGALIBS-424) |
+| `xpkRAKE_1.8_020_.library` | "xpkRAKE V1.8 68020" (Dageforde) — 020 build of the Rake sublib; flat hunk, same 10-vector API, 128KB pack scratch, close underflow. Byte-identical; oracle identical (AMIGALIBS-428) |
 | `xpkRAKE_1.8_000_.library` | "xpkRAKE V1.8 (1 Oct 2013)" (Dageforde) — XPK Rake cruncher sublib; flat hunk, 10 vectors w/ 128KB pack scratch, dead stub slots, close underflow. Byte-identical; oracle identical (AMIGALIBS-423) |
 | `xprdmodem_2.6.library` | "xprDModem 2.6 (08.06.94)" — XPR dual-modem protocol module; CODE+BSS, 8 abs vectors, dos dep, Remove/CloseLibrary/FreeMem close path, count underflow. Byte-identical; oracle identical (AMIGALIBS-422) |
 | `xarDUMMY_1.0.library` | "xarDUMMY.library / Version 1.0" — ARexx host dummy; 5 hunks w/ whole-hunk InitTable (h1) + functab/strings in a CODE-typed h3, 22 vectors ->h0, dos dep, dummy init stub. Byte-identical; oracle identical (AMIGALIBS-421) |
