@@ -21,12 +21,14 @@ points past it).
 
 ## Status
 
-Fully reconstructed in C. `source/` builds a single-hunk `.library`
-with the same non-AUTOINIT RomTag, same six-vector absolute-long
-function table, and semantically identical loader logic. All 6 LVO
-slots resolved; the two user functions are named from the official
-`dsp3210_lib.fd` in the Aminet `driver/other/dsp3210` package
-(Thomas Winischhofer, maintained at github.com/realA10001986/AmigaDSP3210).
+BYTE-IDENTICAL - verbatim asm `source/dsp3210_h0.s` + `fixup.py`
+(11-entry descending-order RELOC32 splice): `cmp`-equal to the
+shipped binary (md5 `80b56d6f33b764b86ba8a80383d4cb27`).
+machine68k oracle identical over rt_Init MakeLibrary+AddLibrary
+bootstrap, libInit, all 6 vectors, expunge (Remove+FreeMem) and
+DSPCalcLen/DSPRelocate on a synthetic valid/invalid d32 blob.
+Semantic C model kept as `cmodel` target.  LVO names from the
+official `dsp3210_lib.fd` (Aminet `driver/other/dsp3210`).
 
 ## Contents
 
