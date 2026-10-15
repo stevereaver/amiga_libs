@@ -40,12 +40,16 @@ Deltas over 40.1 (verified byte-level + oracle):
 
 - Binary: `binary/68020_43.2(MMU).library` — 2192 bytes, m68k,
   two hunks (CODE 0x524 / DATA 0x204), AUTOINIT.
-- Reconstruction: `source/` — `68020.c` (init/lifecycle/
-  PatchTable drivers/FPUControl), `68020_patch.s` (patch
-  stubs, supervisor body, 68881 handlers — PMMU/FPU/VBR/
-  movec/reset instructions plus PC-memory-indirect operands
-  that C cannot express), `68020_lib.s` (RomTag, AUTOINIT
-  InitTable, functab, strings, patch tables).
+- Reconstruction: `source/` — `68020_h0.s` is a
+  **byte-verbatim** transcription of both hunks
+  (m68k mnemonics + raw .short/.byte where objdump/gas
+  disagree on encoding: memory-indirect pc@()@() forms,
+  noncanonical orib immediates, absolute-memory operands);
+  `fixup.py` splices the original RELOC32 tails (gas emits
+  none for the literal operands).  `make` → md5
+  `0146edab012ba03b702076c71eba525f` = shipped binary.
+  The earlier semantic C model stays under `make cmodel`
+  (`68020.c` + `68020_lib.s` + `68020_patch.s`).
 - InitTable at data+0: `{dsize 0x70, functab->data+0x10,
   datatab NULL, initfunc->code+0x4a}`; the library header is
   filled by hand.

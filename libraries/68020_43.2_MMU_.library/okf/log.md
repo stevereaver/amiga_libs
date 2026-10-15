@@ -62,3 +62,15 @@
     relocated patch_lib operand in InstallExcVecs.
   - Data hunk: byte-identical modulo relocation addends;
     identical reloc offset set.
+
+- Phase 5 (2026-10-15): verbatim asm `68020_h0.s` generated
+  from the objdump transcription (L<addr> labels for
+  branch/pc-rel targets, .byte for inline data + the 12B
+  zero-slot table at 0x3e4 objdump omits, .short for
+  mem-indirect/abs-mem/noncanonical forms) + `fixup.py`
+  reloc-tail splice -> BYTE-IDENTICAL (md5
+  0146edab012ba03b702076c71eba525f).  machine68k oracle
+  identical orig-vs-rebuild across attn 02/03/07 and
+  mmu-type scenarios (incl. the SetFunction patch list,
+  INTENA GetMsg, INTREQR -36 trampoline, cold-reboot
+  CACR/VBR clear + reset + ROM jump).

@@ -22,7 +22,22 @@ TARGET  = 68020.library
 
 all: $(TARGET)
 
-$(TARGET): 68020_lib.o 68020_patch.o 68020.o
+# ---- byte-verbatim rebuild (hand asm) ----
+
+$(TARGET): 68020_h0.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $@ 68020_h0.o
+	python3 fixup.py $@
+	@cmp -s $@ "../binary/68020_43.2(MMU).library" && echo BYTE-IDENTICAL \
+	  || echo DIFFERS
+
+68020_h0.o: 68020_h0.s
+	$(CC) $(ASFLAGS) -c -o $@ 68020_h0.s
+
+# ---- C reconstruction model (functional, NOT byte-identical) ----
+
+cmodel: cmodel.library
+
+cmodel.library: 68020_lib.o 68020_patch.o 68020.o
 	$(CC) $(LDFLAGS) -o $@ 68020_lib.o 68020_patch.o 68020.o
 
 68020_lib.o: 68020_lib.s
@@ -37,4 +52,4 @@ $(TARGET): 68020_lib.o 68020_patch.o 68020.o
 clean:
 	rm -f *.o *.nm $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean
