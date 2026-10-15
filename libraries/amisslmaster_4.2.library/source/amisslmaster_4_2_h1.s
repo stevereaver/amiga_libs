@@ -1,0 +1,4 @@
+/* verbatim hunk1 image (amisslmaster_4_2). generated - do not edit. */
+	.section seg1,"aw"
+	.short	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000	/* 0000                 */
+	.short	0x0000,0x0006,0x0000,0x0000	/* 0010         */
