@@ -390,5 +390,6 @@ reconstructed in `source/`, documented in `okf/`, and committed per library
 | `diskfont_34.37.library` | diskfont 34.37 (WB1.3 era) — 15-hunk per-function build, COLDSTART, 8 vectors, -30='FONT' cookie. Byte-identical merged asm + resplit fixup; oracle identical (AMIGALIBS-346) |
 | `diskfont_34.37_WB1.3_.library` | Same binary as `diskfont_34.37` (md5-identical WB1.3 label); shared reconstruction, byte + runtime identical (AMIGALIBS-347) |
 | `realtime_37.3.library` | realtime 37.3 — AUTOINIT 2-hunk build w/ 40-symbol debug tail + DATA hunk size quirk; 14 abs-long vectors (LockRealTime, CreatePlayerA, conductor ops). Byte-identical; oracle identical (AMIGALIBS-345) |
+| `preferences_41.2.library` | Scalos prefs 41.2 (SAS/C 6.58, 2005) — packed DATA-hunk resident, 14 vectors, lazy dep opens on first Open. Byte-identical raw asm + resplit fixup; oracle identical (AMIGALIBS-348) |
 | `diskcode_3.8.library` | 'diskcode 3.8' — disk codec/table lib; AUTOINIT, 21 vectors, one vector performs a 73.5M-step unmapped scan (deterministic). Byte-identical raw asm + fixup; oracle identical (AMIGALIBS-332) |
 | all others | Binary collected; `source/` and `okf/` in progress by size order (~220/1482 done) |
