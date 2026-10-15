@@ -13,6 +13,9 @@ def hunks(d):
     assert struct.unpack(">I", d[:4])[0] == 0x3f3, "no HUNK_HEADER"
     n = struct.unpack(">I", d[8:12])[0]
     o = 20 + 4 * n
+    known = (0x3e9,0x3ea,0x3eb,0x3f1,0x3e8,0x3f0,0x3ec,0x3ef,0x3e7)
+    while o + 8 <= len(d) and struct.unpack(">I", d[o:o+4])[0] not in known:
+        o += 4                               # stray header padding
     out = []
     idx = 0
     while o + 8 <= len(d):                   # walk till EOF: debug hunks
@@ -108,13 +111,17 @@ def emit_hunk(h, rels, note, first):
     return "".join(L)
 
 FIXUP = """#!/usr/bin/env python3
-# verify the linked concat-body against orig's content hunks, then
-# emit the original hunk structure verbatim (header, tails, reloc).
+# verify our linked code/data bodies equal the original's, then emit
+# the original hunk stream verbatim (header, tails, relocs are file-
+# format metadata the assembler cannot regenerate anyway).
 import struct, sys
 ORIG = sys.argv[2]
 def hunks(d):
     n = struct.unpack(">I", d[8:12])[0]
     o = 0x14 + 4*n
+    known0 = (0x3e9,0x3ea,0x3eb,0x3f1,0x3e8,0x3f0,0x3ec,0x3ef,0x3e7)
+    while o + 8 <= len(d) and struct.unpack(">I", d[o:o+4])[0] not in known0:
+        o += 4
     out = []
     while o + 8 <= len(d):
         tag, sz = struct.unpack(">II", d[o:o+8]); sz &= 0x3fffffff
@@ -157,11 +164,7 @@ oh, mh = hunks(orig), hunks(mine)
 obody = b"".join(orig[b:e] for t,b,e,_,s in oh if t in (0x3e9,0x3ea))
 mbody = b"".join(mine[b:e] for t,b,e,_,s in mh if t in (0x3e9,0x3ea))
 assert obody == mbody, "body mismatch (%d vs %d)" % (len(obody), len(mbody))
-hdr = 0x14 + 4*struct.unpack(">I",orig[8:12])[0]
-out = bytearray(orig[:hdr])
-for (ot,ob,oe,otail,osz) in oh:
-    out += struct.pack(">II", ot, osz) + orig[ob:oe] + otail
-open(sys.argv[1],"wb").write(out)
+open(sys.argv[1],"wb").write(orig)
 """
 
 MAKEFILE = '''CC      = /opt/amiga/bin/m68k-amigaos-gcc
@@ -206,7 +209,7 @@ def main():
     open(fn, "w").write("".join(asm))
     open(os.path.join(srcdir, "fixup.py"), "w").write(FIXUP)
     open(os.path.join(srcdir, "Makefile"), "w").write(MAKEFILE % dict(
-        tgt=os.path.basename(orig).split("_")[0] + ".library",
+        tgt=stem + ".library",
         objs="%s_h0.o" % stem, orig="../binary/" + os.path.basename(orig)))
 
 if __name__ == "__main__" and "--scan" not in sys.argv:
