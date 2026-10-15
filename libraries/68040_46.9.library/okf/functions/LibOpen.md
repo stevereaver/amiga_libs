@@ -20,5 +20,5 @@ move.l a6,d0             ; fall back to self
 done: rts
 ```
 
-If init forwarded to the 060 library, callers receive that base
+If init forwarded to the 68060.library, callers receive that base
 instead of this stub — the usual Phase5-style redirection.

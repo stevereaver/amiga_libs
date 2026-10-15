@@ -13,7 +13,7 @@ description: Library base, dataSize 0x34 — struct Library + privates.
 0x24  APTR   lb_SysBase         — set by LibInit (a6)
 0x28  BPTR   lb_SegList         — set by LibInit (a0)
 0x2c  APTR   lb_DOSBase         — TaggedOpenLibrary(4) result
-0x30  APTR   lb_OpenLib         — OpenLibrary("060.library") result,
+0x30  APTR   lb_OpenLib         — OpenLibrary("68060.library") result,
                                   returned by LibOpen when non-NULL
 ```
 

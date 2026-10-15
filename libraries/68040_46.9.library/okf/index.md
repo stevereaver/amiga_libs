@@ -3,8 +3,9 @@ type: Library
 title: 68040.library 46.9 (Lynxx)
 description: >-
   "040/060-Loader" stub masquerading as 68040.library. 568 bytes,
-  one code hunk. Forwards opens to "060.library" on 68060, tries to
-  preload Libs:68040mmu.library on real 68040, then unloads itself.
+  one code hunk. Forwards opens to 68060.library on 68060, preloads
+  Libs:68040mmu.library via LoadSeg+InitResident on real 68040, then
+  unloads itself.
 tags: [68040, 68060, loader, lynxx]
 ---
 
@@ -27,22 +28,26 @@ Implements only the four system vectors — no user LVOs.
 1. `lb_DOSBase = TaggedOpenLibrary(4)` — exec LVO -810, no NULL check
 2. `if (!(AttnFlags & AFF_68040)) return NULL`
 3. `Supervisor(movec pcr probe)`: PCR is 68060-only.
-   - **probe != 0 (68060):** `lb_OpenLib = OpenLibrary("060.library",0)`
-     — the pointer is `str+2` into `"68060.library"` (sic). Fail→NULL,
-     else return base; LibOpen then hands out the 060 library's base.
-   - **probe == 0 (real 68040):** `LoadSeg("bs:68040mmu.library")` +
-     InitResident — again a `str+2` pointer into `"Libs:..."` so it
-     always fails; result discarded, init returns NULL either way
-     (preload-then-die intent, defeated by the pointer quirk).
+   - **probe != 0 (68060):** `lb_OpenLib = OpenLibrary("68060.library",0)`.
+     Fail→NULL, else return base; LibOpen then hands out the 060
+     library's base.
+   - **probe == 0 (real 68040):** `LoadSeg("Libs:68040mmu.library")` +
+     RomTag scan + InitResident; result discarded — init returns NULL
+     either way (preload-then-die by design).
 
 ## Status
 
-FULL — reconstructed in C + asm helpers; `make` in `source/` builds a
-single-hunk `68040.library`.
+DONE — byte-identical pure-asm rebuild (`source/68040.s`,
+`make` → md5 `32ad08d5d71301b0bf9b494bc39cdffe`).
+Runtime-verified under machine68k: oracle exercises both init
+branches (probe fault → LoadSeg/InitResident; forced probe=1 →
+OpenLibrary + proxy open), the RomTag walk, and all four vectors —
+identical traces original vs rebuild. The earlier C model is kept as
+`make cmodel` (documentation, not byte-identical).
 
 ## Categories
 
 - [functions/](functions/index.md) — the four system vectors
 - [structures/](structures/index.md) — RomTag/InitTable/hunk map, LibBase
-- [findings/](findings/index.md) — +2 pointer quirks, LVO -810, etc.
+- [findings/](findings/index.md) — PCR probe, fault-skip, ABI quirks
 - [log.md](log.md) — work journal

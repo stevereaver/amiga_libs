@@ -1,36 +1,30 @@
-# Makefile for 68040.library 46.9 (Lynxx 040/060 loader stub)
-#
-# Builds a HUNK-format .library with the m68k-amigaos cross toolchain.
-# The AUTOINIT function table is absolute-long (.long entries in
-# loader_lib.s), so no two-pass functab generation is needed.
-
+# Makefile for 68040.library 46.9 (040/060-Loader) reconstruction.
+# `make`        -> byte-identical rebuild from 68040.s
+# `make cmodel` -> earlier C model (documentation, not byte-identical)
 CC      = /opt/amiga/bin/m68k-amigaos-gcc
 CFLAGS  = -O2 -m68000 -fomit-frame-pointer -fno-builtin \
           -I/opt/amiga/m68k-amigaos/ndk-include \
           -Wall -Wno-unused-parameter
-ASFLAGS = -m68040
+ASFLAGS = -m68000
 LDFLAGS = -nostdlib -nostartfiles
 
 TARGET  = 68040.library
 
 all: $(TARGET)
 
-$(TARGET): loader_lib.o loader.o helpers.o endmodule.o
-	$(CC) $(LDFLAGS) -o $@ loader_lib.o loader.o helpers.o endmodule.o
+$(TARGET): 68040.o
+	$(CC) $(LDFLAGS) -Wl,-s -o $(TARGET) 68040.o
 
-loader_lib.o: loader_lib.s
-	$(CC) $(ASFLAGS) -c -o $@ loader_lib.s
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+cmodel: loader_lib.o loader.o endmodule.o
+	$(CC) $(LDFLAGS) -o 68040-c.library loader_lib.o loader.o endmodule.o
 
 loader.o: loader.c
 	$(CC) $(CFLAGS) -c -o $@ loader.c
 
-helpers.o: helpers.s
-	$(CC) $(ASFLAGS) -c -o $@ helpers.s
-
-endmodule.o: endmodule.s
-	$(CC) $(ASFLAGS) -c -o $@ endmodule.s
-
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o 68040-c.library $(TARGET)
 
-.PHONY: all clean
+.PHONY: all cmodel clean
