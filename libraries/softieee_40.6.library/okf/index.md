@@ -5,7 +5,7 @@ description: >-
   Byte-identical reconstruction (verbatim hunk .s + fixup.py
   RELOC32 splice).  Structure/LVO map below is auto-decoded from
   the shipped binary.
-timestamp: 2026-10-15T13:44:09.692763Z
+timestamp: 2026-10-15T13:46:58.274379Z
 ---
 
 # softieee_40.6.library

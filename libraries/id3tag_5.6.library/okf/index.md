@@ -5,7 +5,7 @@ description: >-
   Byte-identical reconstruction (verbatim hunk .s + fixup.py
   RELOC32 splice).  Structure/LVO map below is auto-decoded from
   the shipped binary.
-timestamp: 2026-10-15T13:44:07.448334Z
+timestamp: 2026-10-15T13:46:58.627617Z
 ---
 
 # id3tag_5.6.library
